@@ -1,0 +1,104 @@
+<!-- quiz-home.component.html -->
+<div class="container mx-auto p-4">
+  <h1 class="text-3xl font-bold mb-6">Available Quizzes</h1>
+
+  <!-- Filters Section -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <!-- Category Selector -->
+    <div class="p-field">
+      <label for="category" class="block mb-2">Category</label>
+      <p-dropdown
+        [options]="categories"
+        [(ngModel)]="selectedCategory"
+        (onChange)="filterQuizzes()"
+        styleClass="w-full"
+      ></p-dropdown>
+    </div>
+
+    <!-- Difficulty Filter -->
+    <div class="p-field">
+      <label for="difficulty" class="block mb-2">Difficulty</label>
+      <p-dropdown
+        [options]="difficulties"
+        [(ngModel)]="selectedDifficulty"
+        (onChange)="filterQuizzes()"
+        styleClass="w-full"
+      ></p-dropdown>
+    </div>
+
+    <!-- Time Limit Toggle -->
+    <div class="p-field flex items-end">
+      <p-checkbox
+        [(ngModel)]="showTimeLimitOnly"
+        (onChange)="filterQuizzes()"
+        inputId="timeLimit"
+        binary="true"
+      ></p-checkbox>
+      <label for="timeLimit" class="ml-2">Show timed quizzes only</label>
+    </div>
+  </div>
+
+  <!-- Quick Stats Section -->
+  <p-card class="mb-6">
+    <ng-template pTemplate="header">
+      <h2 class="text-xl font-semibold p-3">Your Quiz Stats</h2>
+    </ng-template>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+      <div>
+        <i class="pi pi-check-circle text-2xl text-green-500"></i>
+        <h3 class="text-lg">Quizzes Completed</h3>
+        <p class="text-2xl font-bold">{{ stats.quizzesCompleted }}</p>
+      </div>
+      <div>
+        <i class="pi pi-chart-bar text-2xl text-blue-500"></i>
+        <h3 class="text-lg">Average Score</h3>
+        <p class="text-2xl font-bold">{{ stats.averageScore }}%</p>
+      </div>
+      <div>
+        <i class="pi pi-trophy text-2xl text-yellow-500"></i>
+        <h3 class="text-lg">Ranking</h3>
+        <p class="text-2xl font-bold">{{ stats.ranking }}</p>
+      </div>
+    </div>
+  </p-card>
+
+  <div class="mx-20 mt-8">
+    <h2 class="text-2xl font-bold mb-4">Recommended Quizzes</h2>
+
+  
+
+    <!-- Cards View -->
+    <div  class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      @for (quiz of getRecommendedQuizzes(); track quiz.id) {
+      <p-card class="border border-slate-500 rounded-lg">
+        <ng-template #title>
+          <div class="flex justify-between items-center">
+            <span class="text-lg font-semibold">{{ quiz.title }}</span>
+            <span
+              class="text-sm px-2 py-1 rounded-full text-white"
+              [ngClass]="getDifficultyColor(quiz.difficulty)"
+            >
+              {{ quiz.difficulty }}
+            </span>
+          </div>
+        </ng-template>
+        <div class="mb-4 text-slate-400">
+          <p><i class="pi pi-tag mr-2"></i>{{ quiz.category }}</p>
+          <p><i class="pi pi-star mr-2"></i>{{ quiz.pointsToEarn }} points</p>
+          <p *ngIf="quiz.hasTimeLimit">
+            <i class="pi pi-clock mr-2"></i>Timed Quiz
+          </p>
+        </div>
+        <ng-template #footer>
+          <p-button
+            label="Start Quiz"
+            icon="pi pi-play"
+            class="p-button-success w-full"
+            (click)="startQuiz(quiz.id)"
+          ></p-button>
+        </ng-template>
+      </p-card>
+      }
+    </div>
+  </div>
+</div>

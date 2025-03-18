@@ -1,0 +1,9 @@
+.custom-menubar .p-menubar-root {
+    justify-content: space-evenly; /* Ensures even spacing */
+  }
+  
+  .custom-menubar .p-menuitem {
+    flex-grow: 1; /* Distributes items equally */
+    text-align: center; /* Centers text within items */
+  }
+  
