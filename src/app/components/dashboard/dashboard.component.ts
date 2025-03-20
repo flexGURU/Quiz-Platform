@@ -5,10 +5,19 @@ import { TableModule } from 'primeng/table';
 import { ListboxModule } from 'primeng/listbox';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [CardModule, ListboxModule, CommonModule, TableModule, IconFieldModule, InputIconModule],
+  imports: [
+    RouterLink,
+    CardModule,
+    ListboxModule,
+    CommonModule,
+    TableModule,
+    IconFieldModule,
+    InputIconModule,
+  ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css',
 })

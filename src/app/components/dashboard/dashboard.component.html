@@ -1,79 +1,90 @@
 <div class="p-2">
-    <div class="mx-20">
-        <h1 class="text-2xl font-bold mb-4">Dashboard</h1>
-      </div>
-      
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="p-4 flex items-center justify-center">
-          <p-card [style]="{ width: '25rem', overflow: 'hidden' }" class="border border-slate-500 rounded-lg">
-            <ng-template #title> Progress </ng-template>
-            <ng-template #subtitle> 50% </ng-template>
-          </p-card>
-        </div>
-      
-        <div class="p-4 flex items-center justify-center">
-          <p-card [style]="{ width: '25rem', overflow: 'hidden' }"  class="border border-slate-500 rounded-lg">
-            <ng-template #title> Upcoming Quizzes </ng-template>
-            <ng-template #subtitle> 5 </ng-template>
-          </p-card>
-        </div>
-      
-        <div class="p-4 flex items-center justify-center">
-          <p-card [style]="{ width: '25rem', overflow: 'hidden' }"  class="border border-slate-500 rounded-lg">
-            <ng-template #title> Leaderboard Position </ng-template>
-            <ng-template #subtitle> 5 </ng-template>
-          </p-card>
-        </div>
-      </div>
-      
-      <!-- Recent Quizzes -->
-      <div class="mx-20 mt-8">
-        <h2 class="text-2xl font-bold">Recent Quizzes</h2>
-        <div class="p-2 border border-slate-600 rounded-lg">
-          <p-table
-            [value]="recentQuizzes"
-            [tableStyle]="{ 'min-width': '50rem' }"
-            class=""
-          >
-            <ng-template #header>
-              <tr>
-                <th>Name</th>
-                <th>Score</th>
-                <th>Date</th>
-              </tr>
-            </ng-template>
-            <ng-template #body let-quizz class="text-slate-500">
-              <tr class="">
-                <td class="text-slate-300">{{ quizz.name }}</td>
-                <td class="text-slate-300">{{ quizz.score }}</td>
-                <td class="text-slate-300">{{ quizz.date }}</td>
-              </tr>
-            </ng-template>
-          </p-table>
-        </div>
-      </div>
-      
-      <div class="mx-20 mt-8">
-        <h2 class="text-2xl font-bold">Achievements & Badges</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
-          @for (badge of badges; track badge.name) {
-          <p-card class="border border-slate-500 rounded-lg">
-            <ng-template #title>{{ badge.name }}</ng-template>
-            <ng-template #subtitle> {{ badge.description }} </ng-template>
-            <ng-template #footer> <i [class]="badge.icon"></i></ng-template>
-          </p-card>
-          }
-        </div>
-      </div>
-      
-      <!-- Recommended Quizzes -->
-      <div class="mx-20 mt-8">
-        <h2 class="text-2xl font-bold mb-4">Recommended Quizzes</h2>
-        <p-listbox
-          [options]="recommendedQuizzes"
-          optionLabel="name"
-          class="w-1/2 md:w-3.5"
-        />
-      </div>
-      
+  <div class="mx-20">
+    <h1 class="text-2xl font-bold mb-4">Dashboard</h1>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="p-4 flex items-center justify-center">
+      <p-card
+        [style]="{ width: '25rem', overflow: 'hidden' }"
+        class="border border-green-500 rounded-lg"
+      >
+        <ng-template #title> Progress </ng-template>
+        <ng-template #subtitle> 50% </ng-template>
+      </p-card>
+    </div>
+
+    <div class="p-4 flex items-center justify-center">
+      <p-card
+        routerLink="/quiz-home"
+        [style]="{ width: '25rem', overflow: 'hidden' }"
+        class="cursor-pointer hover:scale-105 duration-300 border border-green-500 rounded-lg"
+      >
+        <ng-template #title> Upcoming Quizzes </ng-template>
+        <ng-template #subtitle> 5 </ng-template>
+      </p-card>
+    </div>
+
+    <div class="p-4 flex items-center justify-center">
+      <p-card
+        routerLink="/leaderboard"
+        [style]="{ width: '25rem', overflow: 'hidden' }"
+        class="cursor-pointer hover:scale-105 duration-300 border border-green-500 rounded-lg"
+      >
+        <ng-template #title> Leaderboard Position </ng-template>
+        <ng-template #subtitle> 5 </ng-template>
+      </p-card>
+    </div>
+  </div>
+
+  <!-- Recent Quizzes -->
+  <div class="mx-20 mt-8">
+    <h2 class="text-2xl font-bold">Recent Quizzes</h2>
+    <div class="p-2 border border-slate-600 rounded-lg">
+      <p-table
+        [value]="recentQuizzes"
+        [tableStyle]="{ 'min-width': '50rem' }"
+        class=""
+      >
+        <ng-template #header>
+          <tr>
+            <th>Name</th>
+            <th>Score</th>
+            <th>Date</th>
+          </tr>
+        </ng-template>
+        <ng-template #body let-quizz class="text-slate-500">
+          <tr class="">
+            <td class="text-slate-300">{{ quizz.name }}</td>
+            <td class="text-slate-300">{{ quizz.score }}</td>
+            <td class="text-slate-300">{{ quizz.date }}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+
+  <div class="mx-20 mt-8">
+    <h2 class="text-2xl font-bold">Achievements & Badges</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
+      @for (badge of badges; track badge.name) {
+      <p-card class="border border-green-500 rounded-lg">
+        <ng-template #title>{{ badge.name }}</ng-template>
+        <ng-template #subtitle> {{ badge.description }} </ng-template>
+        <ng-template #footer> <i [class]="badge.icon"></i></ng-template>
+      </p-card>
+      }
+    </div>
+  </div>
+
+  <!-- Recommended Quizzes -->
+  <div class="mx-20 mt-8">
+    <h2 class="text-2xl font-bold mb-4">Recommended Quizzes</h2>
+    <p-listbox
+      routerLink="/quiz-home"
+      [options]="recommendedQuizzes"
+      optionLabel="name"
+      class="w-1/2 md:w-3.5"
+    />
+  </div>
 </div>
