@@ -1,0 +1,132 @@
+<!-- forum-report.component.html -->
+<div class="container mx-auto p-4">
+  <div class="mb-4">
+    <a
+      routerLink="/forum"
+      class="text-blue-600 hover:text-blue-800 flex items-center"
+    >
+      <i class="pi pi-arrow-left mr-2"></i> Back to Forum
+    </a>
+  </div>
+
+  <h1 class="text-2xl font-bold text-gray-800 mb-2">Report Content</h1>
+  <p class="text-gray-600 mb-6">
+    Please let us know why this content should be reviewed by our moderators.
+  </p>
+
+  <p-card>
+    <form [formGroup]="reportForm" (ngSubmit)="submitReport()">
+      <div class="mb-4">
+        <h3 class="text-lg font-semibold mb-2">Content Being Reported</h3>
+        <div *ngIf="!contentLoaded" class="flex justify-center">
+          <p-progressSpinner></p-progressSpinner>
+        </div>
+        <div *ngIf="contentLoaded" class="bg-gray-50 p-4 rounded-lg">
+          <div *ngIf="contentType === 'thread'" class="border-b pb-2 mb-2">
+            <div class="font-medium">Thread: {{ contentTitle }}</div>
+            <div class="text-sm text-gray-600">By {{ contentAuthor }}</div>
+          </div>
+          <div *ngIf="contentType === 'answer'" class="border-b pb-2 mb-2">
+            <div class="font-medium">Answer in thread: {{ contentTitle }}</div>
+            <div class="text-sm text-gray-600">
+              Answer by {{ contentAuthor }}
+            </div>
+          </div>
+          <div class="text-sm mt-2 line-clamp-3">{{ contentPreview }}</div>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <label for="reason" class="block text-gray-700 font-medium mb-2"
+          >Reason for reporting</label
+        >
+        <p-dropdown
+          id="reason"
+          formControlName="reason"
+          [options]="reasonOptions"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Select a reason"
+          styleClass="w-full"
+        ></p-dropdown>
+        <small
+          *ngIf="
+            reportForm.get('reason')?.invalid &&
+            reportForm.get('reason')?.touched
+          "
+          class="text-red-500"
+        >
+          Please select a reason
+        </small>
+      </div>
+
+      <div *ngIf="reportForm.get('reason')?.value === 'other'" class="mb-4">
+        <label for="otherReason" class="block text-gray-700 font-medium mb-2"
+          >Please specify</label
+        >
+        <textarea
+          id="otherReason"
+          pInputTextarea
+          formControlName="otherReason"
+          rows="3"
+          class="w-full"
+        ></textarea>
+        <small
+          *ngIf="
+            reportForm.get('otherReason')?.invalid &&
+            reportForm.get('otherReason')?.touched
+          "
+          class="text-red-500"
+        >
+          Please provide details for your report
+        </small>
+      </div>
+
+      <div class="mb-4">
+        <label for="details" class="block text-gray-700 font-medium mb-2"
+          >Additional details (optional)</label
+        >
+        <textarea
+          id="details"
+          pInputTextarea
+          formControlName="details"
+          rows="5"
+          class="w-full"
+          placeholder="Provide any additional context that might help moderators understand the issue"
+        ></textarea>
+      </div>
+
+      <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <i class="pi pi-exclamation-triangle text-yellow-400"></i>
+          </div>
+          <div class="ml-3">
+            <p class="text-sm text-yellow-700">
+              False reports may result in penalties. Please ensure your report
+              is accurate and made in good faith.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end">
+        <p-button
+          type="button"
+          label="Cancel"
+          icon="pi pi-times"
+          styleClass="p-button-outlined p-button-secondary mr-2"
+          routerLink="/forums"
+        ></p-button>
+        <p-button
+          type="submit"
+          label="Submit Report"
+          icon="pi pi-flag"
+          [disabled]="reportForm.invalid || submitting"
+        ></p-button>
+      </div>
+    </form>
+  </p-card>
+
+  <p-toast></p-toast>
+</div>

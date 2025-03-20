@@ -1,0 +1,117 @@
+<!-- quiz-leaderboard.component.html -->
+<div class="container mx-auto p-4">
+    <h1 class="text-3xl font-bold mb-6">Leaderboard</h1>
+    
+    <!-- Filters Section -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <!-- Time Filter -->
+      <div class="p-field">
+        <label for="timeFilter" class="block mb-2">Time Period</label>
+        <p-dropdown [options]="timeFilters" [(ngModel)]="selectedTimeFilter" 
+                   (onChange)="filterLeaderboard()" styleClass="w-full"></p-dropdown>
+      </div>
+      
+      <!-- Subject Filter -->
+      <div class="p-field">
+        <label for="subjectFilter" class="block mb-2">Subject</label>
+        <p-dropdown [options]="subjectFilters" [(ngModel)]="selectedSubjectFilter" 
+                   (onChange)="filterLeaderboard()" styleClass="w-full"></p-dropdown>
+      </div>
+      
+      <!-- Search Box -->
+      <div class="p-field">
+        <label for="searchBox" class="block mb-2">Search Student</label>
+        <span class="p-input-icon-left w-full">
+          <i class="pi pi-search"></i>
+          <input type="text" pInputText placeholder="Enter student name" class="w-full">
+        </span>
+      </div>
+    </div>
+    
+    <!-- Current User Highlight -->
+    <div *ngIf="currentUserRank > 0" class="mb-6">
+      <p-card styleClass="border-2 border-green-500 shadow-lg">
+        <div class="flex items-center">
+          <div class="w-12 h-12 flex items-center justify-center rounded-full bg-green-500 text-white font-bold mr-4">
+            {{currentUserRank}}
+          </div>
+          <div class="flex-1">
+            <h3 class="text-xl font-bold">Your Ranking</h3>
+            <p>You are currently ranked #{{currentUserRank}} on the leaderboard!</p>
+          </div>
+          <div class="text-right">
+            <p class="text-2xl font-bold text-green-500">
+              {{leaderboardEntries[currentUserRank-1].totalPoints}} pts
+            </p>
+          </div>
+        </div>
+      </p-card>
+    </div>
+    
+    <!-- Leaderboard Table -->
+    <p-card styleClass="shadow-lg">
+      <p-table [value]="filteredEntries" styleClass="p-datatable-sm" [paginator]="true" [rows]="10">
+        <ng-template pTemplate="header">
+          <tr>
+            <th class="w-16">Rank</th>
+            <th>Student</th>
+            <th class="w-24 text-center">Quizzes</th>
+            <th class="w-24 text-center">Points</th>
+            <th class="w-40">Badges</th>
+            <th class="w-40">Actions</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-entry>
+          <tr [ngClass]="{'bg-blue-50': entry.isCurrentUser}">
+            <td>
+              <div class="w-8 h-8 flex items-center justify-center rounded-full text-white font-bold"
+                   [ngClass]="getBadgeClass(entry.rank)">
+                {{entry.rank}}
+              </div>
+            </td>
+            <td>
+              <div class="flex items-center">
+                <div class="w-10 h-10 rounded-full bg-gray-200 mr-3 overflow-hidden">
+                  <img [src]="entry.avatarUrl" alt="Avatar" class="w-full h-full object-cover" 
+                       onError="this.src='assets/avatars/default.png'"/>
+                </div>
+                <span class="font-medium">{{entry.studentName}}</span>
+                <i *ngIf="entry.isCurrentUser" class="pi pi-user ml-2 text-blue-500" pTooltip="This is you!"></i>
+              </div>
+            </td>
+            <td class="text-center">{{entry.quizzesCompleted}}</td>
+            <td class="text-center font-bold">{{entry.totalPoints}}</td>
+            <td>
+              <div class="flex flex-wrap gap-1">
+                <span *ngFor="let badge of entry.badges" class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                  {{badge}}
+                </span>
+              </div>
+            </td>
+            <td>
+              <p-button pButton type="button" 
+                      icon="pi pi-bolt" 
+                      label="Challenge" 
+                      class="p-button-sm p-button-rounded p-button-warning"
+                      [disabled]="entry.isCurrentUser"
+                      (click)="challengeFriend(entry.studentName)"></p-button>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </p-card>
+    
+    <!-- Invite Friends Section -->
+    <div class="mt-8 text-center">
+      <p-card styleClass="bg-blue-50 border-none shadow-md">
+        <div class="p-4">
+          <h3 class="text-xl font-bold mb-3">Invite Friends to Compete!</h3>
+          <p class="mb-4">Challenge your friends to see who can score the highest on our quizzes.</p>
+          <p-button pButton type="button" 
+                  icon="pi pi-share-alt" 
+                  label="Invite Friends" 
+                  class="p-button-primary transform hover:scale-105 transition-transform duration-300"></p-button>
+        </div>
+      </p-card>
+    </div>
+  </div>
