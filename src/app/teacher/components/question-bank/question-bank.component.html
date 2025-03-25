@@ -1,0 +1,232 @@
+<div class="grid">
+  <div class="p-2">
+    <div class="p-4">
+      <h5 class="text-2xl font-bold mb-4 tracking-wider">Create a Quiz</h5>
+
+      <!-- Action Buttons -->
+      <div class="flex gap-10">
+        <!-- <div>
+          <p-button
+            label="Add New Question"
+            icon="pi pi-plus"
+            (click)="openNewQuestionModal()"
+          ></p-button>
+        </div> -->
+
+        <div class="my-8">
+          <p-fileUpload
+            mode="basic"
+            name="questions[]"
+            accept=".xlsx,.xls"
+            chooseLabel="Import Questions from Excel"
+            [auto]="true"
+            (uploadHandler)="onFileUpload($event)"
+            [customUpload]="true"
+          ></p-fileUpload>
+        </div>
+
+        <div class="my-8">
+          <p-button
+            label="Add New Subject or Topic"
+            icon="pi pi-plus"
+            (click)="openNewQuestionModal()"
+          ></p-button>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="mb-4">
+        <div class="grid grid-cols-6 gap-4">
+          <div class="col-span-6 md:col-span-3">
+            <div class="mb-3">
+              <label class="block text-sm font-medium m-2 tracking-wider"
+                >Select Subject</label
+              >
+              <p-dropdown
+                [options]="subjects"
+                placeholder="Select Subject"
+                (onChange)="filterQuestions($event, 'subject')"
+                [showClear]="true"
+              ></p-dropdown>
+            </div>
+          </div>
+          <!-- 
+          <div class="col-span-6 md:col-span-3">
+            <div class="mb-3">
+              <label class="block text-sm font-medium mb-2">Difficulty</label>
+              <p-dropdown
+                [options]="difficultyLevels"
+                placeholder="Select Difficulty"
+                (onChange)="filterQuestions($event, 'difficulty')"
+                [showClear]="true"
+              ></p-dropdown>
+            </div>
+          </div> -->
+        </div>
+      </div>
+
+      <!-- Questions Table -->
+      <p-table
+        [value]="filteredQuestions"
+        [paginator]="true"
+        [rows]="10"
+        styleClass="p-datatable-responsive"
+        [rowHover]="true"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Question</th>
+            <th>Type</th>
+            <th>Subject</th>
+            <th>Difficulty</th>
+            <th>Points</th>
+            <th>Actions</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-question>
+          <tr>
+            <td>
+              <span class="font-medium">Question</span>
+              {{ question.text }}
+            </td>
+            <td>
+              <span class="font-medium">Type</span>
+              {{
+                question.type === "mcq"
+                  ? "Multiple Choice"
+                  : question.type === "truefalse"
+                  ? "True/False"
+                  : "Fill in the Blank"
+              }}
+            </td>
+            <td>
+              <span class="font-medium">Subject</span>
+              {{ question.subject }}
+            </td>
+            <td>
+              <span class="font-medium">Difficulty</span>
+              <p-tag
+                [severity]="
+                  question.difficulty === 'easy'
+                    ? 'success'
+                    : question.difficulty === 'medium'
+                    ? 'warn'
+                    : 'danger'
+                "
+                [value]="question.difficulty"
+              >
+              </p-tag>
+            </td>
+            <td>
+              <span class="font-medium">Points</span>
+              {{ question.pointValue }}
+            </td>
+            <td>
+              <span class="font-medium">Actions</span>
+              <button
+                pButton
+                pRipple
+                icon="pi pi-pencil"
+                class="p-button-rounded p-button-success mr-2"
+                (click)="openEditQuestionModal(question)"
+              ></button>
+              <button
+                pButton
+                pRipple
+                icon="pi pi-trash"
+                class="p-button-rounded p-button-danger"
+                (click)="deleteQuestion(question)"
+              ></button>
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="6" class="text-center">No questions found.</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</div>
+
+<!-- Add Subject Modal -->
+<p-dialog
+  [(visible)]="displayAddModal"
+  header="Add a New Subject"
+  [modal]="true"
+>
+  <ng-template pTemplate="content">
+    <form [formGroup]="subjectForm">
+      <div class="mb-4">
+        <label for="correctAnswer" class="block text-sm font-medium mb-2"
+          >Add Subject</label
+        >
+        <input
+          type="text"
+          pInputText
+          formControlName="subjectName"
+          [required]="true"
+          class="w-full p-2 border rounded"
+        />
+      </div>
+
+    </form>
+  </ng-template>
+
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      pRipple
+      label="Cancel"
+      icon="pi pi-times"
+      class="p-button-text"
+      (click)="displayAddModal = false"
+    ></button>
+    <button
+      pButton
+      pRipple
+      label="Save"
+      icon="pi pi-check"
+      class="p-button-text"
+      (click)="saveSubject()"
+    ></button>
+  </ng-template>
+</p-dialog>
+
+<!-- Edit Question Modal -->
+<p-dialog
+  [(visible)]="displayEditModal"
+  [style]="{ width: '650px' }"
+  header="Edit Question"
+  [modal]="true"
+  styleClass="p-fluid"
+>
+  <ng-template pTemplate="content">
+    <form [formGroup]="subjectForm">
+      <!-- Same content as Add Question Modal -->
+    </form>
+  </ng-template>
+
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      pRipple
+      label="Cancel"
+      icon="pi pi-times"
+      class="p-button-text"
+      (click)="displayEditModal = false"
+    ></button>
+    <button
+      pButton
+      pRipple
+      label="Save Changes"
+      icon="pi pi-check"
+      class="p-button-text"
+      (click)="saveSubject()"
+    ></button>
+  </ng-template>
+</p-dialog>
+
+<p-toast></p-toast>
+<p-confirmDialog [style]="{ width: '450px' }"></p-confirmDialog>

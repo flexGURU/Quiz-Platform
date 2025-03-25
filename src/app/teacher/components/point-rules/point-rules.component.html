@@ -1,0 +1,390 @@
+<div class="grid grid-cols-12">
+    <div class="col-span-12">
+      <div class="p-4">
+        <h5 class="text-xl font-bold mb-4">Set Point Rules</h5>
+  
+        <!-- TabView for Point Rules and Rewards -->
+        <p-tabView>
+          <!-- Point Rules Tab -->
+          <p-tabPanel header="Point Rules">
+            <!-- Action Button -->
+            <div class="flex justify-between mb-4">
+              <div>
+                <p-button
+                  label="Add New Rule"
+                  icon="pi pi-plus"
+                  (click)="openNewRuleModal()"
+                ></p-button>
+              </div>
+            </div>
+  
+            <!-- Point Rules Table -->
+            <p-table
+              [value]="pointRules"
+              styleClass="p-datatable-responsive"
+              [rowHover]="true"
+            >
+              <ng-template pTemplate="header">
+                <tr>
+                  <th>Rule Name</th>
+                  <th>Action Type</th>
+                  <th>Points</th>
+                  <th>Daily Cap</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-rule>
+                <tr>
+                  <td>
+                    <span class="font-medium">Rule Name</span>
+                    {{ rule.name }}
+                  </td>
+                  <td>
+                    <span class="font-medium">Action Type</span>
+                    {{
+                      rule.actionType === "correct_answer"
+                        ? "Correct Answer"
+                        : rule.actionType === "speed_bonus"
+                        ? "Speed Bonus"
+                        : rule.actionType === "answer_streak"
+                        ? "Answer Streak"
+                        : rule.actionType === "quiz_completion"
+                        ? "Quiz Completion"
+                        : "Daily Login"
+                    }}
+                  </td>
+                  <td>
+                    <span class="font-medium">Points</span>
+                    {{ rule.pointValue }}
+                  </td>
+                  <td>
+                    <span class="font-medium">Daily Cap</span>
+                    {{ rule.dailyCap ? rule.dailyCap : "No limit" }}
+                  </td>
+                  <td class="flex items-center border gap-2">
+                    <span class="font-medium">Status</span>
+                    <p-inputSwitch
+                      [(ngModel)]="rule.isActive"
+                      (onChange)="toggleRuleStatus(rule)"
+                    ></p-inputSwitch>
+                  </td>
+                  <td class="">
+                    <p-button
+                      pButton
+                      pRipple
+                      icon="pi pi-pencil"
+                      class="p-button-rounded p-button-success mr-2"
+                      (click)="openEditRuleModal(rule)"
+                    ></p-button>
+                    <button
+                      pButton
+                      pRipple
+                      icon="pi pi-trash"
+                      class="p-button-rounded p-button-danger"
+                      (click)="deleteRule(rule)"
+                    ></button>
+                  </td>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="emptymessage">
+                <tr>
+                  <td colspan="6" class="text-center">No point rules found.</td>
+                </tr>
+              </ng-template>
+            </p-table>
+          </p-tabPanel>
+  
+          <!-- Rewards & Badges Tab -->
+          <p-tabPanel header="Rewards & Badges">
+            <!-- Action Button -->
+            <div class="flex justify-between mb-4">
+              <div>
+                <p-button
+                  label="Add New Reward"
+                  icon="pi pi-plus"
+                  (click)="openNewRewardModal()"
+                ></p-button>
+              </div>
+            </div>
+  
+            <!-- Rewards Table -->
+            <p-table
+              [value]="rewards"
+              styleClass="p-datatable-responsive"
+              [rowHover]="true"
+            >
+              <ng-template pTemplate="header">
+                <tr>
+                  <th>Badge</th>
+                  <th>Name</th>
+                  <th>Description</th>
+                  <th>Point Threshold</th>
+                  <th>Actions</th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-reward>
+                <tr>
+                  <td style="width: 100px">
+                    <span class="font-medium">Badge</span>
+                    <div class="badge-icon">
+                      <img
+                        [src]="reward.badgeImage || 'assets/images/badge-placeholder.png'"
+                        alt="Badge"
+                        width="60"
+                        height="60"
+                      />
+                    </div>
+                  </td>
+                  <td>
+                    <span class="font-medium">Name</span>
+                    {{ reward.name }}
+                  </td>
+                  <td>
+                    <span class="font-medium">Description</span>
+                    {{ reward.description }}
+                  </td>
+                  <td>
+                    <span class="font-medium">Point Threshold</span>
+                    {{ reward.pointThreshold }} points
+                  </td>
+                  <td>
+                    <span class="font-medium">Actions</span>
+                    <button
+                      pButton
+                      pRipple
+                      icon="pi pi-pencil"
+                      class="p-button-rounded p-button-success mr-2"
+                      (click)="openEditRewardModal(reward)"
+                    ></button>
+                    <button
+                      pButton
+                      pRipple
+                      icon="pi pi-trash"
+                      class="p-button-rounded p-button-danger"
+                      (click)="deleteReward(reward)"
+                    ></button>
+                  </td>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="emptymessage">
+                <tr>
+                  <td colspan="5" class="text-center">No rewards found.</td>
+                </tr>
+              </ng-template>
+            </p-table>
+          </p-tabPanel>
+        </p-tabView>
+  
+        <!-- Save All Changes Button -->
+        <div class="flex justify-end mt-4">
+          <p-button
+            label="Save All Changes"
+            icon="pi pi-save"
+            (click)="saveAllChanges()"
+          ></p-button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Add/Edit Rule Modal -->
+  <p-dialog
+    [(visible)]="displayRuleModal"
+    [style]="{ width: '600px' }"
+    [header]="isEditingRule ? 'Edit Point Rule' : 'Add New Point Rule'"
+    [modal]="true"
+    styleClass="p-fluid"
+  >
+    <ng-template pTemplate="content">
+      <form [formGroup]="ruleForm">
+        <div class="mb-4">
+          <label for="name" class="block text-sm font-medium mb-2">Rule Name</label>
+          <input
+            id="name"
+            type="text"
+            pInputText
+            formControlName="name"
+            class="w-full p-2 border rounded"
+            [required]="true"
+          />
+        </div>
+  
+        <div class="mb-4">
+          <label for="actionType" class="block text-sm font-medium mb-2"
+            >Action Type</label
+          >
+          <p-dropdown
+            id="actionType"
+            formControlName="actionType"
+            [options]="actionTypes"
+            placeholder="Select Action Type"
+            class="w-full"
+            [required]="true"
+          ></p-dropdown>
+        </div>
+  
+        <div class="mb-4">
+          <label for="pointValue" class="block text-sm font-medium mb-2"
+            >Point Value</label
+          >
+          <p-inputNumber
+            id="pointValue"
+            formControlName="pointValue"
+            [min]="1"
+            [showButtons]="true"
+            buttonLayout="horizontal"
+            class="w-full"
+            [required]="true"
+          ></p-inputNumber>
+        </div>
+  
+        <div class="mb-4">
+          <label for="description" class="block text-sm font-medium mb-2"
+            >Description</label
+          >
+          <textarea
+            id="description"
+            pInputTextarea
+            formControlName="description"
+            [rows]="3"
+            class="w-full p-2 border rounded"
+            [required]="true"
+          ></textarea>
+        </div>
+  
+        <div class="mb-4">
+          <label for="dailyCap" class="block text-sm font-medium mb-2"
+            >Daily Point Cap (leave empty for no limit)</label
+          >
+          <p-inputNumber
+            id="dailyCap"
+            formControlName="dailyCap"
+            [min]="0"
+            [showButtons]="true"
+            buttonLayout="horizontal"
+            class="w-full"
+          ></p-inputNumber>
+        </div>
+  
+        <div class="mb-4">
+          <p-checkbox
+            formControlName="isActive"
+            [binary]="true"
+            id="isActive"
+          ></p-checkbox>
+          <label for="isActive" class="ml-2">Active</label>
+        </div>
+      </form>
+    </ng-template>
+  
+    <ng-template pTemplate="footer">
+      <button
+        pButton
+        pRipple
+        label="Cancel"
+        icon="pi pi-times"
+        class="p-button-text"
+        (click)="displayRuleModal = false"
+      ></button>
+      <button
+        pButton
+        pRipple
+        label="Save"
+        icon="pi pi-check"
+        class="p-button-text"
+        (click)="saveRule()"
+      ></button>
+    </ng-template>
+  </p-dialog>
+  
+  <!-- Add/Edit Reward Modal -->
+  <p-dialog
+    [(visible)]="displayRewardModal"
+    [style]="{ width: '600px' }"
+    [header]="isEditingReward ? 'Edit Reward' : 'Add New Reward'"
+    [modal]="true"
+    styleClass="p-fluid"
+  >
+    <ng-template pTemplate="content">
+      <form [formGroup]="rewardForm">
+        <div class="mb-4">
+          <label for="rewardName" class="block text-sm font-medium mb-2"
+            >Badge/Reward Name</label
+          >
+          <input
+            id="rewardName"
+            type="text"
+            pInputText
+            formControlName="name"
+            class="w-full p-2 border rounded"
+            [required]="true"
+          />
+        </div>
+  
+        <div class="mb-4">
+          <label for="rewardDescription" class="block text-sm font-medium mb-2"
+            >Description</label
+          >
+          <textarea
+            id="rewardDescription"
+            pInputTextarea
+            formControlName="description"
+            [rows]="3"
+            class="w-full p-2 border rounded"
+            [required]="true"
+          ></textarea>
+        </div>
+  
+        <div class="mb-4">
+          <label for="pointThreshold" class="block text-sm font-medium mb-2"
+            >Point Threshold</label
+          >
+          <p-inputNumber
+            id="pointThreshold"
+            formControlName="pointThreshold"
+            [min]="1"
+            [showButtons]="true"
+            buttonLayout="horizontal"
+            class="w-full"
+            [required]="true"
+          ></p-inputNumber>
+        </div>
+  
+        <div class="mb-4">
+          <label class="block text-sm font-medium mb-2">Badge Image</label>
+          <p-fileUpload
+            mode="basic"
+            chooseLabel="Upload Badge Image"
+            name="badgeImage[]"
+            accept="image/*"
+            maxFileSize="1000000"
+            [auto]="true"
+            chooseIcon="pi pi-upload"
+          ></p-fileUpload>
+        </div>
+      </form>
+    </ng-template>
+  
+    <ng-template pTemplate="footer">
+      <button
+        pButton
+        pRipple
+        label="Cancel"
+        icon="pi pi-times"
+        class="p-button-text"
+        (click)="displayRewardModal = false"
+      ></button>
+      <button
+        pButton
+        pRipple
+        label="Save"
+        icon="pi pi-check"
+        class="p-button-text"
+        (click)="saveReward()"
+      ></button>
+    </ng-template>
+  </p-dialog>
+  
+  <p-toast></p-toast>
+  <p-confirmDialog [style]="{ width: '450px' }"></p-confirmDialog>

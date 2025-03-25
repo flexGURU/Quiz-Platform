@@ -140,7 +140,7 @@ export class ReportComponent {
       this.submitting = false;
 
       // Navigate back after success
-      setTimeout(() => this.router.navigate(['/forums']), 2000);
+      setTimeout(() => this.router.navigate(['/students/forums']), 2000);
     }, 1500);
   }
 }

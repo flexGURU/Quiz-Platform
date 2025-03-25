@@ -16,7 +16,7 @@
 
     <div class="p-4 flex items-center justify-center">
       <p-card
-        routerLink="/quiz-home"
+        routerLink="/students/quiz-home"
         [style]="{ width: '25rem', overflow: 'hidden' }"
         class="cursor-pointer hover:scale-105 duration-300 border border-green-500 rounded-lg"
       >
@@ -27,7 +27,7 @@
 
     <div class="p-4 flex items-center justify-center">
       <p-card
-        routerLink="/leaderboard"
+        routerLink="/students/leaderboard"
         [style]="{ width: '25rem', overflow: 'hidden' }"
         class="cursor-pointer hover:scale-105 duration-300 border border-green-500 rounded-lg"
       >
@@ -81,7 +81,7 @@
   <div class="mx-20 mt-8">
     <h2 class="text-2xl font-bold mb-4">Recommended Quizzes</h2>
     <p-listbox
-      routerLink="/quiz-home"
+      routerLink="/students/quiz-home"
       [options]="recommendedQuizzes"
       optionLabel="name"
       class="w-1/2 md:w-3.5"

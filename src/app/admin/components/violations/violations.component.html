@@ -1,0 +1,256 @@
+<!-- violations-management.component.html -->
+<div class="p-6">
+  <h1 class="text-2xl font-bold mb-6">🚨 Handle Violations</h1>
+  <p class="text-gray-600 mb-6">Manages reported content and user behavior.</p>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Violation Reports List -->
+    <div class="lg:col-span-1 bg-white rounded-lg shadow-md p-4">
+      <h2 class="text-xl font-bold mb-4">Violation Reports</h2>
+
+      <div class="mb-4">
+        <div class="p-inputgroup w-full">
+          <input
+            pInputText
+            placeholder="Search reports..."
+            [(ngModel)]="reportSearchTerm"
+          />
+          <button type="button" pButton icon="pi pi-search"></button>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <p-selectButton
+          [options]="reportStatusOptions"
+          [(ngModel)]="selectedStatus"
+          optionLabel="label"
+          optionValue="value"
+        ></p-selectButton>
+      </div>
+
+      <p-table
+        [value]="reports"
+        [paginator]="true"
+        [rows]="10"
+        styleClass="p-datatable-sm"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Type</th>
+            <th>Reporter</th>
+            <th>Status</th>
+            <th>Date</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-report>
+          <tr
+            [class.bg-blue-50]="selectedReport?.id === report.id"
+            class="cursor-pointer hover:bg-gray-50"
+            (click)="selectReport(report)"
+          >
+            <td>
+              <p-tag
+                [value]="report.type"
+                [severity]="getTagSeverity(report.type)"
+              ></p-tag>
+            </td>
+            <td>{{ report.reporter }}</td>
+            <td>
+              <p-tag
+                [value]="report.status"
+                [severity]="getStatusSeverity(report.status)"
+              ></p-tag>
+            </td>
+            <td>{{ report.date | date : "short" }}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+
+    <!-- Report Details -->
+    <div
+      *ngIf="selectedReport"
+      class="lg:col-span-2 bg-white rounded-lg shadow-md p-4"
+    >
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold">Report Details</h2>
+        <div>
+          <p-tag
+            [value]="selectedReport.status"
+            [severity]="getStatusSeverity(selectedReport.status)"
+          ></p-tag>
+        </div>
+      </div>
+
+      <!-- Report Info -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div>
+          <h3 class="text-lg font-medium mb-2">Report Information</h3>
+          <div class="mb-2">
+            <span class="font-medium">Report ID:</span> {{ selectedReport.id }}
+          </div>
+          <div class="mb-2">
+            <span class="font-medium">Violation Type:</span>
+            <p-tag
+              [value]="selectedReport.type"
+              [severity]="getTagSeverity(selectedReport.type)"
+              class="ml-2"
+            ></p-tag>
+          </div>
+          <div class="mb-2">
+            <span class="font-medium">Date Reported:</span>
+            {{ selectedReport.date | date : "medium" }}
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-lg font-medium mb-2">People Involved</h3>
+          <div class="flex items-center gap-2 mb-2">
+            <span class="font-medium">Reporter:</span>
+            <div class="flex items-center gap-2">
+              <p-avatar
+                [image]="selectedReport.reporterAvatar"
+                shape="circle"
+                size="normal"
+              ></p-avatar>
+              <span>{{ selectedReport.reporter }}</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 mb-2">
+            <span class="font-medium">Reported User:</span>
+            <div class="flex items-center gap-2">
+              <p-avatar
+                [image]="selectedReport.reportedUserAvatar"
+                shape="circle"
+                size="normal"
+              ></p-avatar>
+              <span>{{ selectedReport.reportedUser }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reason -->
+      <div class="mb-6">
+        <h3 class="text-lg font-medium mb-2">Reason for Report</h3>
+        <p-card>
+          <p class="text-gray-700">{{ selectedReport.reason }}</p>
+        </p-card>
+      </div>
+
+      <!-- Evidence -->
+      <div class="mb-6">
+        <h3 class="text-lg font-medium mb-2">Evidence</h3>
+
+        <div
+          *ngIf="selectedReport.evidenceType === 'text'"
+          class="border p-4 rounded bg-gray-50"
+        >
+          <p class="text-gray-700">{{ selectedReport.evidenceText }}</p>
+        </div>
+
+        <div
+          *ngIf="selectedReport.evidenceType === 'screenshot'"
+          class="border p-2 rounded bg-gray-50"
+        >
+          <img
+            [src]="selectedReport.evidenceImage"
+            class="max-w-full h-auto rounded"
+            alt="Evidence Screenshot"
+          />
+        </div>
+      </div>
+
+      <!-- Actions Panel -->
+      <div class="mb-6">
+        <h3 class="text-lg font-medium mb-2">Actions</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block mb-2">Action Type</label>
+            <p-selectButton
+              [options]="actionOptions"
+              [(ngModel)]="selectedAction"
+              optionLabel="label"
+              optionValue="value"
+              styleClass="w-full"
+            ></p-selectButton>
+          </div>
+
+          <div *ngIf="selectedAction === 'temporarily-ban'">
+            <label class="block mb-2">Ban Duration</label>
+            <p-dropdown
+              [options]="banDurationOptions"
+              [(ngModel)]="selectedBanDuration"
+              optionLabel="label"
+              optionValue="value"
+              styleClass="w-full"
+            ></p-dropdown>
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <label class="block mb-2">Add Comment (Optional)</label>
+          <textarea
+            pInputTextarea
+            [(ngModel)]="actionComment"
+            rows="3"
+            styleClass="w-full"
+          ></textarea>
+        </div>
+      </div>
+
+      <!-- Resolution History -->
+      <div
+        *ngIf="selectedReport.history && selectedReport.history.length > 0"
+        class="mb-6"
+      >
+        <h3 class="text-lg font-medium mb-2">Resolution History</h3>
+
+        <p-timeline [value]="selectedReport.history" align="alternate">
+          <ng-template pTemplate="content" let-event>
+            <div class="text-sm">
+              <p class="font-medium mb-1">{{ event.action }}</p>
+              <p class="text-gray-600">{{ event.date | date : "medium" }}</p>
+              <p *ngIf="event.comment" class="mt-2 text-gray-700">
+                {{ event.comment }}
+              </p>
+            </div>
+          </ng-template>
+          <ng-template pTemplate="opposite" let-event>
+            <div class="text-sm">
+              <p class="font-medium">{{ event.by }}</p>
+            </div>
+          </ng-template>
+        </p-timeline>
+      </div>
+
+      <div class="flex justify-end mt-6">
+        <p-button
+          label="Cancel"
+          icon="pi pi-times"
+          styleClass="p-button-outlined mr-2"
+          (onClick)="cancelAction()"
+        ></p-button>
+        <p-button
+          label="Resolve & Close"
+          icon="pi pi-check"
+          (onClick)="resolveReport()"
+        ></p-button>
+      </div>
+    </div>
+
+    <!-- No Report Selected State -->
+    <div
+      *ngIf="!selectedReport"
+      class="lg:col-span-2 bg-white rounded-lg shadow-md p-4 flex flex-col items-center justify-center"
+      style="min-height: 400px"
+    >
+      <i class="pi pi-inbox text-gray-300 text-6xl mb-4"></i>
+      <h3 class="text-xl text-gray-500 mb-2">No Report Selected</h3>
+      <p class="text-gray-400 text-center">
+        Select a report from the list to view details and take action
+      </p>
+    </div>
+  </div>
+</div>

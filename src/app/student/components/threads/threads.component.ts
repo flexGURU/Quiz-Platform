@@ -185,13 +185,13 @@ export class ThreadsComponent {
   }
 
   reportThread() {
-    this.router.navigate(['/forum/report'], {
+    this.router.navigate(['/students/forum/report'], {
       queryParams: { threadId: this.threadId, contentType: 'thread' },
     });
   }
 
   reportAnswer(answerId: number) {
-    this.router.navigate(['/forum/report'], {
+    this.router.navigate(['/students/forum/report'], {
       queryParams: {
         threadId: this.threadId,
         answerId: answerId,

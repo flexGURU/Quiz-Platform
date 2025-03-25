@@ -1,4 +1,4 @@
-import { Quiz } from "./models/models";
+import { Quiz } from '../../shared/models';
 
 export const quiz: Quiz[] =  [
     {

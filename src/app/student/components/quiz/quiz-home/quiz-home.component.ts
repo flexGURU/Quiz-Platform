@@ -9,7 +9,7 @@ import { ListboxModule } from 'primeng/listbox';
 import { ButtonModule } from 'primeng/button';
 import { Router } from '@angular/router';
 import { quiz } from '../../../services/quiz';
-import { Quiz } from '../../../services/models/models';
+import { Quiz } from '../../../../shared/models';
 
 
 @Component({
@@ -114,6 +114,6 @@ export class QuizHomeComponent {
   startQuiz(quizId: number): void {
     console.log(`Starting quiz with ID: ${quizId}`);
     // In a real application, navigate to the quiz page with the selected quiz ID
-    this.#router.navigate(['/quiz-test'], { queryParams: { id: quizId } });
+    this.#router.navigate(['/students/quiz-test'], { queryParams: { id: quizId } });
   }
 }
