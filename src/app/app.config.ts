@@ -10,12 +10,13 @@ import {
   provideAnimations,
 } from '@angular/platform-browser/animations';
 import { provideHttpClient, withFetch } from '@angular/common/http';
-import { MessageModule } from 'primeng/message';
+import { ConfirmationService, MessageService } from 'primeng/api';
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    ConfirmationService,
+    MessageService,
     provideHttpClient(withFetch()),
-    MessageModule,
     provideHttpClient(withFetch()),
     provideAnimations(),
     BrowserAnimationsModule,

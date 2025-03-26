@@ -45,7 +45,9 @@ export interface Topic {
 }
 
 export interface QuizDB {
-  id?: string;           
-  title: string;        
-  created_at?: Date;    
+  id?: string;
+  title: string;
+  subject: string;
+  difficulty: string;
+  created_at?: Date;
 }

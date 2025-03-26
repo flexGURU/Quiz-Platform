@@ -16,8 +16,8 @@
             </div>
 
             <div>
-              <label class="block text-sm font-medium m-2 tracking-wider"
-                >Select Quiz ID or Quiz Code</label
+              <label class="block m-2 tracking-wider"
+                >Select Quiz</label
               >
               <p-dropdown
               [options]="quizList"
@@ -161,17 +161,42 @@
   [(visible)]="displayAddModal"
   header="Add a New Quizz"
   [modal]="true"
+  [style]="{ width: '35rem' }"
 >
   <ng-template pTemplate="content">
     <form [formGroup]="quizForm">
       <div class="mb-4">
-        <label for="correctAnswer" class="block text-sm font-medium mb-2"
+        <label for="correctAnswer" class="label_modal"
           >Add Quiz Name</label
         >
         <input
           type="text"
           pInputText
           formControlName="title"
+          [required]="true"
+          class="w-full p-2 border rounded"
+        />
+      </div>
+      <div class="mb-4">
+        <label for="correctAnswer" class="label_modal"
+          >Add Subject</label
+        >
+        <input
+          type="text"
+          pInputText
+          formControlName="subject"
+          [required]="true"
+          class="w-full p-2 border rounded"
+        />
+      </div>
+      <div class="mb-4">
+        <label for="correctAnswer" class="label_modal"
+          >Add Difficulty Level <span class="text-red-800"> (1-10) </span></label
+        >
+        <input
+          type="numbers"
+          pInputText
+          formControlName="difficulty"
           [required]="true"
           class="w-full p-2 border rounded"
         />

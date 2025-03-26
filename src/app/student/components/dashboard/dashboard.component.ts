@@ -1,11 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CardModule } from 'primeng/card';
 import { TableModule } from 'primeng/table';
 import { ListboxModule } from 'primeng/listbox';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { RouterLink } from '@angular/router';
+import { QuizService } from '../../services/quiz.service';
+import { QuizDB } from '../../../shared/models';
 
 @Component({
   selector: 'app-dashboard',
@@ -22,6 +24,13 @@ import { RouterLink } from '@angular/router';
   styleUrl: './dashboard.component.css',
 })
 export class DashboardComponent {
+  private supabaseService = inject(QuizService);
+  quizzList: QuizDB[] = [];
+  quizzNumber: number = 0;
+
+  ngOnInit(): void {
+    this.getQuizzes();
+  }
   recentQuizzes = [
     { name: 'Math Quiz 1', score: 85, date: 'March 12, 2025' },
     { name: 'Science Quiz 2', score: 92, date: 'March 10, 2025' },
@@ -47,10 +56,11 @@ export class DashboardComponent {
     },
   ];
 
-  // Simulated recommended quizzes
-  recommendedQuizzes = [
-    { name: 'Algebra Challenge', subject: 'Mathematics', difficulty: 'Medium' },
-    { name: 'Physics Fundamentals', subject: 'Science', difficulty: 'Hard' },
-    { name: 'World History Quiz', subject: 'History', difficulty: 'Easy' },
-  ];
+
+  getQuizzes = () => {
+    this.supabaseService.getQuizzes().subscribe((response) => {
+      this.quizzList = response;
+      this.quizzNumber = this.quizzList.length;
+    });
+  };
 }

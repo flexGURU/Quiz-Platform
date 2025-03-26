@@ -22,6 +22,7 @@ import { ConfirmationService } from 'primeng/api';
 import * as XLSX from 'xlsx';
 import { Questions, QuestionsDB, QuizDB, Topic } from '../../../shared/models';
 import { QuestionBankService } from '../../services/question-bank.service';
+import { NotificationService } from '../../../shared/services/notification.service';
 
 interface Question {
   id: number;
@@ -51,7 +52,6 @@ interface Question {
     MessagesModule,
     ConfirmDialogModule,
   ],
-  providers: [MessageService, ConfirmationService],
   templateUrl: './question-bank.component.html',
   styleUrl: './question-bank.component.css',
 })
@@ -75,19 +75,23 @@ export class QuestionBankComponent {
   });
 
   private messageService = inject(MessageService);
-  constructor(private fb: FormBuilder) {
+  constructor(
+    private fb: FormBuilder,
+    private notification: NotificationService
+  ) {
     this.initquizForm();
   }
   ngOnInit(): void {
     this.supabaseService.getQuizzes().subscribe((response) => {
-
-      this.quizList = response; 
+      this.quizList = response;
     });
   }
 
   initquizForm = () => {
     this.quizForm = this.fb.group({
       title: ['essase', Validators.required],
+      subject: ['essase', Validators.required],
+      difficulty: ['easy', Validators.required],
     });
     console.log(this.quizForm.getRawValue());
   };
@@ -107,25 +111,38 @@ export class QuestionBankComponent {
 
   saveQuiz = () => {
     if (this.quizForm.invalid) {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Please fill all required fields',
-      });
+      this.notification.showError('Error', 'Please fill in all the fields');
       return;
     }
 
     this.supabaseService.addQuiz(this.quizForm.value).subscribe({
       next: (resp) => {
-        console.log(resp);
+        if (resp && resp.length != 0) {  
+          this.notification.showSuccess(
+            'Success',
+            'Quiz added successfully!'
+          );
+          this.displayAddModal = false;
+        } else {
+          this.notification.showError(
+            'Error',
+            'Failed to add quiz. Please try again.'
+          );
+        }
       },
       error: (err) => {
         console.error('🚨 Error Adding Questions:', err.message);
+        this.notification.showError(
+          'Error',
+          `Error adding quiz: ${err.message}`
+        );
       },
       complete: () => {
-        console.log('suuccesful');
+        console.log('Request completed');
       },
     });
+
+    this.displayAddModal = false;
   };
   onFileUpload(event: any) {
     const file = event.files[0]; // Get the first uploaded file

@@ -9,8 +9,8 @@ import { ListboxModule } from 'primeng/listbox';
 import { ButtonModule } from 'primeng/button';
 import { Router } from '@angular/router';
 import { quiz } from '../../../services/quiz';
-import { Quiz } from '../../../../shared/models';
-
+import { Quiz, QuizDB } from '../../../../shared/models';
+import { QuizService } from '../../../services/quiz.service';
 
 @Component({
   selector: 'app-quiz-home',
@@ -28,8 +28,11 @@ import { Quiz } from '../../../../shared/models';
   styleUrl: './quiz-home.component.css',
 })
 export class QuizHomeComponent {
-  #router = inject(Router)
+  private router = inject(Router);
+  private supabaseService = inject(QuizService);
+
   viewMode: 'listbox' | 'cards' = 'listbox'; // Default to cards view
+  subjectList: QuizDB[] = [];
 
   quizzes: Quiz[] = [];
   filteredQuizzes: Quiz[] = [];
@@ -55,13 +58,19 @@ export class QuizHomeComponent {
     ranking: 'Gold Tier (Top 15%)',
   };
 
-
   ngOnInit(): void {
     // Mock data - in real application this would come from a service
-    this.quizzes = quiz
+    this.quizzes = quiz;
 
     this.filterQuizzes();
+    this.loadQuizzes();
   }
+
+  loadQuizzes = () => {
+    this.supabaseService.getQuizzes().subscribe((reponse) => {
+      this.subjectList = reponse;
+    });
+  };
 
   filterQuizzes(): void {
     this.filteredQuizzes = this.quizzes.filter((quiz) => {
@@ -91,10 +100,6 @@ export class QuizHomeComponent {
   }
 
   getRecommendedQuizzes(): Quiz[] {
-    console.log(
-      'Recommended Quizzes:',
-      this.filteredQuizzes.filter((quiz) => quiz.recommended)
-    );
     return this.filteredQuizzes.filter((quiz) => quiz.recommended);
   }
 
@@ -114,6 +119,8 @@ export class QuizHomeComponent {
   startQuiz(quizId: number): void {
     console.log(`Starting quiz with ID: ${quizId}`);
     // In a real application, navigate to the quiz page with the selected quiz ID
-    this.#router.navigate(['/students/quiz-test'], { queryParams: { id: quizId } });
+    this.router.navigate(['/students/quiz-test'], {
+      queryParams: { id: quizId },
+    });
   }
 }

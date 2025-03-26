@@ -6,9 +6,11 @@
   <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
     <!-- Category Selector -->
     <div class="p-field">
-      <label for="category" class="block mb-2">Category</label>
+      <label for="category" class="block mb-2">Choose Subject</label>
       <p-dropdown
-        [options]="categories"
+        placeholder="Select Subject"
+        [options]="subjectList"
+        optionLabel="subject"
         [(ngModel)]="selectedCategory"
         (onChange)="filterQuizzes()"
         styleClass="w-full"
@@ -19,15 +21,17 @@
     <div class="p-field">
       <label for="difficulty" class="block mb-2">Difficulty</label>
       <p-dropdown
-        [options]="difficulties"
-        [(ngModel)]="selectedDifficulty"
-        (onChange)="filterQuizzes()"
-        styleClass="w-full"
+      placeholder="Select Difficulty"
+      [options]="subjectList"
+      optionLabel="difficulty"
+      [(ngModel)]="selectedCategory"
+      (onChange)="filterQuizzes()"
+      styleClass="w-full"
       ></p-dropdown>
     </div>
 
     <!-- Time Limit Toggle -->
-    <div class="p-field flex items-end">
+    <!-- <div class="p-field flex items-end">
       <p-checkbox
         [(ngModel)]="showTimeLimitOnly"
         (onChange)="filterQuizzes()"
@@ -35,7 +39,7 @@
         binary="true"
       ></p-checkbox>
       <label for="timeLimit" class="ml-2">Show timed quizzes only</label>
-    </div>
+    </div> -->
   </div>
 
   <!-- Quick Stats Section -->
@@ -65,10 +69,8 @@
   <div class="mx-20 mt-8">
     <h2 class="text-2xl font-bold mb-4">Recommended Quizzes</h2>
 
-  
-
     <!-- Cards View -->
-    <div  class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
       @for (quiz of getRecommendedQuizzes(); track quiz.id) {
       <p-card class="border border-slate-500 rounded-lg">
         <ng-template #title>

@@ -83,10 +83,10 @@ export class QuestionBankService {
   //   );
   // };
 
-  addQuiz = (quizTitle: QuizDB): Observable<QuizDB[]> => {
+  addQuiz = (quiz: QuizDB): Observable<QuizDB[]> => {
     const promise = this.supabaseClient
       .from(QUIZ_TABLE)
-      .insert(quizTitle)
+      .insert(quiz)
       .select('*');
 
     return from(promise).pipe(
