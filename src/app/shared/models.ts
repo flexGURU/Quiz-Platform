@@ -17,7 +17,7 @@ interface Options {
 
 export interface QuestionsDB {
   id?: number;
-  quiz_id?: number;
+  quiz_id: string;
   question_text: string;
   question_type: string;
   options: Options;
@@ -40,7 +40,12 @@ export interface Questions {
   created_at: Date;
 }
 
-
 export interface Topic {
-  name: string
+  name: string;
+}
+
+export interface QuizDB {
+  id?: string;           
+  title: string;        
+  created_at?: Date;    
 }

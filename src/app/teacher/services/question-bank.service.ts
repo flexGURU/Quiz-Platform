@@ -2,10 +2,11 @@ import { Injectable } from '@angular/core';
 import { createClient } from '@supabase/supabase-js';
 import { environment } from '../../../environments/environment.development';
 import { from, map, Observable } from 'rxjs';
-import { Questions, QuestionsDB, Topic } from '../../shared/models';
+import { Questions, QuestionsDB, Quiz, QuizDB, Topic } from '../../shared/models';
 
 export const QUESTIONS_TABLE = 'questions';
 export const SUBJECT_TABLE = 'subjects';
+export const QUIZ_TABLE = 'quizzes';
 
 @Injectable({
   providedIn: 'root',
@@ -68,13 +69,43 @@ export class QuestionBankService {
     );
   };
 
-  getSubjects = (): Observable<Topic[]> => {
-    const promise = this.supabaseClient.from(SUBJECT_TABLE).select('*');
+  // getSubjects = (): Observable<Topic[]> => {
+  //   const promise = this.supabaseClient.from(SUBJECT_TABLE).select('*');
+
+  //   return from(promise).pipe(
+  //     map((response) => {
+  //       if (response.error) {
+  //         console.error('supabase err', response.error.message);
+  //         throw new Error(response.error.message);
+  //       }
+  //       return response.data;
+  //     })
+  //   );
+  // };
+
+  addQuiz = (quizTitle: QuizDB): Observable<QuizDB[]> => {
+    const promise = this.supabaseClient
+      .from(QUIZ_TABLE)
+      .insert(quizTitle)
+      .select('*');
 
     return from(promise).pipe(
       map((response) => {
         if (response.error) {
-          console.error('supabase err', response.error.message);
+          console.error('error fecthing quizes', response.error.message);
+        }
+        return response.data as QuizDB[];
+      })
+    );
+  };
+
+  getQuizzes = (): Observable<QuizDB[]> => {
+    const promise = this.supabaseClient.from(QUIZ_TABLE).select('*');
+
+    return from(promise).pipe(
+      map((response) => {
+        if (response.error) {
+          console.error('error getting quizzes', response.error.message);
           throw new Error(response.error.message);
         }
         return response.data;

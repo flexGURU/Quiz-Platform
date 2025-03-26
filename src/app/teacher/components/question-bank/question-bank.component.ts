@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, effect, inject, signal } from '@angular/core';
 import {
   FormGroup,
   FormBuilder,
@@ -20,7 +20,7 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { MessagesModule } from 'primeng/messages';
 import { ConfirmationService } from 'primeng/api';
 import * as XLSX from 'xlsx';
-import { Questions, QuestionsDB, Topic } from '../../../shared/models';
+import { Questions, QuestionsDB, QuizDB, Topic } from '../../../shared/models';
 import { QuestionBankService } from '../../services/question-bank.service';
 
 interface Question {
@@ -58,78 +58,55 @@ interface Question {
 export class QuestionBankComponent {
   private supabaseService = inject(QuestionBankService);
   excelData: Questions[] = [];
-  dbQuestions: QuestionsDB[] = [];
-  subjects: string[] = [];
-  questions: Question[] = [
-    {
-      id: 1,
-      text: 'What is 2 + 2?',
-      type: 'mcq',
-      options: ['2', '3', '4', '5'],
-      correctAnswer: '4',
-      difficulty: 'easy',
-      pointValue: 1,
-      subject: 'mathematics',
-    },
-    {
-      id: 2,
-      text: 'Is the sky blue?',
-      type: 'truefalse',
-      options: ['True', 'False'],
-      correctAnswer: 'True',
-      difficulty: 'easy',
-      pointValue: 1,
-      subject: 'science',
-    },
-  ];
+  dbQuestions = signal<QuestionsDB[]>([]);
+  quizList: QuizDB[] = [];
+  selectedQuiz = signal<string>('');
+  questions: Questions[] = [];
 
-  filteredQuestions: Question[] = [...this.questions];
-
-  subjectForm!: FormGroup;
+  quizForm!: FormGroup;
 
   displayAddModal: boolean = false;
   displayEditModal: boolean = false;
   selectedQuestion: Question | null = null;
   isEditing: boolean = false;
 
+  quizChangeEffect = effect(() => {
+    console.log('selected quiz', this.selectedQuiz());
+  });
+
   private messageService = inject(MessageService);
   constructor(private fb: FormBuilder) {
-    this.initSubjectForm();
+    this.initquizForm();
   }
   ngOnInit(): void {
-    this.supabaseService.getSubjects().subscribe((response) => {
-      console.log('subjects:', response);
-  
-      // Access the 'name' field from each subject
-      const subjectNames = response.map((subject: { name: string }) => subject.name);
-      console.log('Subject Names:', subjectNames);
-  
-      this.subjects = subjectNames; // Store the names if needed
+    this.supabaseService.getQuizzes().subscribe((response) => {
+
+      this.quizList = response; 
     });
   }
-  
-  initSubjectForm = () => {
-    this.subjectForm = this.fb.group({
-      subjectName: ['essase', Validators.required],
+
+  initquizForm = () => {
+    this.quizForm = this.fb.group({
+      title: ['essase', Validators.required],
     });
-    console.log(this.subjectForm.getRawValue());
+    console.log(this.quizForm.getRawValue());
   };
 
-  openNewQuestionModal() {
+  openNewQuizModal() {
     this.isEditing = false;
-    // this.subjectForm.reset({ pointValue: 1 });
+    // this.quizForm.reset({ pointValue: 1 });
     this.displayAddModal = true;
   }
 
   openEditQuestionModal(question: Question) {
     this.isEditing = true;
     this.selectedQuestion = question;
-    this.subjectForm.patchValue(question);
+    this.quizForm.patchValue(question);
     this.displayEditModal = true;
   }
 
-  saveSubject = () => {
-    if (this.subjectForm.invalid) {
+  saveQuiz = () => {
+    if (this.quizForm.invalid) {
       this.messageService.add({
         severity: 'error',
         summary: 'Error',
@@ -137,12 +114,8 @@ export class QuestionBankComponent {
       });
       return;
     }
-    const questionData: Topic = {
-      name: this.subjectForm.value.subjectName,
-    };
-    console.log(questionData);
 
-    this.supabaseService.addSubjects(questionData).subscribe({
+    this.supabaseService.addQuiz(this.quizForm.value).subscribe({
       next: (resp) => {
         console.log(resp);
       },
@@ -165,7 +138,8 @@ export class QuestionBankComponent {
         this.excelData = XLSX.utils.sheet_to_json(worksheet, { raw: true });
 
         if (this.excelData && this.excelData.length > 0) {
-          this.addQuestions(this.excelData); // ✅ Call AFTER data is ready
+          this.addQuestions(this.excelData);
+          this.getQuestions();
         } else {
           console.error('❌ No questions to add. Excel file might be empty.');
         }
@@ -176,16 +150,19 @@ export class QuestionBankComponent {
     }
   }
 
-  addQuestions = (bulkQuestions: Questions[]): void => {
+  getQuestions = () => {
     this.supabaseService.getQuestions().subscribe((resp) => {
-      console.log(resp);
+      console.log('questions:', resp);
+      this.questions = resp;
     });
-    if (!bulkQuestions || bulkQuestions.length === 0) {
-      return;
-    }
+  };
 
-    bulkQuestions.forEach((question: Questions) => {
-      const formattedQuestion: QuestionsDB = {
+  addQuestions = (bulkQuestions: Questions[]): void => {
+    if (!bulkQuestions || bulkQuestions.length === 0) return;
+
+    const formattedQuestions: QuestionsDB[] = bulkQuestions.map(
+      (question: Questions) => ({
+        quiz_id: this.selectedQuiz(),
         question_text: question.question_text,
         question_type: question.question_type.toLowerCase(),
         options: {
@@ -196,11 +173,14 @@ export class QuestionBankComponent {
         },
         correct_answer: question.correct_answer,
         points: question.points,
-      };
-      this.dbQuestions.push(formattedQuestion);
-    });
+      })
+    );
 
-    this.supabaseService.addQuestions(this.dbQuestions).subscribe({
+    this.dbQuestions.update((prev) => [...prev, ...formattedQuestions]);
+  };
+
+  createQuizz = () => {
+    this.supabaseService.addQuestions(this.dbQuestions()).subscribe({
       next: (resp) => {
         console.log('✅ Questions Added:', resp);
       },
@@ -213,29 +193,12 @@ export class QuestionBankComponent {
     });
   };
 
-  deleteQuestion(question: Question) {
-    this.questions = this.questions.filter((q) => q.id !== question.id);
-    this.filteredQuestions = [...this.questions];
-    this.messageService.add({
-      severity: 'success',
-      summary: 'Success',
-      detail: 'Question deleted',
-    });
-  }
+  deleteQuestion(question: Question) {}
 
-  filterQuestions(event: any, field: keyof Question) {
-    const value = event.value;
+  filterQuestions(event: any, field: keyof Question) {}
 
-    if (!value || value.length === 0) {
-      this.filteredQuestions = [...this.questions];
-    } else {
-      this.filteredQuestions = this.questions.filter((q) => {
-        if (Array.isArray(value)) {
-          return value.includes(q[field]);
-        } else {
-          return q[field] === value;
-        }
-      });
-    }
-  }
+  onQuizChange = (event: any) => {
+    const title = event.value;
+    this.selectedQuiz.set(title);
+  };
 }
