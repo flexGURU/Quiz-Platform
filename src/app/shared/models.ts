@@ -51,3 +51,33 @@ export interface QuizDB {
   difficulty: string;
   created_at?: Date;
 }
+
+export interface QuizTest {
+  id: string;
+  title: string;
+  questions: QuestionMinimal[];
+  timeLimit: number;
+}
+
+export interface QuestionMinimal {
+  question_text: string;
+  options: Options[];
+  correct_answer: string;
+}
+
+export interface SampleQuizQuestion {
+  id: number;
+  question_text: string;
+  options: {
+    id: string;
+    text: string;
+  }[];
+  correct_answer: string;
+}
+
+export interface SampleQuiz {
+  id: string;
+  title: string;
+  questions: SampleQuizQuestion[];
+  timeLimit: number;
+}

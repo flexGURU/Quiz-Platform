@@ -11,6 +11,7 @@ import { Router } from '@angular/router';
 import { quiz } from '../../../services/quiz';
 import { Quiz, QuizDB } from '../../../../shared/models';
 import { QuizService } from '../../../services/quiz.service';
+import { UUID } from 'crypto';
 
 @Component({
   selector: 'app-quiz-home',
@@ -33,21 +34,11 @@ export class QuizHomeComponent {
 
   viewMode: 'listbox' | 'cards' = 'listbox'; // Default to cards view
   subjectList: QuizDB[] = [];
-
+  selectedCategory = [];
   quizzes: Quiz[] = [];
   filteredQuizzes: Quiz[] = [];
 
-  categories: string[] = [
-    'All',
-    'Math',
-    'Science',
-    'History',
-    'Literature',
-    'Geography',
-  ];
-  selectedCategory: string = 'All';
-
-  difficulties: string[] = ['All', 'Easy', 'Medium', 'Hard'];
+  difficulties: string[] = ['Easy', 'Medium', 'Hard'];
   selectedDifficulty: string = 'All';
 
   showTimeLimitOnly: boolean = false;
@@ -68,36 +59,13 @@ export class QuizHomeComponent {
 
   loadQuizzes = () => {
     this.supabaseService.getQuizzes().subscribe((reponse) => {
+      console.log('quizzes', reponse);
+
       this.subjectList = reponse;
     });
   };
 
-  filterQuizzes(): void {
-    this.filteredQuizzes = this.quizzes.filter((quiz) => {
-      // Filter by category
-      if (
-        this.selectedCategory !== 'All' &&
-        quiz.category !== this.selectedCategory
-      ) {
-        return false;
-      }
-
-      // Filter by difficulty
-      if (
-        this.selectedDifficulty !== 'All' &&
-        quiz.difficulty !== this.selectedDifficulty
-      ) {
-        return false;
-      }
-
-      // Filter by time limit
-      if (this.showTimeLimitOnly && !quiz.hasTimeLimit) {
-        return false;
-      }
-
-      return true;
-    });
-  }
+  filterQuizzes(): void {}
 
   getRecommendedQuizzes(): Quiz[] {
     return this.filteredQuizzes.filter((quiz) => quiz.recommended);
@@ -116,11 +84,14 @@ export class QuizHomeComponent {
     }
   }
 
-  startQuiz(quizId: number): void {
+  startQuiz(quizId: string | undefined, quizTitle: string): void {
     console.log(`Starting quiz with ID: ${quizId}`);
     // In a real application, navigate to the quiz page with the selected quiz ID
     this.router.navigate(['/students/quiz-test'], {
-      queryParams: { id: quizId },
+      queryParams: {
+        quiz_id: quizId,
+        quiz_title: quizTitle,
+      },
     });
   }
 }
