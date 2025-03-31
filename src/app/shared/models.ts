@@ -60,13 +60,14 @@ export interface QuizTest {
 }
 
 export interface QuestionMinimal {
+  id: string;
   question_text: string;
   options: Options[];
   correct_answer: string;
 }
 
 export interface SampleQuizQuestion {
-  id: number;
+  id: string;
   question_text: string;
   options: {
     id: string;
@@ -80,4 +81,25 @@ export interface SampleQuiz {
   title: string;
   questions: SampleQuizQuestion[];
   timeLimit: number;
+}
+
+export interface QuizResult {
+  id?: string;
+  user_id: number;
+  quiz_id: string;
+  quiz_title: string;
+  total_questions: number;
+  correct_answers: number;
+  wrong_answers: number;
+  score_percentage: number;
+  question_results: QuestionResult[];
+  completed_at: string;
+}
+
+export interface QuestionResult {
+  question_id: string;
+  question_text: string;
+  user_answer: string;
+  correct_answer: string;
+  is_correct: boolean;
 }
