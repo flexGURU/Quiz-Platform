@@ -44,6 +44,8 @@ export class QuizTestComponent {
   quizTitleParam!: string;
   sampleQuiz!: SampleQuiz;
   quizResult!: QuizResult;
+  awardedPoints: number = 0;
+  quizResultId!: number;
 
   constructor(private route: ActivatedRoute, private router: Router) {}
   private supabaseClient = inject(QuizService);
@@ -60,7 +62,6 @@ export class QuizTestComponent {
 
   loadSampleQuiz = (quizID: string): void => {
     this.supabaseClient.getQuizQuestions(quizID).subscribe((response) => {
-      console.log('questions', response);
       this.sampleQuiz = {
         id: this.quizIDParam,
         title: this.quizTitleParam,
@@ -120,9 +121,7 @@ export class QuizTestComponent {
     }
   }
 
-  saveAnsEffect = effect(() => {
-    console.log('selected questions', this.userAnswers());
-  });
+  saveAnsEffect = effect(() => {});
 
   previousQuestion(): void {
     if (this.currentQuestionIndex > 0) {
@@ -145,26 +144,40 @@ export class QuizTestComponent {
     }
     this.quizSubmitted = true;
 
-    // In a real app, send answers to the backend and navigate to results page
     this.quizResult = this.gradeQuiz();
-    console.log("results of the quiz:",this.quizResult);
-    
-    this.saveQuizResults(this.quizResult);
+    console.log('quiz result', this.quizResult);
 
-    console.log('Quiz submitted', this.userAnswers);
-    // this.router.navigate(['/quiz-result']);
+    this.saveQuizResults(this.quizResult);
+   
   }
 
   saveQuizResults(result: QuizResult): void {
     this.supabaseClient.saveQuizResult(result).subscribe({
-        next: (resp) => {
-            console.log("response from obs", resp);
-        },
-        error: (err) => {
-            console.error("Error saving quiz results", err);
-        }
+      next: (resp) => {
+        console.log('response from obs', resp);
+        this.quizResultId = resp;
+        this.supabaseClient
+        .calculateQuizPoints(this.quizResult)
+        .subscribe((response) => {
+          console.log('awarded points', response);
+          this.awardedPoints = response;
+  
+          if (this.quizResultId) {
+            this.supabaseClient.awardPoints(
+              1,
+              this.quizResultId,
+              this.awardedPoints
+            );
+          } else {
+            console.log('quiz result does not have an id');
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Error saving quiz results', err);
+      },
     });
-}
+  }
 
   ngOnDestroy(): void {
     if (this.timerSubscription) {
@@ -176,8 +189,7 @@ export class QuizTestComponent {
     const questionResults: QuestionResult[] = [];
     let correctCount = 0;
     let wrongCount = 0;
-    console.log("sssss", this.sampleQuiz);
-    
+    console.log('sssss', this.sampleQuiz);
 
     // Process each question
     this.sampleQuiz.questions.forEach((question) => {

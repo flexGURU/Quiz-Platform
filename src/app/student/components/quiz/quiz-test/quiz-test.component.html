@@ -112,8 +112,8 @@
         label="View Results"
         icon="pi pi-chart-bar"
         class="p-button-success"
-        routerLink="/students/quiz-result"
-      ></p-button>
+        [routerLink]="'/students/quiz-result'" [queryParams]="{ id: quizIDParam}"
+        ></p-button>
     </div>
   </div>
 </p-dialog>

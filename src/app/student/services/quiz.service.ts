@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { environment } from '../../../environments/environment.development';
 import {
   QuestionMinimal,
+  QuestionResult,
   QuizDB,
   QuizResult,
   SampleQuizQuestion,
@@ -23,6 +24,7 @@ export const QUIZ_TABLE = 'quizzes';
 export const QUESTIONS_TABLE = 'questions';
 export const QUIZ_RESULTS_TABLE = 'quiz_results';
 export const QUIZ_QUESTIONS_RESULTS_TABLE = 'quiz_question_results';
+export const USER_POINTS_TABLE = 'user_points';
 
 @Injectable({
   providedIn: 'root',
@@ -73,9 +75,8 @@ export class QuizService {
     );
   };
 
-  saveQuizResult = (result: QuizResult): Observable<any> => {
-    console.log('saving quiz result');
-  
+  // First function: Save the main quiz result
+  saveQuizResult = (result: QuizResult): Observable<number> => {
     let resultObject = {
       user_id: result.user_id,
       quiz_id: result.quiz_id,
@@ -100,41 +101,10 @@ export class QuizService {
         }
   
         if (response.data && response.data.length > 0) {
-          const resultId = response.data[0].id;
-
-          console.log("resopnse response", response.data);
-          
-  
-          // Array of Observables for inserting question results
-          const questionResultsObservables = result.question_results.map((qResult) => {
-            let questionResult = {
-              result_id: resultId,
-              question_id: qResult.question_id,
-              question_text: qResult.question_text,
-              user_answer: qResult.user_answer,
-              correct_answer: qResult.correct_answer,
-              is_correct: qResult.is_correct,
-            };
-            console.log("questionResult", questionResult);
-            
-  
-            return from(
-              this.supabaseClient.from(QUIZ_QUESTIONS_RESULTS_TABLE).insert([questionResult]).select()
-            ).pipe(
-              tap((qResponse) => {
-                console.log("resopnse", qResponse);
-                
-                if (qResponse.error) {
-                  console.error('Problem adding quiz question results', qResponse.error);
-                } else {
-                  console.log('Successfully added question result:', qResponse.data);
-                }
-              })
-            );
-          });
-  
-          // Execute all insert operations
-          return forkJoin(questionResultsObservables);
+          const resultId = response.data[0].id;  // ✅ Extract resultId
+          return this.saveQuizQuestionResults(result.question_results, resultId).pipe(
+            map(() => resultId)  // ✅ Return only resultId
+          );
         }
   
         return of(null);
@@ -142,4 +112,97 @@ export class QuizService {
     );
   };
   
+
+  saveQuizQuestionResults = (
+    questionResults: QuestionResult[],
+    resultId: number
+  ): Observable<any> => {
+    const questionResultsObservables = questionResults.map((qResult) => {
+      let questionResult = {
+        result_id: resultId,
+        question_id: qResult.question_id,
+        question_text: qResult.question_text,
+        user_answer: qResult.user_answer,
+        correct_answer: qResult.correct_answer,
+        is_correct: qResult.is_correct,
+      };
+
+      return from(
+        this.supabaseClient
+          .from(QUIZ_QUESTIONS_RESULTS_TABLE)
+          .insert([questionResult])
+          .select()
+      ).pipe(
+        tap((qResponse) => {
+          if (qResponse.error) {
+            console.error(
+              'Problem adding quiz question results',
+              qResponse.error
+            );
+          }
+        })
+      );
+    });
+
+    return forkJoin(questionResultsObservables);
+  };
+
+  calculateQuizPoints = (quizResult: QuizResult): Observable<number> => {
+    const promise = this.supabaseClient
+      .from(QUIZ_TABLE)
+      .select('difficulty')
+      .eq('id', quizResult.quiz_id)
+      .single();
+
+    return from(promise).pipe(
+      map(({ data: quiz, error: quizError }) => {
+        if (!quiz || quizError) {
+          console.error('Error fetching difficulty', quizError);
+          return 0;
+        }
+
+        const basePoints = Math.floor(quizResult.score_percentage / 10);
+
+        const difficultyMultipliers: Record<
+          'easy' | 'medium' | 'hard',
+          number
+        > = {
+          easy: 1,
+          medium: 1.5,
+          hard: 2,
+        };
+
+        const difficulty =
+          quiz.difficulty as keyof typeof difficultyMultipliers;
+        const difficultyMultiplier = difficultyMultipliers[difficulty] || 1;
+
+        let totalPoints = Math.round(basePoints * difficultyMultiplier);
+        if (quizResult.score_percentage === 100) {
+          totalPoints += 5;
+        }
+        return totalPoints;
+      })
+    );
+  };
+
+  awardPoints = (
+    userId: number,
+    quizResultId: number,
+    points: number
+  ): void => {
+    const promise = this.supabaseClient.from(USER_POINTS_TABLE).insert([
+      {
+        user_id: userId,
+        points: points,
+        source: 'quiz',
+        source_id: quizResultId,
+        earned_at: new Date().toISOString(),
+      },
+    ]);
+
+    from(promise).subscribe({
+      next: (data) => console.log('Points awarded successfully:', data),
+      error: (error) => console.error('Error awarding points:', error),
+    });
+  };
 }
