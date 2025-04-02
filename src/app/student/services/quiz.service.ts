@@ -202,7 +202,7 @@ export class QuizService {
 
     from(promise).subscribe({
       next: (data) => console.log('Points awarded successfully:', data),
-      error: (error) => console.error('Error awarding points:', error),
+      error: (error) => console.error('Error awarding points t user:', error),
     });
   };
 }
