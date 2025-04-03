@@ -1,307 +1,190 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, inject, ViewChild } from '@angular/core';
+import {
+  FormBuilder,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { AvatarModule } from 'primeng/avatar';
 import { ButtonModule } from 'primeng/button';
-import { CardModule } from 'primeng/card';
-import { ChartModule } from 'primeng/chart';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { DialogModule } from 'primeng/dialog';
 import { DropdownModule } from 'primeng/dropdown';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { TableModule } from 'primeng/table';
-import { TabViewModule } from 'primeng/tabview';
-import { TagModule } from 'primeng/tag';
-import { ColorPickerModule } from 'primeng/colorpicker';
 import { PasswordModule } from 'primeng/password';
-import { CheckboxModule } from 'primeng/checkbox';
-import { InputNumberModule } from 'primeng/inputnumber';
-import { InputSwitchModule } from 'primeng/inputswitch';
+import { SelectModule } from 'primeng/select';
+import { Table, TableModule } from 'primeng/table';
+import { AuthService } from '../../../shared/services/auth.service';
+import { User } from '../../../shared/models';
+import { UserManagementService } from '../../services/user-management.service';
+import { response } from 'express';
 
 @Component({
   selector: 'app-operations',
   imports: [
-    TabViewModule,
-    ProgressSpinnerModule,
     ButtonModule,
-    CardModule,
-    ChartModule,
-    TagModule,
-    CommonModule,
-    FormsModule,
+    SelectModule,
+    TableModule,
     DropdownModule,
-    TableModule,
-    AvatarModule,
-    ColorPickerModule, 
+    FormsModule,
+    CommonModule,
+    DialogModule,
+    ConfirmDialogModule,
     PasswordModule,
-    CheckboxModule,
-    InputNumberModule,
-    TableModule,
-    InputSwitchModule
+    ReactiveFormsModule,
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './operations.component.html',
   styleUrl: './operations.component.css',
 })
 export class OperationsComponent {
-  cpuData: any;
-  memoryData: any;
-  chartOptions: any;
-  dbStatus = {
-    connected: true,
-    lastBackup: new Date(2025, 2, 20, 8, 30), // March 20, 2025, 8:30 AM
-    backupSize: '246.5 MB',
-  };
+  @ViewChild('dt') dt!: Table;
+  userForm: FormGroup;
+  users!: User[];
 
-  // User Management
-  users: any[] = [];
-  userSearchTerm: string = '';
-  selectedUserType: string = '';
-  userTypeOptions: any[] = [
-    { label: 'All Users', value: '' },
-    { label: 'Students', value: 'student' },
-    { label: 'Teachers', value: 'teacher' },
+  userDialog: boolean = false;
+  isNewUser: boolean = false;
+
+  dialogTitle: string = 'Add';
+
+  roleOptions = [
+    { label: 'Student', value: 'student' },
+    { label: 'Teacher', value: 'teacher' },
+    { label: 'Admin', value: 'admin' },
   ];
-  totalStudents: number = 0;
-  totalTeachers: number = 0;
-  totalActive: number = 0;
 
-  // Backup & Restore
-  backups: any[] = [];
-  backupInProgress: boolean = false;
-
-  // Settings
-  themes: any[] = [
-    { id: 'light', name: 'Light Theme', primaryColor: '#4F46E5' },
-    { id: 'dark', name: 'Dark Theme', primaryColor: '#1F2937' },
-    { id: 'colorful', name: 'Colorful', primaryColor: '#06B6D4' },
-  ];
-  selectedTheme: string = 'light';
-  customTheme = {
-    primaryColor: '#4F46E5',
-    secondaryColor: '#10B981',
-  };
-  emailSettings = {
-    smtpServer: 'smtp.example.com',
-    smtpPort: 587,
-    username: 'notifications@example.com',
-    password: '',
-    fromEmail: 'no-reply@example.com',
-    enableSSL: true,
-  };
+  supaBase = inject(AuthService);
+  userService = inject(UserManagementService);
 
   constructor(
+    private messageService: MessageService,
     private confirmationService: ConfirmationService,
-    private messageService: MessageService
-  ) {}
+    private fb: FormBuilder
+  ) {
+    this.userForm = this.fb.nonNullable.group({
+      id: [''],
+      full_name: ['', [Validators.required, Validators.minLength(3)]],
+      email: ['', [Validators.required, Validators.email]],
+      role: ['', Validators.required],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+    });
+  }
 
   ngOnInit() {
-    this.initChartData();
-    this.loadUsers();
-    this.loadBackups();
-  }
-
-  initChartData() {
-    // Generate sample CPU data
-    this.cpuData = {
-      labels: ['12 AM', '4 AM', '8 AM', '12 PM', '4 PM', '8 PM'],
-      datasets: [
-        {
-          label: 'CPU Usage',
-          data: [25, 30, 45, 65, 52, 38],
-          fill: true,
-          backgroundColor: 'rgba(79, 70, 229, 0.2)',
-          borderColor: 'rgba(79, 70, 229, 1)',
-          tension: 0.4,
-        },
-      ],
-    };
-
-    // Generate sample Memory data
-    this.memoryData = {
-      labels: ['12 AM', '4 AM', '8 AM', '12 PM', '4 PM', '8 PM'],
-      datasets: [
-        {
-          label: 'Memory Usage',
-          data: [42, 45, 60, 75, 68, 55],
-          fill: true,
-          backgroundColor: 'rgba(16, 185, 129, 0.2)',
-          borderColor: 'rgba(16, 185, 129, 1)',
-          tension: 0.4,
-        },
-      ],
-    };
-
-    this.chartOptions = {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          display: false,
-        },
-      },
-      scales: {
-        y: {
-          beginAtZero: true,
-          max: 100,
-          ticks: {
-            callback: function (value: any) {
-              return value + '%';
-            },
-          },
-        },
-      },
-    };
-  }
-
-  loadUsers() {
-    // Sample user data
-    this.users = [
-      {
-        id: 1,
-        name: 'Alice Johnson',
-        role: 'Student',
-        active: true,
-        avatar: 'https://via.placeholder.com/150',
-      },
-      {
-        id: 2,
-        name: 'Bob Smith',
-        role: 'Student',
-        active: true,
-        avatar: 'https://via.placeholder.com/150',
-      },
-      {
-        id: 3,
-        name: 'Carol Williams',
-        role: 'Teacher',
-        active: true,
-        avatar: 'https://via.placeholder.com/150',
-      },
-      {
-        id: 4,
-        name: 'David Brown',
-        role: 'Student',
-        active: false,
-        avatar: 'https://via.placeholder.com/150',
-      },
-      {
-        id: 5,
-        name: 'Eva Davis',
-        role: 'Teacher',
-        active: true,
-        avatar: 'https://via.placeholder.com/150',
-      },
-    ];
-
-    // Calculate totals
-    this.totalStudents = this.users.filter((u) => u.role === 'Student').length;
-    this.totalTeachers = this.users.filter((u) => u.role === 'Teacher').length;
-    this.totalActive = this.users.filter((u) => u.active).length;
-  }
-
-  loadBackups() {
-    // Sample backup data
-    this.backups = [
-      {
-        id: 1,
-        date: new Date(2025, 2, 20, 8, 30), // March 20, 2025, 8:30 AM
-        size: '246.5 MB',
-      },
-      {
-        id: 2,
-        date: new Date(2025, 2, 15, 9, 0), // March 15, 2025, 9:00 AM
-        size: '240.2 MB',
-      },
-      {
-        id: 3,
-        date: new Date(2025, 2, 10, 8, 45), // March 10, 2025, 8:45 AM
-        size: '235.8 MB',
-      },
-    ];
-  }
-
-  toggleUserStatus(user: any) {
-    // In a real app, call API to update user status
-    this.messageService.add({
-      severity: user.active ? 'success' : 'info',
-      summary: 'User Status Updated',
-      detail: `${user.name} has been ${
-        user.active ? 'activated' : 'deactivated'
-      }`,
+    this.userService.getUsers().subscribe((response) => {
+      this.users = response;
     });
-    this.totalActive = this.users.filter((u) => u.active).length;
+  }
+  getErrorMessage(field: string) {}
+
+  showAddUserDialog() {
+    this.isNewUser = true;
+    this.userDialog = true;
   }
 
-  createBackup() {
-    this.backupInProgress = true;
-    // Simulate backup creation
-    setTimeout(() => {
-      const newBackup = {
-        id: this.backups.length + 1,
-        date: new Date(),
-        size: '248.0 MB',
-      };
-      this.backups.unshift(newBackup);
-      this.backupInProgress = false;
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Backup Created',
-        detail: `Backup created successfully (${newBackup.size})`,
+  editUser(user: any) {
+    this.isNewUser = false;
+    this.userDialog = true;
+    this.dialogTitle = 'Edit';
+    console.log('user', user);
+
+    this.userForm.patchValue({
+      id: user.id,
+      full_name: user.full_name,
+      email: user.email,
+      role: user.role,
+    });
+    this.userForm.get('password')?.clearValidators();
+    this.userForm.get('password')?.updateValueAndValidity();
+  }
+
+  hideDialog() {
+    this.userDialog = false;
+  }
+
+  saveUser() {
+    console.log('user frm data', this.userForm.getRawValue().full_name);
+    const userForm = {
+      email: this.userForm.getRawValue().email,
+      password: this.userForm.getRawValue().password,
+      username: this.userForm.getRawValue().full_name,
+      role: this.userForm.getRawValue().role,
+    };
+    this.supaBase
+      .signUp(
+        userForm.email,
+        userForm.password,
+        userForm.username,
+        userForm.role
+      )
+      .subscribe((response) => {
+        console.log('logged i', response);
       });
-    }, 2000);
   }
 
-  downloadBackup(backup: any) {
-    // In a real app, trigger file download
-    this.messageService.add({
-      severity: 'info',
-      summary: 'Download Started',
-      detail: `Downloading backup from ${backup.date.toLocaleString()}`,
-    });
-  }
+  addUserDetails = () => {
+    if (this.isNewUser) {
+      this.saveUser();
+    } else {
+      this.updateUser();
+    }
+  };
 
-  confirmRestore(backup: any) {
+  confirmDelete(user: any) {
     this.confirmationService.confirm({
-      message: `Are you sure you want to restore the backup from ${backup.date.toLocaleString()}? This will replace all current data.`,
-      header: 'Confirm Restore',
+      message: 'Are you sure you want to delete ' + user.full_name + '?',
+      header: 'Confirm',
       icon: 'pi pi-exclamation-triangle',
-      accept: () => {
-        // Simulate restore operation
-        setTimeout(() => {
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Restore Complete',
-            detail: 'System has been restored to previous state',
-          });
-        }, 2000);
-      },
+      accept: () => {},
     });
   }
 
-  selectTheme(themeId: string) {
-    this.selectedTheme = themeId;
-    // In a real app, apply theme
+  updateUser() {
+    console.log('updating user', this.userForm.getRawValue());
+
+    const updateValue: User = {
+      email: this.userForm.getRawValue().email,
+      full_name: this.userForm.getRawValue().full_name,
+      role: this.userForm.getRawValue().role,
+    };
+
+    this.userService
+      .updateUsers(this.userForm.getRawValue().id, updateValue)
+      .subscribe((response) => {
+        console.log('updated', response);
+      });
+
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Success',
+      detail: 'Role Updated',
+      life: 3000,
+    });
   }
 
-  testEmailConnection() {
-    // Simulate email connection test
-    setTimeout(() => {
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Connection Successful',
-        detail: 'Email configuration is working correctly',
-      });
-    }, 1500);
-  }
+  resetPassword(user: any) {
+    this.confirmationService.confirm({
+      message:
+        'Are you sure you want to reset the password for ' +
+        user.full_name +
+        '?',
+      header: 'Reset Password',
+      icon: 'pi pi-question-circle',
+      accept: () => {
+        // Call API to reset password
+        // this.userService.resetPassword(user.id).subscribe(result => {
+        //   this.messageService.add({severity:'success', summary: 'Success', detail: 'Password Reset Email Sent', life: 3000});
+        // });
 
-  saveChanges() {
-    // Simulate saving configurations
-    setTimeout(() => {
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Changes Saved',
-        detail: 'Platform configurations have been updated',
-      });
-    }, 1000);
+        // Mock implementation
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'Password Reset Email Sent',
+          life: 3000,
+        });
+      },
+    });
   }
 }

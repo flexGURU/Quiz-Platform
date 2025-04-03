@@ -1,214 +1,170 @@
-<!-- platform-operations.component.html -->
-<div class="p-6">
-    <h1 class="text-2xl font-bold mb-6">⚙️ Maintain Platform Operations</h1>
-    <p class="text-gray-600 mb-6">Ensures the platform runs smoothly.</p>
-    
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <!-- System Status Dashboard -->
-      <div class="col-span-2 bg-white rounded-lg shadow-md p-4">
-        <h2 class="text-xl font-bold mb-4">System Status Dashboard</h2>
-        <p-card styleClass="mb-4">
-          <ng-template pTemplate="header">
-            <div class="p-3 bg-blue-50 text-blue-800 font-medium">Server Health</div>
-          </ng-template>
-          <div class="flex flex-wrap gap-4">
-            <div class="flex-1">
-              <p-chart type="line" [data]="cpuData" [options]="chartOptions"></p-chart>
-              <div class="text-center mt-2">CPU Usage</div>
-            </div>
-            <div class="flex-1">
-              <p-chart type="line" [data]="memoryData" [options]="chartOptions"></p-chart>
-              <div class="text-center mt-2">Memory Usage</div>
-            </div>
-          </div>
-        </p-card>
-        
-        <p-card>
-          <ng-template pTemplate="header">
-            <div class="p-3 bg-green-50 text-green-800 font-medium">Database Status</div>
-          </ng-template>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <h3 class="text-lg font-medium mb-2">Connection Status</h3>
-              <p-tag *ngIf="dbStatus.connected" severity="success" value="Connected"></p-tag>
-              <p-tag *ngIf="!dbStatus.connected" severity="danger" value="Disconnected"></p-tag>
-            </div>
-            <div>
-              <h3 class="text-lg font-medium mb-2">Last Backup</h3>
-              <div>{{dbStatus.lastBackup | date:'medium'}}</div>
-              <div class="text-sm text-gray-500">{{dbStatus.backupSize}}</div>
-            </div>
-          </div>
-        </p-card>
-      </div>
-      
-      <!-- User Management -->
-      <div class="col-span-2 md:col-span-1 bg-white rounded-lg shadow-md p-4">
-        <h2 class="text-xl font-bold mb-4">User Management</h2>
-        
-        <div class="flex justify-between mb-4">
-          <div class="p-inputgroup w-full md:w-auto">
-            <input pInputText placeholder="Search users..." [(ngModel)]="userSearchTerm" />
-            <button type="button" pButton icon="pi pi-search"></button>
-          </div>
-          <p-dropdown [options]="userTypeOptions" [(ngModel)]="selectedUserType" placeholder="Filter by role"></p-dropdown>
-        </div>
-        
-        <div class="flex gap-8 mb-4">
-          <div class="text-center">
-            <div class="text-3xl font-bold text-blue-600">{{totalStudents}}</div>
-            <div class="text-sm text-gray-600">Students</div>
-          </div>
-          <div class="text-center">
-            <div class="text-3xl font-bold text-green-600">{{totalTeachers}}</div>
-            <div class="text-sm text-gray-600">Teachers</div>
-          </div>
-          <div class="text-center">
-            <div class="text-3xl font-bold text-purple-600">{{totalActive}}</div>
-            <div class="text-sm text-gray-600">Active Users</div>
-          </div>
-        </div>
-        
-        <p-table [value]="users" [paginator]="true" [rows]="5" styleClass="p-datatable-sm">
-          <ng-template pTemplate="header">
-            <tr>
-              <th>Name</th>
-              <th>Role</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="body" let-user>
-            <tr>
-              <td>
-                <div class="flex items-center gap-2">
-                  <p-avatar [image]="user.avatar" size="normal" shape="circle"></p-avatar>
-                  <span>{{user.name}}</span>
-                </div>
-              </td>
-              <td>{{user.role}}</td>
-              <td>
-                <p-tag *ngIf="user.active" severity="success" value="Active"></p-tag>
-                <p-tag *ngIf="!user.active" severity="danger" value="Inactive"></p-tag>
-              </td>
-              <td>
-                <p-inputSwitch [(ngModel)]="user.active" (onChange)="toggleUserStatus(user)"></p-inputSwitch>
-              </td>
-            </tr>
-          </ng-template>
-        </p-table>
-      </div>
-      
-      <!-- Backup & Restore -->
-      <div class="bg-white rounded-lg shadow-md p-4">
-        <h2 class="text-xl font-bold mb-4">Backup & Restore</h2>
-        
-        <div class="mb-4">
-          <h3 class="text-lg font-medium mb-2">Create Backup</h3>
-          <div class="flex items-center gap-2">
-            <p-button label="Create New Backup" icon="pi pi-save" (onClick)="createBackup()"></p-button>
-            <p-progressSpinner *ngIf="backupInProgress" [style]="{width: '20px', height: '20px'}"></p-progressSpinner>
-          </div>
-        </div>
-        
-        <h3 class="text-lg font-medium mb-2">Recent Backups</h3>
-        <p-table [value]="backups" [paginator]="true" [rows]="3" styleClass="p-datatable-sm">
-          <ng-template pTemplate="header">
-            <tr>
-              <th>Date</th>
-              <th>Size</th>
-              <th>Actions</th>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="body" let-backup>
-            <tr>
-              <td>{{backup.date | date:'medium'}}</td>
-              <td>{{backup.size}}</td>
-              <td>
-                <div class="flex gap-2">
-                  <button pButton icon="pi pi-download" class="p-button-sm p-button-outlined" (click)="downloadBackup(backup)"></button>
-                  <button pButton icon="pi pi-refresh" class="p-button-sm p-button-outlined p-button-warning" (click)="confirmRestore(backup)"></button>
-                </div>
-              </td>
-            </tr>
-          </ng-template>
-        </p-table>
-      </div>
-      
-      <!-- Settings -->
-      <div class="bg-white rounded-lg shadow-md p-4">
-        <h2 class="text-xl font-bold mb-4">Settings</h2>
-        
-        <p-tabView>
-          <p-tabPanel header="Theme">
-            <h3 class="text-lg font-medium mb-3">Platform Theme</h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-              <div *ngFor="let theme of themes" 
-                   class="cursor-pointer p-3 border rounded-lg"
-                   [class.border-blue-500]="selectedTheme === theme.id"
-                   (click)="selectTheme(theme.id)">
-                <div class="w-full h-24 mb-2 rounded" [style.background-color]="theme.primaryColor"></div>
-                <div class="text-center font-medium">{{theme.name}}</div>
-              </div>
-            </div>
-            
-            <h3 class="text-lg font-medium mb-3">Custom Colors</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div class="mb-4">
-                <label class="block mb-2">Primary Color</label>
-                <p-colorPicker [(ngModel)]="customTheme.primaryColor" [inline]="true"></p-colorPicker>
-              </div>
-              <div class="mb-4">
-                <label class="block mb-2">Secondary Color</label>
-                <p-colorPicker [(ngModel)]="customTheme.secondaryColor" [inline]="true"></p-colorPicker>
-              </div>
-            </div>
-          </p-tabPanel>
-          
-          <p-tabPanel header="Email">
-            <h3 class="text-lg font-medium mb-3">Email Settings</h3>
-            
-            <div class="mb-4">
-              <label class="block mb-2">SMTP Server</label>
-              <input pInputText class="w-full" [(ngModel)]="emailSettings.smtpServer" />
-            </div>
-            
-            <div class="mb-4">
-              <label class="block mb-2">SMTP Port</label>
-              <p-inputNumber class="w-full" [(ngModel)]="emailSettings.smtpPort"></p-inputNumber>
-            </div>
-            
-            <div class="mb-4">
-              <label class="block mb-2">Username</label>
-              <input pInputText class="w-full" [(ngModel)]="emailSettings.username" />
-            </div>
-            
-            <div class="mb-4">
-              <label class="block mb-2">Password</label>
-              <p-password class="w-full" [(ngModel)]="emailSettings.password" [toggleMask]="true"></p-password>
-            </div>
-            
-            <div class="mb-4">
-              <label class="block mb-2">From Email</label>
-              <input pInputText class="w-full" [(ngModel)]="emailSettings.fromEmail" />
-            </div>
-            
-            <div class="mb-4">
-              <p-checkbox [(ngModel)]="emailSettings.enableSSL" [binary]="true" label="Enable SSL"></p-checkbox>
-            </div>
-            
-            <div class="mb-4">
-              <p-button label="Test Connection" icon="pi pi-check" (onClick)="testEmailConnection()"></p-button>
-            </div>
-          </p-tabPanel>
-        </p-tabView>
-      </div>
+<div class="flex justify-center">
+  <!-- HTML Template -->
+  <div class="p-8 w-11/12 flex flex-col gap-8">
+    <h2 class="mb-4 text-3xl">User Management</h2>
+
+    <!-- Add New User Button -->
+    <div class="mb-3">
+      <p-button
+        label="Add New User"
+        icon="pi pi-plus"
+        (click)="showAddUserDialog()"
+      ></p-button>
     </div>
-    
-    <div class="flex justify-end mt-6">
-      <p-button label="Save Changes" icon="pi pi-save" (onClick)="saveChanges()"></p-button>
-    </div>
+
+    <!-- User Table -->
+    <p-table
+      #dt
+      [value]="users"
+      [paginator]="true"
+      [rows]="10"
+      [rowsPerPageOptions]="[5, 10, 25]"
+      [globalFilterFields]="['full_name', 'email', 'role']"
+      styleClass="p-datatable-gridlines p-datatable-sm"
+    >
+      <ng-template pTemplate="caption">
+        <div class="p-d-flex p-jc-between p-ai-center">
+          <span class="p-input-icon-left flex gap-4 items-center">
+            <i class="pi pi-search"></i>
+            <input
+              pInputText
+              type="text"
+              (input)="dt.filterGlobal($event, 'contains')"
+              placeholder="Search..."
+              class="input"
+            />
+          </span>
+        </div>
+      </ng-template>
+
+      <ng-template pTemplate="header">
+        <tr>
+          <th pSortableColumn="full_name">
+            Name <p-sortIcon field="full_name"></p-sortIcon>
+          </th>
+          <th pSortableColumn="email">
+            Email <p-sortIcon field="email"></p-sortIcon>
+          </th>
+          <th pSortableColumn="role">
+            Role <p-sortIcon field="role"></p-sortIcon>
+          </th>
+          <th>Actions</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-user>
+        <tr>
+          <td>{{ user.full_name }}</td>
+          <td>{{ user.email }}</td>
+          <td>{{ user.role }}</td>
+          <td class="">
+            <p-button
+              icon="pi pi-pencil"
+              pTooltip="Edit User"
+              tooltipPosition="top"
+              (click)="editUser(user)"
+              styleClass="p-button-lg p-button-outlined p-button-primary mr-2"
+              class="mr-2"
+            >
+            </p-button>
+            <p-button
+              icon="pi pi-trash"
+              pTooltip="Delete User"
+              tooltipPosition="top"
+              (click)="confirmDelete(user)"
+              styleClass="p-button-lg p-button-outlined p-button-danger"
+            >
+            </p-button>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="4" class="text-center">No users found.</td>
+        </tr>
+      </ng-template>
+    </p-table>
   </div>
 
+  <!-- Add/Edit User Dialog -->
+  <p-dialog
+    [(visible)]="userDialog"
+    [style]="{ width: '450px' }"
+    header="{{ dialogTitle }} User Details"
+    [modal]="true"
+    styleClass="p-fluid"
+    [contentStyle]="{ 'max-height': '70vh', 'overflow-y': 'auto' }"
+  >
+    <ng-template pTemplate="content">
+      <form [formGroup]="userForm" class="p-3">
+        <div class="p-field mb-3">
+          <label for="name" class="block mb-1 ml-5">Name</label>
+          <input
+            type="text"
+            pInputText
+            id="name"
+            formControlName="full_name"
+            class="input w-full"
+          />
+        </div>
 
-  
+        <div class="p-field mb-3">
+          <label for="email" class="block mb-1 ml-5">Email</label>
+          <input
+            type="email"
+            pInputText
+            id="email"
+            formControlName="email"
+            class="input w-full"
+          />
+        </div>
+
+        <div class="p-field mb-3">
+          <label for="role" class="block mb-1">Role</label>
+          <p-select
+            id="role"
+            [options]="roleOptions"
+            formControlName="role"
+            placeholder="Select a Role"
+            optionLabel="label"
+            optionValue="value"
+            appendTo="body"
+            class="w-full"
+          ></p-select>
+        </div>
+
+        <div class="p-field mb-3" *ngIf="isNewUser">
+          <label for="password" class="block mb-1">Password</label>
+          <p-password
+            placeholder="At least six characters"
+            id="password"
+            formControlName="password"
+            [toggleMask]="true"
+            [feedback]="true"
+            minLength="6"
+            styleClass="w-full"
+          ></p-password>
+        </div>
+      </form>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+      <p-button
+        label="Cancel"
+        icon="pi pi-times"
+        (click)="hideDialog()"
+        styleClass="p-button-text"
+      ></p-button>
+      <p-button
+        label="Save"
+        icon="pi pi-check"
+        (click)="addUserDetails()"
+        [disabled]="userForm.invalid"
+      ></p-button>
+    </ng-template>
+  </p-dialog>
+
+  <!-- Confirmation Dialog for Delete -->
+  <p-confirmDialog [style]="{ width: '450px' }"></p-confirmDialog>
+</div>

@@ -16,6 +16,13 @@ import { ViolationsComponent } from './admin/components/violations/violations.co
 
 export const routes: Routes = [
   {
+    path: 'login',
+    loadChildren: () =>
+      import('./shared/auth/components/login/auth.routes').then(
+        (mod) => mod.loginRoutes
+      ),
+  },
+  {
     path: 'students',
     children: [
       { path: 'dashboard', component: DashboardComponent },
@@ -44,10 +51,8 @@ export const routes: Routes = [
     children: [
       { path: 'operations', component: OperationsComponent },
       { path: 'violations', component: ViolationsComponent },
-
     ],
   },
-
 
   { path: '', redirectTo: '/students/dashboard', pathMatch: 'full' },
   { path: '**', redirectTo: '/students/dashboard' },
