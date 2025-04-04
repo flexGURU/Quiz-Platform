@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import {
   AbstractControl,
   FormBuilder,
@@ -16,6 +16,10 @@ import { SelectButtonModule } from 'primeng/selectbutton';
 import { MessageModule } from 'primeng/message';
 import { MessageService } from 'primeng/api';
 import { Router } from '@angular/router';
+import { AuthService } from '../../../services/auth.service';
+import { NotificationService } from '../../../services/notification.service';
+import { ToastModule } from 'primeng/toast';
+import { ProgressSpinner } from 'primeng/progressspinner';
 
 interface LoginOption {
   label: string;
@@ -33,6 +37,8 @@ interface LoginOption {
     ButtonModule,
     MessageModule,
     ReactiveFormsModule,
+    ToastModule,
+    ProgressSpinner,
   ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
@@ -43,6 +49,9 @@ export class LoginComponent {
   loginForm: FormGroup;
   registerForm: FormGroup;
   errorMessage: string = '';
+  isLoading: boolean = false;
+
+  authService = inject(AuthService);
 
   loginOptions: LoginOption[] = [
     { label: 'Login', value: 'login' },
@@ -52,11 +61,15 @@ export class LoginComponent {
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private messageService: MessageService // Add your auth service here // private authService: AuthService
+    private messageService: MessageService,
+    private notification: NotificationService
   ) {
     this.loginForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', Validators.required],
+      email: [
+        'mukunathegreat@gmail.com',
+        [Validators.required, Validators.email],
+      ],
+      password: ['qwerty', Validators.required],
       rememberMe: [false],
     });
 
@@ -72,12 +85,7 @@ export class LoginComponent {
     );
   }
 
-  ngOnInit() {
-    // Check if user is already logged in
-    // if (this.authService.isLoggedIn()) {
-    //   this.router.navigate(['/dashboard']);
-    // }
-  }
+  ngOnInit() {}
 
   toggleMode() {
     this.isLoginMode = this.loginMode === 'login';
@@ -99,36 +107,42 @@ export class LoginComponent {
   }
 
   onLogin() {
+    this.isLoading = true;
     if (this.loginForm.invalid) {
       return;
     }
 
-    const { email, password, rememberMe } = this.loginForm.value;
+    const { email, password } = this.loginForm.getRawValue();
+    console.log(email, password);
 
-    // Here you would normally call your auth service to log in
-    // For demo purposes, we'll simulate a successful login
-    // this.authService.login(email, password, rememberMe).subscribe({
-    //   next: (response) => {
-    //     this.router.navigate(['/dashboard']);
-    //   },
-    //   error: (error) => {
-    //     this.errorMessage = 'Invalid email or password';
-    //   }
-    // });
+    this.authService.login(email, password).subscribe({
+      next: (response) => {
+        if (response.user) {
+          this.notification.showSuccess('Success', 'Logged In ');
 
-    // Mock implementation
-    if (email === 'admin@example.com' && password === 'password') {
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Success',
-        detail: 'Logged in successfully!',
-      });
-      setTimeout(() => {
-        this.router.navigate(['/admin/users']);
-      }, 1000);
-    } else {
-      this.errorMessage = 'Invalid email or password';
-    }
+          if (this.authService.hasRole('admin')) {
+            this.router.navigate(['/admin/operations']);
+          } else if (this.authService.hasRole('teacher')) {
+            this.router.navigate(['/teacher/question-bank']);
+          } else {
+            this.router.navigate(['/students/dashboard']);
+          }
+        } else {
+          this.isLoading = false;
+
+          this.notification.showError('Error', `${response.error?.message}`);
+        }
+      },
+      error: (error) => {
+        this.isLoading = false;
+
+        console.error('error logging in', error.message);
+        this.notification.showError(
+          'Error',
+          'Failed to add quiz. Please try again.'
+        );
+      },
+    });
   }
 
   onRegister() {
@@ -138,23 +152,6 @@ export class LoginComponent {
 
     const { fullName, email, password } = this.registerForm.value;
 
-    // Here you would normally call your auth service to register
-    // this.authService.register(fullName, email, password).subscribe({
-    //   next: (response) => {
-    //     this.messageService.add({
-    //       severity: 'success',
-    //       summary: 'Success',
-    //       detail: 'Account created successfully!'
-    //     });
-    //     this.loginMode = 'login';
-    //     this.isLoginMode = true;
-    //   },
-    //   error: (error) => {
-    //     this.errorMessage = error.message || 'Registration failed';
-    //   }
-    // });
-
-    // Mock implementation
     this.messageService.add({
       severity: 'success',
       summary: 'Success',

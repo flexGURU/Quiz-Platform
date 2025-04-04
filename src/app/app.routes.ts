@@ -13,6 +13,8 @@ import { PointRulesComponent } from './teacher/components/point-rules/point-rule
 import { StudentPerformanceComponent } from './teacher/components/student-performance/student-performance.component';
 import { OperationsComponent } from './admin/components/operations/operations.component';
 import { ViolationsComponent } from './admin/components/violations/violations.component';
+import { authGuard } from './shared/auth/auth.guard';
+import { roleGuard } from './shared/auth/role.guard';
 
 export const routes: Routes = [
   {
@@ -35,6 +37,8 @@ export const routes: Routes = [
       { path: 'threads', component: ThreadsComponent },
       { path: 'reports', component: ReportComponent },
     ],
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['student'] },
   },
 
   {
@@ -44,6 +48,8 @@ export const routes: Routes = [
       { path: 'point-rule', component: PointRulesComponent },
       { path: 'student-performance', component: StudentPerformanceComponent },
     ],
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['teacher'] },
   },
 
   {
@@ -52,6 +58,8 @@ export const routes: Routes = [
       { path: 'operations', component: OperationsComponent },
       { path: 'violations', component: ViolationsComponent },
     ],
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['admin'] },
   },
 
   { path: '', redirectTo: '/students/dashboard', pathMatch: 'full' },

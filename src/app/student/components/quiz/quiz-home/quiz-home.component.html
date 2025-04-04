@@ -1,5 +1,5 @@
 <!-- quiz-home.component.html -->
-<div class="container mx-auto p-4">
+<div class="p-4 bg-slate-50 dark:bg-slate-900">
   <h1 class="text-3xl font-bold mb-6">Available Quizzes</h1>
 
   <!-- Filters Section -->
@@ -29,17 +29,6 @@
         styleClass="w-full"
       ></p-dropdown>
     </div>
-
-    <!-- Time Limit Toggle -->
-    <!-- <div class="p-field flex items-end">
-      <p-checkbox
-        [(ngModel)]="showTimeLimitOnly"
-        (onChange)="filterQuizzes()"
-        inputId="timeLimit"
-        binary="true"
-      ></p-checkbox>
-      <label for="timeLimit" class="ml-2">Show timed quizzes only</label>
-    </div> -->
   </div>
 
   <!-- Quick Stats Section -->

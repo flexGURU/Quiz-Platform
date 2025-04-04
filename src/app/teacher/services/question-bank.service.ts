@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
-import { createClient } from '@supabase/supabase-js';
-import { environment } from '../../../environments/environment.development';
 import { from, map, Observable } from 'rxjs';
-import { Questions, QuestionsDB, Quiz, QuizDB, Topic } from '../../shared/models';
+import { Questions, QuestionsDB, QuizDB, Topic } from '../../shared/models';
+import { Supabase } from '../../shared/supabase/supabase.client';
 
 export const QUESTIONS_TABLE = 'questions';
 export const SUBJECT_TABLE = 'subjects';
@@ -12,10 +11,8 @@ export const QUIZ_TABLE = 'quizzes';
   providedIn: 'root',
 })
 export class QuestionBankService {
-  private supabaseClient = createClient(
-    environment.projectUrl,
-    environment.apiKey
-  );
+  private supabaseClient = Supabase;
+
 
   constructor() {}
 

@@ -35,3 +35,4 @@ body {
 .custom-password .p-inputtext {
   @apply p-2 border-2 my-2 rounded-xl border-green-500 w-full;
 }
+

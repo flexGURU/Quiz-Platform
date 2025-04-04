@@ -8,6 +8,9 @@ import { InputIconModule } from 'primeng/inputicon';
 import { RouterLink } from '@angular/router';
 import { QuizService } from '../../services/quiz.service';
 import { QuizDB } from '../../../shared/models';
+import { ButtonModule } from 'primeng/button';
+import { TagModule } from 'primeng/tag';
+import { ProgressBarModule } from 'primeng/progressbar';
 
 @Component({
   selector: 'app-dashboard',
@@ -19,6 +22,9 @@ import { QuizDB } from '../../../shared/models';
     TableModule,
     IconFieldModule,
     InputIconModule,
+    ButtonModule,
+    TagModule,
+    ProgressBarModule,
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css',
@@ -43,19 +49,27 @@ export class DashboardComponent {
       name: 'Quiz Master',
       description: 'Scored 90+ on 3 quizzes',
       icon: 'pi pi-sign-out',
+      category: 'me',
+      date: 'today',
+      earned: 'success',
     },
     {
       name: 'Speedster',
       description: 'Completed a quiz in under 2 minutes',
       icon: 'pi pi-sign-out',
+      category: 'me',
+      date: 'today',
+      earned: 'success',
     },
     {
       name: 'Consistency King',
       description: 'Completed 5 quizzes in a row',
       icon: 'pi pi-sign-out',
+      category: 'me',
+      date: 'today',
+      earned: 'success',
     },
   ];
-
 
   getQuizzes = () => {
     this.supabaseService.getQuizzes().subscribe((response) => {

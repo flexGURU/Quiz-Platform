@@ -1,24 +1,26 @@
-<!-- Login & Signup Page Template -->
+<div
+  *ngIf="isLoading"
+  class="fixed inset-0 bg-black bg-opacity-70 flex flex-col items-center justify-center"
+>
+  <p-progressSpinner
+    strokeWidth="8"
+    fill="transparent"
+    animationDuration=".5s"
+    [style]="{ width: '80px', height: '80px' }"
+  ></p-progressSpinner>
+  <span>Loading ...</span>
+</div>
+
+@if (!isLoading) {
 <div class="flex min-h-screen bg-black">
   <div
-    class="m-auto border-2 border-green-500 bg-gray-900 rounded-lg shadow-lg p-8 max-w-md w-full"
+    class="m-auto border border-green-500 bg-gray-900 rounded-lg shadow-lg p-8 max-w-md w-full"
   >
     <div class="text-center mb-8">
       <h1 class="text-3xl font-semibold mb-2 text-white">Welcome</h1>
       <p class="text-gray-300">
         {{ isLoginMode ? "Sign in to your account" : "Create a new account" }}
       </p>
-    </div>
-
-    <!-- Toggle Between Login/Register -->
-    <div class="mb-6">
-      <p-selectButton
-        [options]="loginOptions"
-        [(ngModel)]="loginMode"
-        optionLabel="label"
-        optionValue="value"
-        (onChange)="toggleMode()"
-      ></p-selectButton>
     </div>
 
     <!-- Login Form -->
@@ -89,144 +91,10 @@
         icon="pi pi-sign-in"
         styleClass="w-full"
         [style]="{ 'background-color': '#10b981', 'border-color': '#059669' }"
-        [disabled]="loginForm.invalid"
+        [disabled]="loginForm.invalid || isLoading"
       ></p-button>
     </form>
 
-    <!-- Registration Form -->
-    <form
-      *ngIf="!isLoginMode"
-      [formGroup]="registerForm"
-      (ngSubmit)="onRegister()"
-      class="space-y-5"
-    >
-      <div class="p-field">
-        <label for="register-name" class="block mb-2 font-medium text-white"
-          >Full Name</label
-        >
-        <span class="p-input-icon-left w-full">
-          <input
-            id="register-name"
-            type="text"
-            pInputText
-            formControlName="fullName"
-            class="w-full login"
-            placeholder="Enter your full name"
-          />
-        </span>
-        <small
-          *ngIf="
-            registerForm.get('fullName')?.invalid &&
-            registerForm.get('fullName')?.touched
-          "
-          class="text-red-500"
-        >
-          Full name is required
-        </small>
-      </div>
-
-      <div class="p-field">
-        <label for="register-email" class="block mb-2 font-medium text-white"
-          >Email</label
-        >
-        <span class="p-input-icon-left w-full">
-          <input
-            id="register-email"
-            type="email"
-            pInputText
-            formControlName="email"
-            class="w-full login"
-            placeholder="Enter your email"
-          />
-        </span>
-        <small
-          *ngIf="
-            registerForm.get('email')?.invalid &&
-            registerForm.get('email')?.touched
-          "
-          class="text-red-500"
-        >
-          Valid email is required
-        </small>
-      </div>
-
-      <div class="p-field">
-        <label for="register-password" class="block mb-2 font-medium text-white"
-          >Password</label
-        >
-        <p-password
-          id="register-password"
-          formControlName="password"
-          [toggleMask]="true"
-          [feedback]="true"
-          [inputStyle]="{
-            width: '100%',
-            'background-color': '#1f2937',
-            color: 'white',
-            'border-color': '#10b981'
-          }"
-          styleClass="w-full dark-password"
-          placeholder="Create a password"
-        ></p-password>
-        <small
-          *ngIf="
-            registerForm.get('password')?.invalid &&
-            registerForm.get('password')?.touched
-          "
-          class="text-red-500"
-        >
-          Password must be at least 8 characters
-        </small>
-      </div>
-
-      <div class="p-field">
-        <label
-          for="register-confirm-password"
-          class="block mb-2 font-medium text-white"
-          >Confirm Password</label
-        >
-        <p-password
-          id="register-confirm-password"
-          formControlName="confirmPassword"
-          [toggleMask]="true"
-          [feedback]="false"
-          [inputStyle]="{
-            width: '100%',
-            'background-color': '#1f2937',
-            color: 'white',
-            'border-color': '#10b981'
-          }"
-          styleClass="w-full dark-password"
-          placeholder="Confirm your password"
-        ></p-password>
-        <small
-          *ngIf="
-            registerForm.get('confirmPassword')?.invalid &&
-            registerForm.get('confirmPassword')?.touched
-          "
-          class="text-red-500"
-        >
-          Password confirmation is required
-        </small>
-        <small
-          *ngIf="registerForm.errors?.['passwordMismatch'] && registerForm.get('confirmPassword')?.touched"
-          class="text-red-500"
-        >
-          Passwords do not match
-        </small>
-      </div>
-
-      <p-button
-        type="submit"
-        label="Create Account"
-        icon="pi pi-user-plus"
-        styleClass="w-full"
-        [style]="{ 'background-color': '#10b981', 'border-color': '#059669' }"
-        [disabled]="registerForm.invalid"
-      ></p-button>
-    </form>
-
-    <!-- Error Message -->
     <p-message
       *ngIf="errorMessage"
       severity="error"
@@ -235,3 +103,5 @@
     ></p-message>
   </div>
 </div>
+}
+<p-toast></p-toast>

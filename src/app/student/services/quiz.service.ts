@@ -1,6 +1,4 @@
 import { Injectable } from '@angular/core';
-import { createClient } from '@supabase/supabase-js';
-import { environment } from '../../../environments/environment.development';
 import {
   QuestionMinimal,
   QuestionResult,
@@ -9,7 +7,6 @@ import {
   SampleQuizQuestion,
 } from '../../shared/models';
 import {
-  catchError,
   forkJoin,
   from,
   map,
@@ -19,6 +16,7 @@ import {
   tap,
   throwError,
 } from 'rxjs';
+import { Supabase } from '../../shared/supabase/supabase.client';
 
 export const QUIZ_TABLE = 'quizzes';
 export const QUESTIONS_TABLE = 'questions';
@@ -30,10 +28,8 @@ export const USER_POINTS_TABLE = 'user_points';
   providedIn: 'root',
 })
 export class QuizService {
-  private supabaseClient = createClient(
-    environment.projectUrl,
-    environment.apiKey
-  );
+  private supabaseClient = Supabase;
+
 
   getQuizzes = (): Observable<QuizDB[]> => {
     const promise = this.supabaseClient.from(QUIZ_TABLE).select('*');

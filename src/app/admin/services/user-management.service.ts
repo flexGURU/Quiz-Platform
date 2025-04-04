@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
-import { createClient } from '@supabase/supabase-js';
-import { environment } from '../../../environments/environment.development';
 import { from, map, Observable } from 'rxjs';
 import { User } from '../../shared/models';
+import { Supabase } from '../../shared/supabase/supabase.client';
 
 export const USERS_TABLE = 'users';
 
@@ -10,10 +9,7 @@ export const USERS_TABLE = 'users';
   providedIn: 'root',
 })
 export class UserManagementService {
-  private supabaseClient = createClient(
-    environment.projectUrl,
-    environment.apiKey
-  );
+  private supabaseClient = Supabase;
 
   getUsers = (): Observable<User[]> => {
     const promise = this.supabaseClient

@@ -74,7 +74,6 @@ export class QuestionBankComponent {
     console.log('selected quiz', this.selectedQuiz());
   });
 
-  private messageService = inject(MessageService);
   constructor(
     private fb: FormBuilder,
     private notification: NotificationService
@@ -131,7 +130,6 @@ export class QuestionBankComponent {
         }
       },
       error: (err) => {
-        console.error('🚨 Error Adding Questions:', err.message);
         this.notification.showError(
           'Error',
           `Error adding quiz: ${err.message}`

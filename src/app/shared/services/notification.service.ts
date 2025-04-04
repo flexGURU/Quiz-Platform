@@ -5,7 +5,6 @@ import { MessageService } from 'primeng/api';
   providedIn: 'root',
 })
 export class NotificationService {
-  // constructor(private messageService: MessageService, private ) { }
   private messageService = inject(MessageService);
 
   showSuccess(summary: string, detail: string) {
@@ -16,7 +15,6 @@ export class NotificationService {
     });
   }
 
-  // Error Notification
   showError(summary: string, detail: string) {
     this.messageService.add({
       severity: 'error',

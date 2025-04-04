@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
-import { createClient } from '@supabase/supabase-js';
-import { environment } from '../../../environments/environment.development';
 import { from, map, Observable, of, switchMap } from 'rxjs';
 import { QuestionResult, QuizResult } from '../../shared/models';
+import { Supabase } from '../../shared/supabase/supabase.client';
 
 export const QUIZ_RESULTS_TABLE = 'quiz_results';
 export const QUIZ_QUESTIONS_RESULTS_TABLE = 'quiz_question_results';
@@ -11,10 +10,8 @@ export const QUIZ_QUESTIONS_RESULTS_TABLE = 'quiz_question_results';
   providedIn: 'root',
 })
 export class GradingService {
-  private supabaseClient = createClient(
-    environment.projectUrl,
-    environment.apiKey
-  );
+  private supabaseClient = Supabase;
+
   constructor() {}
 
   getGradedQuiz = (quizId: string): Observable<QuizResult | null> => {
