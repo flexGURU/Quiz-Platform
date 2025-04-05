@@ -65,10 +65,7 @@ export class LoginComponent {
     private notification: NotificationService
   ) {
     this.loginForm = this.fb.group({
-      email: [
-        'mukunathegreat@gmail.com',
-        [Validators.required, Validators.email],
-      ],
+      email: ['stud@student.com', [Validators.required, Validators.email]],
       password: ['qwerty', Validators.required],
       rememberMe: [false],
     });
@@ -118,7 +115,6 @@ export class LoginComponent {
     this.authService.login(email, password).subscribe({
       next: (response) => {
         if (response.user) {
-          
           this.notification.showSuccess('Success', 'Logged In ');
 
           if (this.authService.hasRole('admin')) {
