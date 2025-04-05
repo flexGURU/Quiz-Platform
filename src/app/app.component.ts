@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
-import { NavComponent } from './student/components/nav/nav.component';
+import { NavComponent } from './shared/nav/nav.component';
 import { ToastModule } from 'primeng/toast';
 
 @Component({

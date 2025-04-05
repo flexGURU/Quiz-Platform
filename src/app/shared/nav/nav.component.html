@@ -1,0 +1,21 @@
+<nav class="flex items-center justify-between p-10 shadow-md">
+  <div class="flex items-center space-x-3">
+    <i class="pi pi-user text-primary text-3xl"></i>
+    <span class="text-2xl font-semibold">
+      Welcome back,
+      <span class="text-primary text-green-500 ml-3">
+        <!-- Use async pipe to get user metadata -->
+        {{ (userName$ | async)?.user_metadata?.['username'] || 'Guest' }}
+      </span>
+    </span>
+  </div>
+
+  <button
+    pButton
+    type="button"
+    label="Logout"
+    icon="pi pi-sign-out"
+    class="p-button-danger p-button-outlined"
+    (click)="logout()"
+  ></button>
+</nav>
