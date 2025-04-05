@@ -118,6 +118,7 @@ export class LoginComponent {
     this.authService.login(email, password).subscribe({
       next: (response) => {
         if (response.user) {
+          
           this.notification.showSuccess('Success', 'Logged In ');
 
           if (this.authService.hasRole('admin')) {

@@ -30,6 +30,8 @@ export class AuthService {
   private authInitializedSubject = new ReplaySubject<boolean>(1);
   public authInitialized$ = this.authInitializedSubject.asObservable();
 
+  private readonly storedUserKeyID = 'USER_ID';
+
   constructor(private router: Router) {
     this.initializeAuth();
   }
@@ -115,7 +117,7 @@ export class AuthService {
   login(
     email: string,
     password: string
-  ): Observable<{ user: User | null; error: Error | null }> {
+  ): Observable<{ user: any | null; error: any | null }> {
     return from(
       this.supabaseClient.auth.signInWithPassword({ email, password })
     ).pipe(
@@ -126,7 +128,6 @@ export class AuthService {
 
         this.handleAuthChange(data.session);
 
-        // Optional: Fetch additional user data from your users table
         return from(
           this.supabaseClient
             .from('users')
@@ -134,15 +135,27 @@ export class AuthService {
             .eq('auth_id', data.user?.id)
             .single()
         ).pipe(
-          map(() => ({ user: data.user, error: null })),
-          catchError((err) => {
-            console.error('Error fetching user data:', err);
-            return of({ user: data.user, error: err });
+          map(({ data: userData, error: userFetchError }) => {
+            if (userData) {
+              console.log('usedr', userData.id);
+              this.userId = userData.id;
+              console.log("saved user id", this.userId);
+              
+            }
+            if (userFetchError) {
+              console.error(
+                'Error fetching user from users table:',
+                userFetchError
+              );
+              return { user: null, error: userFetchError };
+            }
+
+            return { user: userData, error: null };
           })
         );
       }),
       catchError((error) => {
-        console.error('Login error:', error.message);
+        console.error('Login error:', error.message || error);
         return of({ user: null, error });
       })
     );
@@ -155,6 +168,17 @@ export class AuthService {
         this.router.navigate(['/login']);
       })
     );
+  }
+
+  private set userId(id: string) {
+    console.log('Setting userId:', id);
+    localStorage.setItem(this.storedUserKeyID, id);
+  }
+
+  get userId(): string {
+    const id = localStorage.getItem(this.storedUserKeyID) || '';
+    console.log('Getting userId:', id);
+    return id;
   }
 
   // Observables

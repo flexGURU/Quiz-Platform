@@ -19,6 +19,7 @@ import { AuthService } from '../../../shared/services/auth.service';
 import { User } from '../../../shared/models';
 import { UserManagementService } from '../../services/user-management.service';
 import { response } from 'express';
+import { NotificationService } from '../../../shared/services/notification.service';
 
 @Component({
   selector: 'app-operations',
@@ -56,6 +57,7 @@ export class OperationsComponent {
 
   supaBase = inject(AuthService);
   userService = inject(UserManagementService);
+  notification = inject(NotificationService);
 
   constructor(
     private messageService: MessageService,
@@ -67,7 +69,7 @@ export class OperationsComponent {
       full_name: ['', [Validators.required, Validators.minLength(3)]],
       email: ['', [Validators.required, Validators.email]],
       role: ['', Validators.required],
-      password: ['', [Validators.required, Validators.minLength(6)]],
+      password: ['qwerty', [Validators.required, Validators.minLength(6)]],
     });
   }
 
@@ -104,13 +106,25 @@ export class OperationsComponent {
   }
 
   saveUser() {
-    console.log('user frm data', this.userForm.getRawValue().full_name);
+    const userFormValues = this.userForm.getRawValue();
+
+    if (!this.userForm.valid) {
+      this.notification.showError(
+        'Form Error',
+        'Please fill all required fields correctly.'
+      );
+      return;
+    }
+
+    console.log('User form data:', userFormValues.full_name);
+
     const userForm = {
-      email: this.userForm.getRawValue().email,
-      password: this.userForm.getRawValue().password,
-      username: this.userForm.getRawValue().full_name,
-      role: this.userForm.getRawValue().role,
+      email: userFormValues.email,
+      password: userFormValues.password,
+      username: userFormValues.full_name,
+      role: userFormValues.role,
     };
+
     this.supaBase
       .signUp(
         userForm.email,
@@ -118,8 +132,21 @@ export class OperationsComponent {
         userForm.username,
         userForm.role
       )
-      .subscribe((response) => {
-        console.log('logged i', response);
+      .subscribe({
+        next: (response) => {
+          if (response.data.user) {
+            this.notification.showSuccess('User', 'Added Successfully');
+            this.userDialog = false;
+          } else {
+            this.notification.showError(
+              'User',
+              `Email of ${response.error.message}`
+            );
+          }
+        },
+        error: (err) => {
+          this.notification.showError('User', err.message);
+        },
       });
   }
 

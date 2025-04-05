@@ -11,6 +11,7 @@ import { QuizDB } from '../../../shared/models';
 import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import { ProgressBarModule } from 'primeng/progressbar';
+import { AuthService } from '../../../shared/services/auth.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -30,12 +31,20 @@ import { ProgressBarModule } from 'primeng/progressbar';
   styleUrl: './dashboard.component.css',
 })
 export class DashboardComponent {
-  private supabaseService = inject(QuizService);
+  private quizService = inject(QuizService);
+  private authService = inject(AuthService);
   quizzList: QuizDB[] = [];
   quizzNumber: number = 0;
+  userID!: string;
 
   ngOnInit(): void {
     this.getQuizzes();
+    this.authService.currentUser$.subscribe((response) => {
+      console.log('current user', response);
+    });
+    this.userID = this.authService.userId;
+    this.recentQuizzesCount()
+    this.completedQuizzesCount()
   }
   recentQuizzes = [
     { name: 'Math Quiz 1', score: 85, date: 'March 12, 2025' },
@@ -72,9 +81,33 @@ export class DashboardComponent {
   ];
 
   getQuizzes = () => {
-    this.supabaseService.getQuizzes().subscribe((response) => {
+    this.quizService.getQuizzes().subscribe((response) => {
       this.quizzList = response;
       this.quizzNumber = this.quizzList.length;
+    });
+  };
+
+  upcomingQuizzes = () => {
+    this.quizService.getUpcomingQuizzes(this.userID).subscribe((response) => {
+      console.log('upcomi quizzes', response);
+    });
+  };
+
+  recentQuizzesapi = () => {
+    this.quizService.getRecentQuizzes(this.userID).subscribe((response) => {
+      console.log('rcent quizzes', response);
+    });
+  };
+
+  recentQuizzesCount = () => {
+    this.quizService.getUpcomingQuizzesCount(this.userID).subscribe((response) => {
+      console.log('rcent quizzes', response);
+    });
+  };
+
+  completedQuizzesCount = () => {
+    this.quizService.getCompletedQuizzesCount(this.userID).subscribe((response) => {
+      console.log('comploted quizzes', response);
     });
   };
 }

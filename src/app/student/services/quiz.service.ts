@@ -7,6 +7,7 @@ import {
   SampleQuizQuestion,
 } from '../../shared/models';
 import {
+  catchError,
   forkJoin,
   from,
   map,
@@ -203,7 +204,70 @@ export class QuizService {
     });
   };
 
-  getQuizByUser = (userid: string) => {
-    
-  };
+  getQuizByUser = (userid: string) => {};
+
+  getUpcomingQuizzes(userId: string): Observable<any[]> {
+    return from(
+      this.supabaseClient.rpc('get_upcoming_quizzes', { p_user_id: userId })
+    ).pipe(
+      map(({ data, error }) => {
+        if (error) throw error;
+        return data;
+      }),
+      catchError((error) => {
+        console.error('Error fetching upcoming quizzes:', error);
+        return of([]);
+      })
+    );
+  }
+
+  // Get recent quizzes using SQL function
+  getRecentQuizzes(userId: string): Observable<any[]> {
+    return from(
+      this.supabaseClient.rpc('get_recent_quizzes', { user_id: userId })
+    ).pipe(
+      map(({ data, error }) => {
+        if (error) throw error;
+        return data;
+      }),
+      catchError((error) => {
+        console.error('Error fetching recent quizzes:', error);
+        return of([]);
+      })
+    );
+  }
+
+  // Get upcoming quizzes count using SQL function
+  getUpcomingQuizzesCount(userId: string): Observable<number> {
+    return from(
+      this.supabaseClient.rpc('get_upcoming_quizzes_count', {
+        p_user_id: userId,
+      })
+    ).pipe(
+      map(({ data, error }) => {
+        if (error) throw error;
+        return data;
+      }),
+      catchError((error) => {
+        console.error('Error fetching upcoming quizzes count:', error);
+        return of(0);
+      })
+    );
+  }
+
+  // In your quiz.service.ts
+  getCompletedQuizzesCount(userId: string): Observable<number> {
+    return from(
+      this.supabaseClient.rpc('get_completed_quizzes_count', { p_user_id: userId })
+    ).pipe(
+      map(({ data, error }) => {
+        if (error) throw error;
+        return data;
+      }),
+      catchError((error) => {
+        console.error('Error fetching completed quizzes count:', error);
+        return of(0);
+      })
+    );
+  }
 }

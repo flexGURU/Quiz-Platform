@@ -195,7 +195,9 @@ export class QuestionBankComponent {
   createQuizz = () => {
     this.supabaseService.addQuestions(this.dbQuestions()).subscribe({
       next: (resp) => {
+        this.notification.showSuccess('Quiz', 'Quiz added successfully!');
         console.log('✅ Questions Added:', resp);
+        this.dbQuestions.set([]);
       },
       error: (err) => {
         console.error('🚨 Error Adding Questions:', err.message);

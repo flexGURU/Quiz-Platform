@@ -16,6 +16,7 @@ import {
   SampleQuiz,
   SampleQuizQuestion,
 } from '../../../../shared/models';
+import { AuthService } from '../../../../shared/services/auth.service';
 
 @Component({
   selector: 'app-quiz-test',
@@ -49,6 +50,8 @@ export class QuizTestComponent {
 
   constructor(private route: ActivatedRoute, private router: Router) {}
   private supabaseClient = inject(QuizService);
+  private authService = inject(AuthService);
+  userId!: string;
 
   ngOnInit(): void {
     this.route.queryParams.subscribe((value) => {
@@ -58,6 +61,8 @@ export class QuizTestComponent {
       this.quizTitleParam = value['quiz_title'];
     });
     this.loadSampleQuiz(this.quizIDParam);
+
+    this.userId = this.authService.userId;
   }
 
   loadSampleQuiz = (quizID: string): void => {
@@ -148,7 +153,6 @@ export class QuizTestComponent {
     console.log('quiz result', this.quizResult);
 
     this.saveQuizResults(this.quizResult);
-   
   }
 
   saveQuizResults(result: QuizResult): void {
@@ -157,21 +161,21 @@ export class QuizTestComponent {
         console.log('response from obs', resp);
         this.quizResultId = resp;
         this.supabaseClient
-        .calculateQuizPoints(this.quizResult)
-        .subscribe((response) => {
-          console.log('awarded points', response);
-          this.awardedPoints = response;
-  
-          if (this.quizResultId) {
-            this.supabaseClient.awardPoints(
-              '1be2721b-c8cf-4dd1-bccb-3c7b278959cc',
-              this.quizResultId,
-              this.awardedPoints
-            );
-          } else {
-            console.log('quiz result does not have an id');
-          }
-        });
+          .calculateQuizPoints(this.quizResult)
+          .subscribe((response) => {
+            console.log('awarded points', response);
+            this.awardedPoints = response;
+
+            if (this.quizResultId) {
+              this.supabaseClient.awardPoints(
+                '1be2721b-c8cf-4dd1-bccb-3c7b278959cc',
+                this.quizResultId,
+                this.awardedPoints
+              );
+            } else {
+              console.log('quiz result does not have an id');
+            }
+          });
       },
       error: (err) => {
         console.error('Error saving quiz results', err);
@@ -218,10 +222,9 @@ export class QuizTestComponent {
         : 0;
 
     // Get current user ID - in a real app, you would get this from your auth service
-    const userId = "1be2721b-c8cf-4dd1-bccb-3c7b278959cc"; // Replace with actual user ID
 
     return {
-      user_id: userId,
+      user_id: this.userId,
       quiz_id: this.sampleQuiz.id,
       quiz_title: this.sampleQuiz.title,
       total_questions: totalQuestions,
