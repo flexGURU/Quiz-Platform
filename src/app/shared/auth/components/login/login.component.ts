@@ -20,6 +20,7 @@ import { AuthService } from '../../../services/auth.service';
 import { NotificationService } from '../../../services/notification.service';
 import { ToastModule } from 'primeng/toast';
 import { ProgressSpinner } from 'primeng/progressspinner';
+import { SpinnerComponent } from '../../../components/spinner/spinner.component';
 
 interface LoginOption {
   label: string;
@@ -38,7 +39,7 @@ interface LoginOption {
     MessageModule,
     ReactiveFormsModule,
     ToastModule,
-    ProgressSpinner,
+    SpinnerComponent,
   ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
