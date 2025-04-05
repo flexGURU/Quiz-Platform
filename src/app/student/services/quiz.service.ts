@@ -30,7 +30,6 @@ export const USER_POINTS_TABLE = 'user_points';
 export class QuizService {
   private supabaseClient = Supabase;
 
-
   getQuizzes = (): Observable<QuizDB[]> => {
     const promise = this.supabaseClient.from(QUIZ_TABLE).select('*');
 
@@ -83,31 +82,33 @@ export class QuizService {
       score_percentage: result.score_percentage,
       completed_at: result.completed_at,
     };
-  
+
     const promise = this.supabaseClient
       .from(QUIZ_RESULTS_TABLE)
       .insert([resultObject])
       .select();
-  
+
     return from(promise).pipe(
       switchMap((response) => {
         if (response.error) {
           console.error('Problem adding quiz results', response.error);
           return throwError(() => response.error);
         }
-  
+
         if (response.data && response.data.length > 0) {
-          const resultId = response.data[0].id;  // ✅ Extract resultId
-          return this.saveQuizQuestionResults(result.question_results, resultId).pipe(
-            map(() => resultId)  // ✅ Return only resultId
+          const resultId = response.data[0].id; // ✅ Extract resultId
+          return this.saveQuizQuestionResults(
+            result.question_results,
+            resultId
+          ).pipe(
+            map(() => resultId) // ✅ Return only resultId
           );
         }
-  
+
         return of(null);
       })
     );
   };
-  
 
   saveQuizQuestionResults = (
     questionResults: QuestionResult[],
@@ -182,7 +183,7 @@ export class QuizService {
   };
 
   awardPoints = (
-    userId: number,
+    userId: string,
     quizResultId: number,
     points: number
   ): void => {
@@ -200,5 +201,9 @@ export class QuizService {
       next: (data) => console.log('Points awarded successfully:', data),
       error: (error) => console.error('Error awarding points t user:', error),
     });
+  };
+
+  getQuizByUser = (userid: string) => {
+    
   };
 }

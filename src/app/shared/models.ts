@@ -85,7 +85,7 @@ export interface SampleQuiz {
 
 export interface QuizResult {
   id?: string;
-  user_id?: number;
+  user_id?: string;
   quiz_id: string;
   quiz_title: string;
   total_questions: number;

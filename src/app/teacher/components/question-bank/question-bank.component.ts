@@ -88,9 +88,9 @@ export class QuestionBankComponent {
 
   initquizForm = () => {
     this.quizForm = this.fb.group({
-      title: ['essase', Validators.required],
-      subject: ['essase', Validators.required],
-      difficulty: ['easy', Validators.required],
+      title: ['', Validators.required],
+      subject: ['', Validators.required],
+      difficulty: ['', Validators.required],
     });
     console.log(this.quizForm.getRawValue());
   };
@@ -116,11 +116,9 @@ export class QuestionBankComponent {
 
     this.supabaseService.addQuiz(this.quizForm.value).subscribe({
       next: (resp) => {
-        if (resp && resp.length != 0) {  
-          this.notification.showSuccess(
-            'Success',
-            'Quiz added successfully!'
-          );
+        if (resp && resp.length != 0) {
+          this.notification.showSuccess('Success', 'Quiz added successfully!');
+          this.quizForm.reset();
           this.displayAddModal = false;
         } else {
           this.notification.showError(

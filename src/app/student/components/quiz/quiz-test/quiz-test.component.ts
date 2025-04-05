@@ -164,7 +164,7 @@ export class QuizTestComponent {
   
           if (this.quizResultId) {
             this.supabaseClient.awardPoints(
-              1,
+              '1be2721b-c8cf-4dd1-bccb-3c7b278959cc',
               this.quizResultId,
               this.awardedPoints
             );
@@ -218,7 +218,7 @@ export class QuizTestComponent {
         : 0;
 
     // Get current user ID - in a real app, you would get this from your auth service
-    const userId = 1; // Replace with actual user ID
+    const userId = "1be2721b-c8cf-4dd1-bccb-3c7b278959cc"; // Replace with actual user ID
 
     return {
       user_id: userId,
