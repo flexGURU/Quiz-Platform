@@ -1,198 +1,50 @@
-# CSC3094 Dissertation: Gamified Quiz Application with RBAC
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
-library(tidyverse)
-library(kableExtra)
-```
+# CSC3094 Dissertation: Gamified Quiz Application with Role-Based Access Control
 
 ## 1. Introduction
 
-### 1.1 Project Motivation
-```{r motivation-diagram, echo=FALSE, fig.cap="System Value Proposition"}
-mermaid("
-graph LR
-  A[Education Gap] --> B[Lack of Engaging Tools]
-  C[Admin Burden] --> D[Manual Quiz Creation]
-  E[No Progress Tracking] --> F[Demotivated Students]
-  B --> G[Our Solution]
-  D --> G
-  F --> G
-")
-```
+### Motivation
+- Growing demand for interactive e-learning tools in post-pandemic education
+- Need for adaptive assessment systems that reward progressive learning
+- Gap in existing solutions: lack of integrated point-based motivation systems with granular RBAC
 
-**Key Objectives**:
-1. Implement three-tier RBAC system
-2. Develop bulk import functionality (`xlsx` → JSON → PostgreSQL)
-3. Create adaptive scoring algorithm
+### Aims & Objectives (SMART Framework)
+1. **Specific**: Develop an Angular/Supabase quiz app with 3-tier role management (admin/teacher/student)
+2. **Measurable**: Implement 5 core features (bulk quiz import, timed tests, scoring, leaderboard, RBAC)
+3. **Achievable**: Leverage Supabase BaaS for 90% backend functionality
+4. **Relevant**: Aligns with digital education trends (QAA Digital Literacy Framework)
+5. **Time-bound**: 12-week development cycle
 
-```{r objectives-table}
-tribble(
-  ~Objective, ~Metric, ~Target,
-  "RBAC Implementation", "Role resolution time", "<2s",
-  "Bulk Import", "100 questions processing", "<5s",
-  "Scoring Accuracy", "Points calculation precision", "100%"
-) %>% kable(align = 'c') %>% kable_styling()
-```
+### Dissertation Structure
+1. Background review of EdTech systems
+2. System architecture decisions
+3. Implementation challenges
+4. Evaluation against learning outcomes
+5. Future enhancements
 
-## 2. Literature Review
+## 2. Background Review
 
-### 2.1 Pedagogical Foundations
-```{r bloom-taxonomy, echo=FALSE}
-# Bloom's Taxonomy correlation with question difficulty
-question_levels <- data.frame(
-  Level = c("Remember", "Understand", "Apply", "Analyze", "Evaluate", "Create"),
-  Difficulty = c("Easy", "Easy", "Medium", "Medium", "Hard", "Hard"),
-  Example = c("Recall facts", "Explain concepts", "Solve problems", 
-              "Compare ideas", "Justify decisions", "Produce new work")
-)
+### Key Literature
+- **Pedagogical Foundations**:
+  - Bloom's Taxonomy for question difficulty levels (Anderson & Krathwohl, 2001)
+  - Gamification in education (Deterding et al., 2011)
 
-kable(question_levels, caption = "Bloom's Taxonomy Alignment") %>% 
-  kable_styling(bootstrap_options = "striped")
-```
+### Technical Landscape
+- **Supabase Advantages**:
+  - PostgreSQL triggers for point calculation
+  - Row-Level Security for RBAC implementation
+- **Angular Architecture**:
+  - Observable pattern for state management
+  - PrimeNG vs Tailwind design tradeoffs
 
-### 2.2 Technical Landscape
-**Supabase Architecture**:
-```{r supabase-schema, eval=FALSE}
-# Example of RLS Policy from database
-create policy "Teachers can only manage their quizzes"
-  on quizzes for all using (
-    auth.uid() = created_by AND
-    auth.jwt() ->> 'role' = 'teacher'
-  );
-```
+### Commercial Solutions
+- Comparison with Kahoot!, Quizlet (feature matrix included in Appendix A)
 
-## 3. System Design
+## 3. System Design & Implementation
 
-### 3.1 Core Architecture
-```{r architecture-diagram, echo=FALSE}
-mermaid("
-sequenceDiagram
-  participant Frontend
-  participant Supabase
-  participant PostgreSQL
-  
-  Frontend->>Supabase: Login (JWT)
-  Supabase->>PostgreSQL: RLS Check
-  PostgreSQL-->>Supabase: User Data
-  Supabase-->>Frontend: Session + Role
-  Frontend->>Supabase: Bulk Upload (Excel)
-  Supabase->>PostgreSQL: Import via Function
-  PostgreSQL->>Supabase: Trigger Points Update
-")
-```
-
-### 3.2 Key Components
-**RBAC Implementation**:
-```{r rbac-flow}
-# Angular Auth Guard Example
-auth.guard.ts <- '
-@Injectable()
-export class RoleGuard implements CanActivate {
-  constructor(private auth: AuthService) {}
-
-  canActivate(route: ActivatedRouteSnapshot): boolean {
-    const expectedRole = route.data["role"];
-    return this.auth.currentUser.role === expectedRole;
-  }
-}'
-```
-
-## 4. Implementation
-
-### 4.1 Bulk Import Pipeline
-```{r import-process, eval=FALSE}
-# Excel Processing Workflow
-process_excel <- function(file) {
-  df <- readxl::read_excel(file) %>%
-    mutate(
-      options = pmap(list(A, B, C, D), ~ list(...)),
-      quiz_id = supabase$get_current_quiz()
-    )
-  
-  supabase$from("questions")$insert(df)
-}
-```
-
-### 4.2 Scoring Algorithm
-```{r scoring-formula}
-# Points calculation logic
-calculate_score <- function(correct, total, difficulty) {
-  base <- (correct / total) * 100
-  multiplier <- case_when(
-    difficulty == "Easy" ~ 1,
-    difficulty == "Medium" ~ 1.5,
-    difficulty == "Hard" ~ 2
-  )
-  round(base * multiplier)
-}
-```
-
-## 5. Evaluation
-
-### 5.1 Performance Metrics
-```{r performance-data, echo=FALSE}
-# Simulated performance data
-perf_data <- tibble(
-  Test = c("Auth Flow", "Bulk Import", "Scoring"),
-  Metric = c("Role resolution", "100Q Processing", "Points Calc"),
-  Result = c("1.8s", "3.2s", "0.3s"),
-  Target = c("<2s", "<5s", "<1s")
-)
-
-kable(perf_data, caption = "System Performance") %>%
-  kable_styling(full_width = FALSE)
-```
-
-### 5.2 User Testing Results
-```{r user-feedback, fig.height=4}
-# Mock survey results
-feedback <- data.frame(
-  Aspect = rep(c("Usability", "Performance", "Features"), each=3),
-  Rating = sample(3:5, 9, replace=TRUE)
-)
-
-ggplot(feedback, aes(Aspect, Rating)) + 
-  geom_boxplot() + 
-  labs(title = "User Satisfaction Ratings")
-```
-
-## 6. Conclusion
-
-**Key Achievements**:
-1. Successfully implemented all three target objectives
-2. Exceeded performance benchmarks by 30%
-3. Positive user feedback (avg 4.2/5 rating)
-
-**Future Work**:
-```{r future-roadmap}
-tribble(
-  ~Priority, ~Feature, ~Status,
-  1, "AI Question Generation", "Prototyped",
-  2, "LMS Integration", "Planned",
-  3, "Mobile Optimization", "Backlog"
-) %>% kable() %>% kable_styling()
-```
-
-## References
-
-```{r references, echo=FALSE, results='asis'}
-cat("
-1. Anderson, L.W. (2001). *A Taxonomy for Learning...*  
-2. Supabase Documentation (2023). *Row-Level Security*  
-3. Angular Team (2023). *Route Guards Guide*
-")
-```
-
-## Appendices
-
-### Appendix A: Database Schema
-```{r db-schema, eval=FALSE}
-# Full SQL schema available in:
-# database/schema.sql
-```
-
-### Appendix B: Sample Quiz Data
-```{r sample-data}
-head(quiz_data, 3) %>% kable() %>% kable_styling()
-```
+### Architectural Overview
+```mermaid
+graph TD
+    A[Angular Frontend] -->|HTTP| B[Supabase API]
+    B --> C[(PostgreSQL DB)]
+    C --> D[Triggers]
+    D --> E[Points Calculation]
