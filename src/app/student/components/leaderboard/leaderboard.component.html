@@ -96,26 +96,15 @@
     </ng-template>
   </p-table>
 
-  <!-- Pagination Controls -->
   <div class="flex justify-between mt-4 gap-4">
     <button
       pButton
       type="button"
-      label="Previous"
+      label="Go back Home"
       icon="pi pi-chevron-left"
-      [disabled]="currentPage === 0"
-      (click)="previousPage()"
+      iconPos="left"
       class="p-button-outlined"
-    ></button>
-
-    <button
-      pButton
-      type="button"
-      label="Next"
-      icon="pi pi-chevron-right"
-      iconPos="right"
-      (click)="nextPage()"
-      class="p-button-outlined"
+      routerLink="/students/dashboard"
     ></button>
   </div>
 </div>

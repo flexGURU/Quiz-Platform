@@ -8,6 +8,7 @@ import { TableModule } from 'primeng/table';
 import { AuthService } from '../../../shared/services/auth.service';
 import { LeaderboardService } from '../../services/leaderboard.service';
 import { LeaderboardEntry } from '../../../shared/models';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-leaderboard',
@@ -18,6 +19,7 @@ import { LeaderboardEntry } from '../../../shared/models';
     DropdownModule,
     CardModule,
     TableModule,
+    
   ],
   templateUrl: './leaderboard.component.html',
   styleUrl: './leaderboard.component.css',
