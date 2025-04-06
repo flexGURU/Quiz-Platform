@@ -8,9 +8,13 @@ body {
   height: 100%;
 }
 body {
-  margin: 0;
-  font-family: Roboto, "Helvetica Neue", sans-serif;
+  font-family: 'Lexend', sans-serif;
 }
+
+button, input, select, textarea {
+  font-family: inherit;
+}
+
 
 .card {
   @apply border border-slate-400  flex items-center justify-center w-2xl;

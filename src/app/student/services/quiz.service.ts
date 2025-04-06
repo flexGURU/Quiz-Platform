@@ -192,7 +192,6 @@ export class QuizService {
       {
         user_id: userId,
         points: points,
-        source: 'quiz',
         source_id: quizResultId,
         earned_at: new Date().toISOString(),
       },
@@ -238,12 +237,11 @@ export class QuizService {
   }
 
   // Get upcoming quizzes count using SQL function
-  getUpcomingQuizzesCount(userId: string): Observable<number> {
-    return from(
-      this.supabaseClient.rpc('get_upcoming_quizzes_count', {
-        p_user_id: userId,
-      })
-    ).pipe(
+  getUpcomingQuizzesCount = (userId: string): Observable<number> => {
+    const promise = this.supabaseClient.rpc('get_upcoming_quizzes_count', {
+      p_user_id: userId,
+    });
+    return from(promise).pipe(
       map(({ data, error }) => {
         if (error) throw error;
         return data;
@@ -253,12 +251,13 @@ export class QuizService {
         return of(0);
       })
     );
-  }
+  };
 
-  // In your quiz.service.ts
   getCompletedQuizzesCount(userId: string): Observable<number> {
     return from(
-      this.supabaseClient.rpc('get_completed_quizzes_count', { p_user_id: userId })
+      this.supabaseClient.rpc('get_completed_quizzes_count', {
+        p_user_id: userId,
+      })
     ).pipe(
       map(({ data, error }) => {
         if (error) throw error;

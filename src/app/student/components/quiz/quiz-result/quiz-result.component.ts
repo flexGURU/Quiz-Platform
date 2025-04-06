@@ -7,10 +7,18 @@ import { AccordionModule } from 'primeng/accordion';
 import { GradingService } from '../../../services/grading.service';
 import { QuestionResult, QuizResult } from '../../../../shared/models';
 import { response } from 'express';
+import { SpinnerComponent } from '../../../../shared/components/spinner/spinner.component';
 
 @Component({
   selector: 'app-quiz-result',
-  imports: [CardModule, RouterLink, CommonModule, ButtonModule, AccordionModule],
+  imports: [
+    CardModule,
+    RouterLink,
+    CommonModule,
+    ButtonModule,
+    AccordionModule,
+    SpinnerComponent,
+  ],
   templateUrl: './quiz-result.component.html',
   styleUrl: './quiz-result.component.css',
 })
@@ -22,6 +30,8 @@ export class QuizResultComponent {
   quizResult: QuizResult | null = null;
   questionResults: QuestionResult[] = [];
   showPerformanceQuestions: Boolean = false;
+
+  loadSpinner = false;
 
   constructor(private route: ActivatedRoute) {}
   private supabaseClient = inject(GradingService);
@@ -43,9 +53,11 @@ export class QuizResultComponent {
   }
 
   showPerformance = () => {
+    this.loadSpinner = true;
     if (this.quizId && this.quizResult) {
       this.supabaseClient.getQuestionResults(this.quizResult.id).subscribe({
         next: (response) => {
+          this.loadSpinner = false;
           console.log('response by geeee', response);
           this.showPerformanceQuestions = true;
           this.questionResults = response;

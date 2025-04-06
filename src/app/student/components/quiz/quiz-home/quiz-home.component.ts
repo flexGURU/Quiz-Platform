@@ -8,7 +8,6 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { ListboxModule } from 'primeng/listbox';
 import { ButtonModule } from 'primeng/button';
 import { Router } from '@angular/router';
-import { quiz } from '../../../services/quiz';
 import { Quiz, QuizDB } from '../../../../shared/models';
 import { QuizService } from '../../../services/quiz.service';
 import { SkeletonModule } from 'primeng/skeleton';
@@ -26,6 +25,7 @@ import { AuthService } from '../../../../shared/services/auth.service';
     CheckboxModule,
     ListboxModule,
     SkeletonModule,
+    
   ],
   templateUrl: './quiz-home.component.html',
   styleUrl: './quiz-home.component.css',

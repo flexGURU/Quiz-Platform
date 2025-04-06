@@ -114,3 +114,13 @@ export interface User {
   role: string;
   password?: string;
 }
+
+export interface LeaderboardEntry {
+  rank: number;
+  user_id: string;
+  full_name: string;
+  email: string;
+  total_points: number;
+  quizzes_completed: number;
+  average_score: number;
+}

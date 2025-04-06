@@ -92,6 +92,15 @@
       class="p-button-outlined"
       routerLink="/students/quiz-home"
     ></button>
+    <button
+      pButton
+      type="button"
+      class="p-button-outlined p-button-text-right"
+      routerLink="/students/leaderboard"
+    >
+      <span class="button-label">Show LeaderBoard</span>
+      <i class="pi pi-arrow-right" style="margin-left: 0.5rem"></i>
+    </button>
   </div>
 </div>
 <!-- Detailed Results Section -->
@@ -178,4 +187,7 @@
     </p-accordion>
   </div>
 </div>
+} @if (loadSpinner) {
+<app-spinner></app-spinner>
+
 }

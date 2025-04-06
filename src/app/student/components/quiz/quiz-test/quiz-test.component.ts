@@ -17,6 +17,7 @@ import {
   SampleQuizQuestion,
 } from '../../../../shared/models';
 import { AuthService } from '../../../../shared/services/auth.service';
+import { SpinnerComponent } from '../../../../shared/components/spinner/spinner.component';
 
 @Component({
   selector: 'app-quiz-test',
@@ -30,6 +31,7 @@ import { AuthService } from '../../../../shared/services/auth.service';
     StepsModule,
     DialogModule,
     ProgressBarModule,
+    SpinnerComponent,
   ],
   templateUrl: './quiz-test.component.html',
   styleUrl: './quiz-test.component.css',
@@ -47,6 +49,7 @@ export class QuizTestComponent {
   quizResult!: QuizResult;
   awardedPoints: number = 0;
   quizResultId!: number;
+  loadSpinner = false;
 
   constructor(private route: ActivatedRoute, private router: Router) {}
   private supabaseClient = inject(QuizService);
@@ -66,6 +69,7 @@ export class QuizTestComponent {
   }
 
   loadSampleQuiz = (quizID: string): void => {
+    this.loadSpinner = true;
     this.supabaseClient.getQuizQuestions(quizID).subscribe((response) => {
       this.sampleQuiz = {
         id: this.quizIDParam,
@@ -78,6 +82,7 @@ export class QuizTestComponent {
         this.remainingTime = this.sampleQuiz.timeLimit;
         this.startTimer();
       }
+      this.loadSpinner = false;
     });
   };
 
@@ -168,7 +173,7 @@ export class QuizTestComponent {
 
             if (this.quizResultId) {
               this.supabaseClient.awardPoints(
-                '1be2721b-c8cf-4dd1-bccb-3c7b278959cc',
+                this.userId,
                 this.quizResultId,
                 this.awardedPoints
               );

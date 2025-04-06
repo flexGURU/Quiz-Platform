@@ -5,16 +5,9 @@ import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { DropdownModule } from 'primeng/dropdown';
 import { TableModule } from 'primeng/table';
-
-interface LeaderboardEntry {
-  rank: number;
-  studentName: string;
-  avatarUrl: string;
-  totalPoints: number;
-  quizzesCompleted: number;
-  badges: string[];
-  isCurrentUser: boolean;
-}
+import { AuthService } from '../../../shared/services/auth.service';
+import { LeaderboardService } from '../../services/leaderboard.service';
+import { LeaderboardEntry } from '../../../shared/models';
 
 @Component({
   selector: 'app-leaderboard',
@@ -30,147 +23,61 @@ interface LeaderboardEntry {
   styleUrl: './leaderboard.component.css',
 })
 export class LeaderboardComponent {
-  leaderboardEntries: LeaderboardEntry[] = [];
-  filteredEntries: LeaderboardEntry[] = [];
+  leaderboard: LeaderboardEntry[] = [];
+  currentUserRank: LeaderboardEntry | null = null;
+  loading: boolean = true;
+  pageSize: number = 10;
+  currentPage: number = 0;
 
-  timeFilters: string[] = ['Daily', 'Weekly', 'Monthly', 'All-time'];
-  selectedTimeFilter: string = 'All-time';
-
-  subjectFilters: string[] = [
-    'All Subjects',
-    'Math',
-    'Science',
-    'History',
-    'Literature',
-    'Geography',
-  ];
-  selectedSubjectFilter: string = 'All Subjects';
-
-  currentUserRank: number = 0;
-
-  constructor() {}
+  constructor(
+    private leaderboardService: LeaderboardService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
-    // Mock data - in a real app, this would come from a service
-    this.leaderboardEntries = [
-      {
-        rank: 1,
-        studentName: 'Emma Johnson',
-        avatarUrl: 'assets/avatars/avatar1.png',
-        totalPoints: 5280,
-        quizzesCompleted: 42,
-        badges: ['Math Master', 'Science Pro', 'History Buff'],
-        isCurrentUser: false,
-      },
-      {
-        rank: 2,
-        studentName: 'Noah Williams',
-        avatarUrl: 'assets/avatars/avatar2.png',
-        totalPoints: 4970,
-        quizzesCompleted: 38,
-        badges: ['Quiz Champion', 'Perfect Score'],
-        isCurrentUser: false,
-      },
-      {
-        rank: 3,
-        studentName: 'Olivia Smith',
-        avatarUrl: 'assets/avatars/avatar3.png',
-        totalPoints: 4750,
-        quizzesCompleted: 36,
-        badges: ['Quick Solver', 'Knowledge Seeker'],
-        isCurrentUser: true,
-      },
-      {
-        rank: 4,
-        studentName: 'Liam Brown',
-        avatarUrl: 'assets/avatars/avatar4.png',
-        totalPoints: 4320,
-        quizzesCompleted: 35,
-        badges: ['Consistent Learner'],
-        isCurrentUser: false,
-      },
-      {
-        rank: 5,
-        studentName: 'Ava Jones',
-        avatarUrl: 'assets/avatars/avatar5.png',
-        totalPoints: 4150,
-        quizzesCompleted: 33,
-        badges: ['Rising Star'],
-        isCurrentUser: false,
-      },
-      {
-        rank: 6,
-        studentName: 'Ethan Davis',
-        avatarUrl: 'assets/avatars/avatar6.png',
-        totalPoints: 3980,
-        quizzesCompleted: 31,
-        badges: ['Dedicated Student'],
-        isCurrentUser: false,
-      },
-      {
-        rank: 7,
-        studentName: 'Sophia Miller',
-        avatarUrl: 'assets/avatars/avatar7.png',
-        totalPoints: 3850,
-        quizzesCompleted: 30,
-        badges: ['Fast Learner'],
-        isCurrentUser: false,
-      },
-      {
-        rank: 8,
-        studentName: 'Mason Wilson',
-        avatarUrl: 'assets/avatars/avatar8.png',
-        totalPoints: 3720,
-        quizzesCompleted: 29,
-        badges: ['Trivia Expert'],
-        isCurrentUser: false,
-      },
-      {
-        rank: 9,
-        studentName: 'Isabella Moore',
-        avatarUrl: 'assets/avatars/avatar9.png',
-        totalPoints: 3590,
-        quizzesCompleted: 28,
-        badges: ['Quiz Enthusiast'],
-        isCurrentUser: false,
-      },
-      {
-        rank: 10,
-        studentName: 'Lucas Taylor',
-        avatarUrl: 'assets/avatars/avatar10.png',
-        totalPoints: 3480,
-        quizzesCompleted: 27,
-        badges: ['Knowledge Explorer'],
-        isCurrentUser: false,
-      },
-    ];
+    this.loadLeaderboard();
+    this.getCurrentUserRank();
+  }
 
-    // Find current user's rank
-    const currentUser = this.leaderboardEntries.find(
-      (entry) => entry.isCurrentUser
-    );
-    if (currentUser) {
-      this.currentUserRank = currentUser.rank;
+  loadLeaderboard(page: number = 0): void {
+    this.loading = true;
+    this.currentPage = page;
+
+    this.leaderboardService
+      .getLeaderboard(this.pageSize, page * this.pageSize)
+      .subscribe({
+        next: (data) => {
+          this.leaderboard = data;
+          this.loading = false;
+        },
+        error: (error) => {
+          console.error('Failed to load leaderboard:', error);
+          this.loading = false;
+        },
+      });
+  }
+
+  getCurrentUserRank(): void {
+    const currentUserId = this.authService.userId;
+    if (currentUserId) {
+      this.leaderboardService.getCurrentUserRank(currentUserId).subscribe({
+        next: (data) => {
+          this.currentUserRank = data;
+        },
+        error: (error) => {
+          console.error('Failed to load user rank:', error);
+        },
+      });
     }
-
-    this.filterLeaderboard();
   }
 
-  filterLeaderboard(): void {
-    // In a real app, this would call a service with the selected filters
-    // For this example, we'll just use the mock data
-    this.filteredEntries = [...this.leaderboardEntries];
+  nextPage(): void {
+    this.loadLeaderboard(this.currentPage + 1);
   }
 
-  getBadgeClass(rank: number): string {
-    if (rank === 1) return 'bg-yellow-500'; // Gold
-    if (rank === 2) return 'bg-gray-400'; // Silver
-    if (rank === 3) return 'bg-amber-700'; // Bronze
-    return 'bg-blue-500'; // Default
-  }
-
-  challengeFriend(studentName: string): void {
-    console.log(`Challenging ${studentName} to a quiz duel!`);
-    // In a real app, this would open a dialog to select a quiz and send a challenge
+  previousPage(): void {
+    if (this.currentPage > 0) {
+      this.loadLeaderboard(this.currentPage - 1);
+    }
   }
 }
