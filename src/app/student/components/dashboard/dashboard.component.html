@@ -2,139 +2,296 @@
   <div class="max-w-7xl mx-auto">
     <!-- Header with welcome message -->
     <div class="mb-8">
-      <h1 class="text-3xl font-bold text-slate-800 dark:text-white">Student Dashboard</h1>
-      <p class="text-slate-500 dark:text-slate-400 mt-2">Welcome back! Here's your learning progress at a glance.</p>
+      <h1 class="text-3xl font-bold text-slate-800 dark:text-white">
+        Student Dashboard
+      </h1>
+      <p class="text-slate-500 dark:text-slate-400 mt-2">
+        Welcome back! Here's your learning progress at a glance.
+      </p>
     </div>
-    
+
     <!-- Stat Cards -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
       <!-- Progress Card -->
       <div class="transform transition-all duration-300 hover:scale-105">
-        <p-card 
+        <p-card
           [style]="{ width: '100%', overflow: 'hidden' }"
           class="border-l-4 border-emerald-500 shadow-lg rounded-lg"
+          *ngIf="!loading"
         >
           <ng-template #header>
-            <div class="flex justify-between items-center p-4 bg-emerald-50 dark:bg-emerald-900/30">
+            <div
+              class="flex justify-between items-center p-4 bg-emerald-50 dark:bg-emerald-900/30"
+            >
               <i class="pi pi-chart-line text-2xl text-emerald-500"></i>
               <div class="text-right">
-                <span class="text-sm text-slate-500 dark:text-slate-400">Overall</span>
+                <span class="text-sm text-slate-500 dark:text-slate-400"
+                  >Overall</span
+                >
               </div>
             </div>
           </ng-template>
           <ng-template #title>Course Progress</ng-template>
           <ng-template #subtitle>
             <div class="flex items-center">
-              <span class="text-2xl font-bold text-emerald-600 dark:text-emerald-400">50%</span>
-              <p-progressBar [value]="50" styleClass="h-2 ml-4" [showValue]="false"></p-progressBar>
+              <span
+                class="text-2xl font-bold text-emerald-600 dark:text-emerald-400"
+                >{{ progress }}%</span
+              >
+              <p-progressBar
+                [value]="50"
+                styleClass="h-2 ml-4"
+                [showValue]="false"
+              ></p-progressBar>
             </div>
           </ng-template>
         </p-card>
+
+        <!-- Skeleton for Progress Card -->
+        <div
+          class="border-l-4 border-emerald-500 shadow-lg rounded-lg bg-white dark:bg-slate-800 overflow-hidden"
+          *ngIf="loading"
+        >
+          <div class="p-4 bg-emerald-50 dark:bg-emerald-900/30">
+            <p-skeleton
+              width="2rem"
+              height="2rem"
+              styleClass="mb-2"
+            ></p-skeleton>
+          </div>
+          <div class="p-4">
+            <p-skeleton
+              width="60%"
+              height="1.5rem"
+              styleClass="mb-2"
+            ></p-skeleton>
+            <div class="flex items-center mt-2">
+              <p-skeleton width="3rem" height="2rem"></p-skeleton>
+              <p-skeleton
+                width="70%"
+                height="0.5rem"
+                styleClass="ml-4"
+              ></p-skeleton>
+            </div>
+          </div>
+        </div>
       </div>
-      
+
       <!-- Upcoming Quizzes Card -->
       <div class="transform transition-all duration-300 hover:scale-105">
         <p-card
           routerLink="/students/quiz-home"
           [style]="{ width: '100%', overflow: 'hidden', cursor: 'pointer' }"
           class="border-l-4 border-blue-500 shadow-lg rounded-lg"
+          *ngIf="!loading"
         >
           <ng-template #header>
-            <div class="flex justify-between items-center p-4 bg-blue-50 dark:bg-blue-900/30">
+            <div
+              class="flex justify-between items-center p-4 bg-blue-50 dark:bg-blue-900/30"
+            >
               <i class="pi pi-calendar-plus text-2xl text-blue-500"></i>
               <div class="text-right">
-                <span class="text-sm text-slate-500 dark:text-slate-400">This Week</span>
+                <span class="text-sm text-slate-500 dark:text-slate-400"
+                  >This Week</span
+                >
               </div>
             </div>
           </ng-template>
-          <ng-template #title>Upcoming Quizzes</ng-template>
+          <ng-template #title>Quiz Stats</ng-template>
           <ng-template #subtitle>
-            <div class="flex items-center">
-              <span class="text-2xl font-bold text-blue-600 dark:text-blue-400">{{ quizzNumber }}</span>
-              <span class="ml-2 text-sm text-slate-500 dark:text-slate-400">remaining</span>
+            <div class="flex flex-col justify-center">
+              <span class="text-xl text-slate-500 dark:text-slate-400"
+                >Total Quizzes
+                <span
+                  class="ml-2 text-2xl font-bold text-blue-600 dark:text-blue-400"
+                  >{{ totalQuizzNumber }}</span
+                >
+              </span>
+
+              <span class="text-xl text-slate-500 dark:text-slate-400"
+                >Completed
+                <span
+                  class="ml-2 text-2xl font-bold text-blue-600 dark:text-blue-400"
+                  >{{ completedQuizNumber }}</span
+                ></span
+              >
             </div>
           </ng-template>
           <ng-template #footer>
             <div class="text-right">
-              <span class="text-sm text-blue-500 hover:text-blue-700 flex items-center justify-end">
+              <span
+                class="text-sm text-blue-500 hover:text-blue-700 flex items-center justify-end"
+              >
                 View Schedule <i class="pi pi-arrow-right ml-2"></i>
               </span>
             </div>
           </ng-template>
         </p-card>
+
+        <!-- Skeleton for Upcoming Quizzes Card -->
+        <div
+          class="border-l-4 border-blue-500 shadow-lg rounded-lg bg-white dark:bg-slate-800 overflow-hidden"
+          *ngIf="loading"
+        >
+          <div class="p-4 bg-blue-50 dark:bg-blue-900/30">
+            <p-skeleton
+              width="2rem"
+              height="2rem"
+              styleClass="mb-2"
+            ></p-skeleton>
+          </div>
+          <div class="p-4">
+            <p-skeleton
+              width="70%"
+              height="1.5rem"
+              styleClass="mb-2"
+            ></p-skeleton>
+            <div class="flex items-center mt-2">
+              <p-skeleton width="2rem" height="2rem"></p-skeleton>
+              <p-skeleton
+                width="40%"
+                height="1rem"
+                styleClass="ml-2"
+              ></p-skeleton>
+            </div>
+          </div>
+          <div class="p-4 flex justify-end">
+            <p-skeleton width="30%" height="1rem"></p-skeleton>
+          </div>
+        </div>
       </div>
-      
+
       <!-- Leaderboard Position Card -->
       <div class="transform transition-all duration-300 hover:scale-105">
         <p-card
           routerLink="/students/leaderboard"
           [style]="{ width: '100%', overflow: 'hidden', cursor: 'pointer' }"
           class="border-l-4 border-purple-500 shadow-lg rounded-lg"
+          *ngIf="!loading"
         >
           <ng-template #header>
-            <div class="flex justify-between items-center p-4 bg-purple-50 dark:bg-purple-900/30">
+            <div
+              class="flex justify-between items-center p-4 bg-purple-50 dark:bg-purple-900/30"
+            >
               <i class="pi pi-star text-2xl text-purple-500"></i>
               <div class="text-right">
-                <span class="text-sm text-slate-500 dark:text-slate-400">Your Rank</span>
+                <span class="text-sm text-slate-500 dark:text-slate-400"
+                  >Your Rank</span
+                >
               </div>
             </div>
           </ng-template>
           <ng-template #title>Leaderboard Position</ng-template>
           <ng-template #subtitle>
             <div class="flex items-center">
-              <span class="text-2xl font-bold text-purple-600 dark:text-purple-400">5</span>
-              <span class="ml-2 text-sm text-slate-500 dark:text-slate-400">out of 124 students</span>
+              <span
+                class="text-2xl font-bold text-purple-600 dark:text-purple-400"
+                >5</span
+              >
+              <span class="ml-2 text-sm text-slate-500 dark:text-slate-400"
+                >out of 124 students</span
+              >
             </div>
           </ng-template>
           <ng-template #footer>
             <div class="text-right">
-              <span class="text-sm text-purple-500 hover:text-purple-700 flex items-center justify-end">
+              <span
+                class="text-sm text-purple-500 hover:text-purple-700 flex items-center justify-end"
+              >
                 View Leaderboard <i class="pi pi-arrow-right ml-2"></i>
               </span>
             </div>
           </ng-template>
         </p-card>
+
+        <!-- Skeleton for Leaderboard Position Card -->
+        <div
+          class="border-l-4 border-purple-500 shadow-lg rounded-lg bg-white dark:bg-slate-800 overflow-hidden"
+          *ngIf="loading"
+        >
+          <div class="p-4 bg-purple-50 dark:bg-purple-900/30">
+            <p-skeleton
+              width="2rem"
+              height="2rem"
+              styleClass="mb-2"
+            ></p-skeleton>
+          </div>
+          <div class="p-4">
+            <p-skeleton
+              width="80%"
+              height="1.5rem"
+              styleClass="mb-2"
+            ></p-skeleton>
+            <div class="flex items-center mt-2">
+              <p-skeleton width="2rem" height="2rem"></p-skeleton>
+              <p-skeleton
+                width="60%"
+                height="1rem"
+                styleClass="ml-2"
+              ></p-skeleton>
+            </div>
+          </div>
+          <div class="p-4 flex justify-end">
+            <p-skeleton width="40%" height="1rem"></p-skeleton>
+          </div>
+        </div>
       </div>
     </div>
-    
+
     <!-- Recent Quizzes -->
     <div class="mb-8">
       <div class="flex justify-between items-center mb-4">
-        <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Recent Quizzes</h2>
-        <p-button label="View All" icon="pi pi-external-link" styleClass="p-button-text"></p-button>
+        <h2 class="text-2xl font-bold text-slate-800 dark:text-white">
+          Recent Quizzes
+        </h2>
+        <p-button
+          label="View All"
+          icon="pi pi-external-link"
+          styleClass="p-button-text"
+          *ngIf="!loading"
+        ></p-button>
+        <p-skeleton width="8rem" height="2.5rem" *ngIf="loading"></p-skeleton>
       </div>
-      <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden">
+      <div
+        class="bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden"
+      >
+        <!-- Actual data table -->
         <p-table
           [value]="recentQuizzes"
           [tableStyle]="{ 'min-width': '50rem' }"
           styleClass="p-datatable-sm"
-          [paginator]="true" 
           [rows]="5"
+          *ngIf="!loading"
         >
           <ng-template #header>
             <tr>
               <th class="text-slate-600 dark:text-slate-300">Quiz Name</th>
               <th class="text-slate-600 dark:text-slate-300">Score</th>
               <th class="text-slate-600 dark:text-slate-300">Date</th>
-              <th class="text-slate-600 dark:text-slate-300">Actions</th>
             </tr>
           </ng-template>
           <ng-template #body let-quizz>
             <tr class="hover:bg-slate-50 dark:hover:bg-slate-700">
-              <td class="text-slate-700 dark:text-slate-300 font-medium">{{ quizz.name }}</td>
+              <td class="text-slate-700 dark:text-slate-300 font-medium">
+                {{ quizz.name }}
+              </td>
               <td>
-                <span [ngClass]="{'text-green-600 dark:text-green-400': quizz.score > 70, 
-                                'text-yellow-600 dark:text-yellow-400': quizz.score >= 50 && quizz.score <= 70,
-                                'text-red-600 dark:text-red-400': quizz.score < 50}" 
-                      class="font-semibold">
+                <span
+                  [ngClass]="{
+                    'text-green-600 dark:text-green-400': quizz.score > 70,
+                    'text-yellow-600 dark:text-yellow-400':
+                      quizz.score >= 50 && quizz.score <= 70,
+                    'text-red-600 dark:text-red-400': quizz.score < 50
+                  }"
+                  class="font-semibold"
+                >
                   {{ quizz.score }}%
                 </span>
               </td>
-              <td class="text-slate-600 dark:text-slate-400">{{ quizz.date }}</td>
-              <td>
-                <p-button icon="pi pi-eye" styleClass="p-button-rounded p-button-text p-button-sm"></p-button>
-                <p-button icon="pi pi-refresh" styleClass="p-button-rounded p-button-text p-button-sm"></p-button>
+              <td class="text-slate-600 dark:text-slate-400">
+                {{ quizz.date }}
               </td>
+
             </tr>
           </ng-template>
           <ng-template #emptymessage>
@@ -143,45 +300,127 @@
                 <div class="flex flex-col items-center">
                   <i class="pi pi-inbox text-4xl text-slate-300 mb-4"></i>
                   <span class="text-slate-500">No quizzes completed yet</span>
-                  <p-button label="Take a Quiz" styleClass="p-button-sm mt-3"></p-button>
+                  <p-button
+                    label="Take a Quiz"
+                    styleClass="p-button-sm mt-3"
+                    routerLink="/students/quiz-home"
+                  ></p-button>
                 </div>
               </td>
             </tr>
           </ng-template>
         </p-table>
+
+        <!-- Skeleton for table -->
+        <div class="p-4" *ngIf="loading">
+          <p-skeleton height="2rem" styleClass="mb-2"></p-skeleton>
+          <p-skeleton height="3.5rem" styleClass="mb-2"></p-skeleton>
+          <p-skeleton height="3.5rem" styleClass="mb-2"></p-skeleton>
+          <p-skeleton height="3.5rem" styleClass="mb-2"></p-skeleton>
+          <p-skeleton height="3.5rem" styleClass="mb-2"></p-skeleton>
+          <p-skeleton height="3.5rem" styleClass="mb-2"></p-skeleton>
+          <div class="flex justify-center mt-4">
+            <p-skeleton width="50%" height="2rem"></p-skeleton>
+          </div>
+        </div>
       </div>
     </div>
-    
+
     <!-- Achievements & Badges -->
     <div>
       <div class="flex justify-between items-center mb-4">
-        <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Achievements & Badges</h2>
-        <p-button label="View All" icon="pi pi-external-link" styleClass="p-button-text"></p-button>
+        <h2 class="text-2xl font-bold text-slate-800 dark:text-white">
+          Achievements & Badges
+        </h2>
+        <p-button
+          label="View All"
+          icon="pi pi-external-link"
+          styleClass="p-button-text"
+          *ngIf="!loading"
+        ></p-button>
+        <p-skeleton width="8rem" height="2.5rem" *ngIf="loading"></p-skeleton>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Actual badge cards -->
         @for (badge of badges; track badge.name) {
-        <div class="transform transition-all duration-300 hover:scale-105">
+        <div
+          class="transform transition-all duration-300 hover:scale-105"
+          *ngIf="!loading"
+        >
           <p-card class="shadow-md rounded-lg overflow-hidden">
             <ng-template #header>
-              <div class="bg-gradient-to-r from-indigo-500 to-purple-600 h-16 flex items-center justify-center">
+              <div
+                class="bg-gradient-to-r from-indigo-500 to-purple-600 h-16 flex items-center justify-center"
+              >
                 <i [class]="badge.icon + ' text-4xl text-white'"></i>
               </div>
             </ng-template>
             <ng-template #title>
               <div class="flex items-center">
-                <span class="font-bold text-slate-800 dark:text-white">{{ badge.name }}</span>
-                <i class="pi pi-check-circle text-green-500 ml-2" *ngIf="badge.earned"></i>
+                <span class="font-bold text-slate-800 dark:text-white">{{
+                  badge.name
+                }}</span>
+                <i
+                  class="pi pi-check-circle text-green-500 ml-2"
+                  *ngIf="badge.earned"
+                ></i>
               </div>
             </ng-template>
             <ng-template #subtitle>
-              <p class="text-slate-600 dark:text-slate-400">{{ badge.description }}</p>
+              <p class="text-slate-600 dark:text-slate-400">
+                {{ badge.description }}
+              </p>
             </ng-template>
             <ng-template #footer>
               <div class="flex justify-between items-center">
-                <span class="text-xs text-slate-500">Earned {{ badge.date }}</span>
+                <span class="text-xs text-slate-500"
+                  >Earned {{ badge.date }}</span
+                >
               </div>
             </ng-template>
           </p-card>
+        </div>
+        }
+
+        <!-- Skeleton badges -->
+        @for (i of [1,2,3]; track i) {
+        <div
+          class="shadow-md rounded-lg overflow-hidden bg-white dark:bg-slate-800"
+          *ngIf="loading"
+        >
+          <div
+            class="h-16 flex items-center justify-center bg-gradient-to-r from-indigo-200 to-purple-200 dark:from-indigo-900 dark:to-purple-900"
+          >
+            <p-skeleton shape="circle" size="3rem"></p-skeleton>
+          </div>
+          <div class="p-4">
+            <div class="flex items-center mb-2">
+              <p-skeleton
+                width="60%"
+                height="1.5rem"
+                styleClass="mr-2"
+              ></p-skeleton>
+              <p-skeleton shape="circle" size="1rem"></p-skeleton>
+            </div>
+            <p-skeleton
+              width="100%"
+              height="1rem"
+              styleClass="mb-1"
+            ></p-skeleton>
+            <p-skeleton
+              width="90%"
+              height="1rem"
+              styleClass="mb-1"
+            ></p-skeleton>
+            <p-skeleton
+              width="40%"
+              height="1rem"
+              styleClass="mb-1"
+            ></p-skeleton>
+            <div class="flex justify-between items-center mt-4">
+              <p-skeleton width="30%" height="0.75rem"></p-skeleton>
+            </div>
+          </div>
         </div>
         }
       </div>

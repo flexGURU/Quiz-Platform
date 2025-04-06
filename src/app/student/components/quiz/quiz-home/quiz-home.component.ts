@@ -11,7 +11,8 @@ import { Router } from '@angular/router';
 import { quiz } from '../../../services/quiz';
 import { Quiz, QuizDB } from '../../../../shared/models';
 import { QuizService } from '../../../services/quiz.service';
-import { UUID } from 'crypto';
+import { SkeletonModule } from 'primeng/skeleton';
+import { AuthService } from '../../../../shared/services/auth.service';
 
 @Component({
   selector: 'app-quiz-home',
@@ -24,24 +25,28 @@ import { UUID } from 'crypto';
     FormsModule,
     CheckboxModule,
     ListboxModule,
+    SkeletonModule,
   ],
   templateUrl: './quiz-home.component.html',
   styleUrl: './quiz-home.component.css',
 })
 export class QuizHomeComponent {
   private router = inject(Router);
-  private supabaseService = inject(QuizService);
+  private quizService = inject(QuizService);
+  private authService = inject(AuthService);
 
   viewMode: 'listbox' | 'cards' = 'listbox'; // Default to cards view
   subjectList: QuizDB[] = [];
   selectedCategory = [];
-  quizzes: Quiz[] = [];
   filteredQuizzes: Quiz[] = [];
+
+  userID!: string;
 
   difficulties: string[] = ['Easy', 'Medium', 'Hard'];
   selectedDifficulty: string = 'All';
 
   showTimeLimitOnly: boolean = false;
+  loading: boolean = true;
 
   stats = {
     quizzesCompleted: 32,
@@ -50,18 +55,19 @@ export class QuizHomeComponent {
   };
 
   ngOnInit(): void {
-    // Mock data - in real application this would come from a service
-    this.quizzes = quiz;
+    this.userID = this.authService.userId;
 
     this.filterQuizzes();
     this.loadQuizzes();
+    this.upcomingQuizzes();
   }
 
   loadQuizzes = () => {
-    this.supabaseService.getQuizzes().subscribe((reponse) => {
+    this.loading = true;
+    this.quizService.getQuizzes().subscribe((reponse) => {
       console.log('quizzes', reponse);
 
-      this.subjectList = reponse;
+      this.loading = false;
     });
   };
 
@@ -94,4 +100,11 @@ export class QuizHomeComponent {
       },
     });
   }
+
+  upcomingQuizzes = () => {
+    this.quizService.getUpcomingQuizzes(this.userID).subscribe((response) => {
+      console.log('upcomi quizzes', response);
+      this.subjectList = response;
+    });
+  };
 }

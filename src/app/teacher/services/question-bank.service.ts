@@ -13,7 +13,6 @@ export const QUIZ_TABLE = 'quizzes';
 export class QuestionBankService {
   private supabaseClient = Supabase;
 
-
   constructor() {}
 
   getQuestions = (): Observable<Questions[]> => {
@@ -65,20 +64,6 @@ export class QuestionBankService {
       })
     );
   };
-
-  // getSubjects = (): Observable<Topic[]> => {
-  //   const promise = this.supabaseClient.from(SUBJECT_TABLE).select('*');
-
-  //   return from(promise).pipe(
-  //     map((response) => {
-  //       if (response.error) {
-  //         console.error('supabase err', response.error.message);
-  //         throw new Error(response.error.message);
-  //       }
-  //       return response.data;
-  //     })
-  //   );
-  // };
 
   addQuiz = (quiz: QuizDB): Observable<QuizDB[]> => {
     const promise = this.supabaseClient

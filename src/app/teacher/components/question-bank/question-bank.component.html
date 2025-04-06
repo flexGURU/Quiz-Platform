@@ -16,19 +16,16 @@
             </div>
 
             <div>
-              <label class="block m-2 tracking-wider"
-                >Select Quiz</label
-              >
+              <label class="block m-2 tracking-wider">Select Quiz</label>
               <p-dropdown
-              [options]="quizList"
-              [(ngModel)]="selectedQuiz"
-              optionLabel="title" 
-              optionValue="id"
-              placeholder="Select Quiz"
-              (onChange)="onQuizChange($event)"
-              [showClear]="true"
-            ></p-dropdown>
-            
+                [options]="quizList"
+                [(ngModel)]="selectedQuiz"
+                optionLabel="title"
+                optionValue="id"
+                placeholder="Select Quiz"
+                (onChange)="onQuizChange($event)"
+                [showClear]="true"
+              ></p-dropdown>
             </div>
           </div>
         </div>
@@ -162,13 +159,13 @@
   header="Add a New Quizz"
   [modal]="true"
   [style]="{ width: '35rem' }"
+  styleClass="p-fluid"
+  [contentStyle]="{ 'max-height': '70vh', 'overflow-y': 'auto' }"
 >
   <ng-template pTemplate="content">
     <form [formGroup]="quizForm">
       <div class="mb-4">
-        <label for="correctAnswer" class="label_modal"
-          >Add Quiz Name</label
-        >
+        <label for="correctAnswer" class="label_modal">Add Quiz Name</label>
         <input
           type="text"
           pInputText
@@ -178,9 +175,7 @@
         />
       </div>
       <div class="mb-4">
-        <label for="correctAnswer" class="label_modal"
-          >Add Subject</label
-        >
+        <label for="correctAnswer" class="label_modal">Add Subject</label>
         <input
           type="text"
           pInputText
@@ -190,13 +185,25 @@
         />
       </div>
       <div class="mb-4">
-        <label for="correctAnswer" class="label_modal"
-          >Add Difficulty Level <span class="text-red-800"> (1-10) </span></label
-        >
-        <input
-          type="numbers"
-          pInputText
+        <label for="difficulty" class="label_modal">Add Difficulty Level</label>
+        <p-select
+          id="difficulty"
           formControlName="difficulty"
+          [options]="difficultyLevels"
+          placeholder="Select Difficulty"
+          [required]="true"
+          styleClass="w-full"
+          appendTo="body"
+          [showClear]="false"
+          optionValue="value"
+        ></p-select>
+      </div>
+      <div>
+        <label class="label_modal">Add Number of Questions</label>
+        <input
+          type="number"
+          pInputText
+          formControlName="numberofquestions"
           [required]="true"
           class="w-full p-2 border rounded"
         />

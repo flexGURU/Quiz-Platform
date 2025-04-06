@@ -49,6 +49,8 @@ export interface QuizDB {
   title: string;
   subject: string;
   difficulty: string;
+  numberofquestions: number;
+  minutes?: number;
   created_at?: Date;
 }
 

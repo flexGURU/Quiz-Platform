@@ -12,6 +12,7 @@ import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { AuthService } from '../../../shared/services/auth.service';
+import { SkeletonModule } from 'primeng/skeleton';
 
 @Component({
   selector: 'app-dashboard',
@@ -26,6 +27,7 @@ import { AuthService } from '../../../shared/services/auth.service';
     ButtonModule,
     TagModule,
     ProgressBarModule,
+    SkeletonModule,
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css',
@@ -34,8 +36,12 @@ export class DashboardComponent {
   private quizService = inject(QuizService);
   private authService = inject(AuthService);
   quizzList: QuizDB[] = [];
-  quizzNumber: number = 0;
+  totalQuizzNumber: number = 0;
+  completedQuizNumber!: number;
   userID!: string;
+  loading: boolean = true;
+  progress!: number;
+  recentQuizzes: any[] = [];
 
   ngOnInit(): void {
     this.getQuizzes();
@@ -43,14 +49,11 @@ export class DashboardComponent {
       console.log('current user', response);
     });
     this.userID = this.authService.userId;
-    this.recentQuizzesCount()
-    this.completedQuizzesCount()
+    this.recentQuizzesCount();
+
+    this.completedQuizzesCount();
+    this.recentQuizzesapi();
   }
-  recentQuizzes = [
-    { name: 'Math Quiz 1', score: 85, date: 'March 12, 2025' },
-    { name: 'Science Quiz 2', score: 92, date: 'March 10, 2025' },
-    { name: 'History Quiz 3', score: 78, date: 'March 8, 2025' },
-  ];
 
   // Simulated achievements and badges
   badges = [
@@ -81,33 +84,53 @@ export class DashboardComponent {
   ];
 
   getQuizzes = () => {
+    this.loading = true;
+
     this.quizService.getQuizzes().subscribe((response) => {
       this.quizzList = response;
-      this.quizzNumber = this.quizzList.length;
-    });
-  };
-
-  upcomingQuizzes = () => {
-    this.quizService.getUpcomingQuizzes(this.userID).subscribe((response) => {
-      console.log('upcomi quizzes', response);
+      this.totalQuizzNumber = this.quizzList.length;
+      this.loading = false;
+      this.updateProgress();
     });
   };
 
   recentQuizzesapi = () => {
     this.quizService.getRecentQuizzes(this.userID).subscribe((response) => {
-      console.log('rcent quizzes', response);
+      console.log('which quizzes', response);
+
+      const quizr = response.map((quiz) => ({
+        name: quiz.name,
+        score: quiz.score,
+        date: quiz.date,
+      }));
+
+      this.recentQuizzes = quizr;
     });
   };
 
   recentQuizzesCount = () => {
-    this.quizService.getUpcomingQuizzesCount(this.userID).subscribe((response) => {
-      console.log('rcent quizzes', response);
-    });
+    this.quizService
+      .getUpcomingQuizzesCount(this.userID)
+      .subscribe((response) => {
+        console.log('rcent quizzes', response);
+      });
   };
 
   completedQuizzesCount = () => {
-    this.quizService.getCompletedQuizzesCount(this.userID).subscribe((response) => {
-      console.log('comploted quizzes', response);
-    });
+    this.quizService
+      .getCompletedQuizzesCount(this.userID)
+      .subscribe((response) => {
+        console.log('comploted quizzes', response);
+        this.completedQuizNumber = response;
+        this.updateProgress();
+      });
   };
+
+  updateProgress() {
+    if (this.totalQuizzNumber && this.completedQuizNumber !== undefined) {
+      const percentage =
+        (this.completedQuizNumber * 100) / this.totalQuizzNumber;
+      this.progress = Math.round(percentage);
+    }
+  }
 }

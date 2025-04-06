@@ -23,6 +23,7 @@ import * as XLSX from 'xlsx';
 import { Questions, QuestionsDB, QuizDB, Topic } from '../../../shared/models';
 import { QuestionBankService } from '../../services/question-bank.service';
 import { NotificationService } from '../../../shared/services/notification.service';
+import { SelectModule } from 'primeng/select';
 
 interface Question {
   id: number;
@@ -51,6 +52,7 @@ interface Question {
     ToastModule,
     MessagesModule,
     ConfirmDialogModule,
+    SelectModule,
   ],
   templateUrl: './question-bank.component.html',
   styleUrl: './question-bank.component.css',
@@ -70,6 +72,8 @@ export class QuestionBankComponent {
   selectedQuestion: Question | null = null;
   isEditing: boolean = false;
 
+  difficultyLevels!: any[];
+
   quizChangeEffect = effect(() => {
     console.log('selected quiz', this.selectedQuiz());
   });
@@ -84,6 +88,11 @@ export class QuestionBankComponent {
     this.supabaseService.getQuizzes().subscribe((response) => {
       this.quizList = response;
     });
+    this.difficultyLevels = [
+      { label: 'Easy', value: 'easy' },
+      { label: 'Medium', value: 'medium' },
+      { label: 'Hard', value: 'hard' },
+    ];
   }
 
   initquizForm = () => {
@@ -91,8 +100,8 @@ export class QuestionBankComponent {
       title: ['', Validators.required],
       subject: ['', Validators.required],
       difficulty: ['', Validators.required],
+      numberofquestions: ['', Validators.required],
     });
-    console.log(this.quizForm.getRawValue());
   };
 
   openNewQuizModal() {
@@ -111,6 +120,7 @@ export class QuestionBankComponent {
   saveQuiz = () => {
     if (this.quizForm.invalid) {
       this.notification.showError('Error', 'Please fill in all the fields');
+
       return;
     }
 
