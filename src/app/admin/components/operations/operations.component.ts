@@ -65,7 +65,6 @@ export class OperationsComponent {
     private fb: FormBuilder
   ) {
     this.userForm = this.fb.nonNullable.group({
-      id: [''],
       full_name: ['', [Validators.required, Validators.minLength(3)]],
       email: ['', [Validators.required, Validators.email]],
       role: ['', Validators.required],
@@ -116,7 +115,7 @@ export class OperationsComponent {
       return;
     }
 
-    console.log('User form data:', userFormValues.full_name);
+    console.log('User form data:', userFormValues);
 
     const userForm = {
       email: userFormValues.email,

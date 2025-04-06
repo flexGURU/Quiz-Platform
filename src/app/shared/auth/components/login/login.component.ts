@@ -19,7 +19,6 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 import { NotificationService } from '../../../services/notification.service';
 import { ToastModule } from 'primeng/toast';
-import { ProgressSpinner } from 'primeng/progressspinner';
 import { SpinnerComponent } from '../../../components/spinner/spinner.component';
 
 interface LoginOption {

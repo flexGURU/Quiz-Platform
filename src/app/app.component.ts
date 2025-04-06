@@ -2,11 +2,10 @@ import { Component } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { NavComponent } from './shared/components/nav/nav.component';
 import { ToastModule } from 'primeng/toast';
-import { SpinnerComponent } from "./shared/components/spinner/spinner.component";
 
 @Component({
   selector: 'app-root',
-  imports: [NavComponent, RouterOutlet, ToastModule, SpinnerComponent],
+  imports: [NavComponent, RouterOutlet, ToastModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
 })
