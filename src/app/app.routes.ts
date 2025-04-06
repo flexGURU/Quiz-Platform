@@ -62,6 +62,6 @@ export const routes: Routes = [
     data: { roles: ['admin'] },
   },
 
-  { path: '', redirectTo: '/students/dashboard', pathMatch: 'full' },
+  { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: '**', redirectTo: '/students/dashboard' },
 ];
