@@ -1,12 +1,12 @@
 <!-- student-performance.component.html -->
-<div class="grid grid-cols-12">
-    <div class="col-span-12">
+<div class="grid grid-cols-12 bg-slate-50 dark:bg-slate-900 p-8">
+  <div class="col-span-12">
+    <div>
+      <h5 class="text-3xl font-semibold my-8">Monitor Student Performance</h5>
+
       <div>
-        <h5 class="text-lg font-semibold mb-4">Monitor Student Performance</h5>
-  
-        <div *ngIf="!selectedStudent">
-          <!-- Student List View -->
-          <div class="grid mb-4">
+        <!-- Student List View -->
+        <!-- <div class="grid mb-4">
             <div class="col-12 md:col-8">
               <div class="p-inputgroup flex items-center gap-3 mr-8">
                 <span class="p-inputgroup-addon">
@@ -29,105 +29,80 @@
                 ></p-button>
               </div>
             </div>
-  
-            <div class="col-12 md:col-4 flex justify-end">
-              <button
-                pButton
-                type="button"
-                label="Advanced Filters"
-                icon="pi pi-filter"
-                (click)="op.toggle($event)"
-                class="p-button-secondary"
-              ></button>
-            </div>
-          </div>
-  
-          <p-table
-            [value]="filteredStudents"
-            styleClass="p-datatable-responsive"
-            [rowHover]="true"
-            [paginator]="true"
-            [rows]="10"
-            [showCurrentPageReport]="true"
-            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} students"
-          >
-            <ng-template pTemplate="header">
-              <tr>
-                <th (click)="sortStudents('name')" pSortableColumn="name">
-                  Student Name <p-sortIcon field="name"></p-sortIcon>
-                </th>
-                <th>Email</th>
-                <th
-                  (click)="sortStudents('totalPoints')"
-                  pSortableColumn="totalPoints"
+
+          </div> -->
+
+        <p-table
+          [value]="students"
+          styleClass="p-datatable-responsive border border-green-500 rounded-xl"
+          [rowHover]="true"
+          [rows]="10"
+          stripedRows
+          [showCurrentPageReport]="true"
+          currentPageReportTemplate="Showing {first} to {last} of {totalRecords} students"
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th pSortableColumn="name">
+                Student Name <p-sortIcon field="name"></p-sortIcon>
+              </th>
+              <th pSortableColumn="email">
+                Email <p-sortIcon field="email"></p-sortIcon>
+              </th>
+              <th pSortableColumn="total_points">
+                Total Points <p-sortIcon field="total_points"></p-sortIcon>
+              </th>
+
+              <th
+                (click)="sortStudents('quizzes_completed')"
+                pSortableColumn="quizzes_completed"
+              >
+                Quizzes Done<p-sortIcon field="quizzesCompleted"></p-sortIcon>
+              </th>
+              <th
+                (click)="sortStudents('average_score')"
+                pSortableColumn="average_score"
+              >
+                Avg. Score <p-sortIcon field="averageScore"></p-sortIcon>
+              </th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-student>
+            <tr>
+              <td>
+                <span class="p-column-title"></span>
+                {{ student.name }}
+              </td>
+              <td>
+                <span class="p-column-title"></span>
+                {{ student.email }}
+              </td>
+              <td>
+                <span class="p-column-title"> </span>
+                {{ student.total_points }}
+              </td>
+              <td>
+                <span class="p-column-title"></span>
+                {{ student.quizzes_completed }}
+              </td>
+              <td>
+                <span class="p-column-title"></span>
+                <p-progressBar
+                  [value]="student.average_score"
+                  [showValue]="true"
+                  [style]="{ height: '15px' }"
+                  [styleClass]="
+                    student.averageScore < 60
+                      ? 'p-progressbar-danger'
+                      : student.averageScore < 80
+                      ? 'p-progressbar-warning'
+                      : 'p-progressbar-success'
+                  "
                 >
-                  Total Points <p-sortIcon field="totalPoints"></p-sortIcon>
-                </th>
-                <th
-                  (click)="sortStudents('badgesEarned')"
-                  pSortableColumn="badgesEarned"
-                >
-                  Badges <p-sortIcon field="badgesEarned"></p-sortIcon>
-                </th>
-                <th
-                  (click)="sortStudents('quizzesCompleted')"
-                  pSortableColumn="quizzesCompleted"
-                >
-                  Quizzes <p-sortIcon field="quizzesCompleted"></p-sortIcon>
-                </th>
-                <th
-                  (click)="sortStudents('averageScore')"
-                  pSortableColumn="averageScore"
-                >
-                  Avg. Score <p-sortIcon field="averageScore"></p-sortIcon>
-                </th>
-                <th>Last Active</th>
-                <th>Actions</th>
-              </tr>
-            </ng-template>
-            <ng-template pTemplate="body" let-student>
-              <tr>
-                <td>
-                  <span class="p-column-title"></span>
-                  {{ student.name }}
-                </td>
-                <td>
-                  <span class="p-column-title"></span>
-                  {{ student.email }}
-                </td>
-                <td>
-                  <span class="p-column-title"> </span>
-                  {{ student.totalPoints }}
-                </td>
-                <td>
-                  <span class="p-column-title"></span>
-                  {{ student.badgesEarned }}
-                </td>
-                <td>
-                  <span class="p-column-title">Q</span>
-                  {{ student.quizzesCompleted }}
-                </td>
-                <td>
-                  <span class="p-column-title"></span>
-                  <p-progressBar
-                    [value]="student.averageScore"
-                    [showValue]="true"
-                    [style]="{ height: '15px' }"
-                    [styleClass]="
-                      student.averageScore < 60
-                        ? 'p-progressbar-danger'
-                        : student.averageScore < 80
-                        ? 'p-progressbar-warning'
-                        : 'p-progressbar-success'
-                    "
-                  >
-                  </p-progressBar>
-                </td>
-                <td>
-                  <span class="p-column-title"></span>
-                  {{ student.lastActive | date : "short" }}
-                </td>
-                <td>
+                </p-progressBar>
+              </td>
+
+              <!-- <td>
                   <span class="p-column-title"></span>
                   <button
                     pButton
@@ -136,251 +111,254 @@
                     class="p-button-rounded p-button-info"
                     (click)="viewStudentDetails(student)"
                   ></button>
-                </td>
-              </tr>
-            </ng-template>
-            <ng-template pTemplate="emptymessage">
-              <tr>
-                <td colspan="8">No students found.</td>
-              </tr>
-            </ng-template>
-          </p-table>
-        </div>
-  
-        <div *ngIf="selectedStudent">
-          <!-- Student Detail View -->
-          <div class="mb-4">
-            <button
-              pButton
-              pRipple
-              label="Back to List"
-              icon="pi pi-arrow-left"
-              (click)="selectedStudent = null"
-              class="p-button-secondary"
-            ></button>
-            <button
-              pButton
-              pRipple
-              label="Download Report"
-              icon="pi pi-download"
-              class="ml-2 p-button-success"
-              (click)="exportStudentReport()"
-            ></button>
-          </div>
-  
-          <div class="grid">
-            <div class="col-12 md:col-4">
-              <div class="card p-4 mb-4">
-                <h6 class="text-lg font-semibold mb-4">Student Information</h6>
-                <div class="student-info">
-                  <div class="flex items-center mb-4">
-                    <div class="avatar mr-4">
-                      <i class="pi pi-user text-3xl"></i>
-                    </div>
-                    <div class="info">
-                      <h4 class="text-xl font-bold">{{ selectedStudent.name }}</h4>
-                      <p class="text-gray-600">{{ selectedStudent.email }}</p>
-                    </div>
-                  </div>
-  
-                  <div class="stats">
-                    <div class="stat-item mb-2">
-                      <span class="label font-medium">Total Points:</span>
-                      <span class="value">{{ selectedStudent.totalPoints }}</span>
-                    </div>
-                    <div class="stat-item mb-2">
-                      <span class="label font-medium">Badges Earned:</span>
-                      <span class="value">{{
-                        selectedStudent.badgesEarned
-                      }}</span>
-                    </div>
-                    <div class="stat-item mb-2">
-                      <span class="label font-medium">Quizzes Completed:</span>
-                      <span class="value">{{
-                        selectedStudent.quizzesCompleted
-                      }}</span>
-                    </div>
-                    <div class="stat-item mb-2">
-                      <span class="label font-medium">Average Score:</span>
-                      <span class="value"
-                        >{{ selectedStudent.averageScore }}%</span
-                      >
-                    </div>
-                    <div class="stat-item mb-2">
-                      <span class="label font-medium">Last Active:</span>
-                      <span class="value">{{
-                        selectedStudent.lastActive | date
-                      }}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-  
-              <div class="card p-4">
-                <h6 class="text-lg font-semibold mb-4">Strengths & Weaknesses</h6>
-                <div *ngIf="performanceData?.strengthsWeaknesses">
-                  <p-chart
-                    type="bar"
-                    [data]="performanceData?.strengthsWeaknesses"
-                    [options]="strengthsOptions"
-                    height="250px"
-                  ></p-chart>
-                </div>
-              </div>
-            </div>
-  
-            <div class="col-12 md:col-8">
-              <div class="card p-4 mb-4">
-                <h6 class="text-lg font-semibold mb-4">Quiz Attempts</h6>
-                <p-table
-                  [value]="quizAttempts"
-                  [paginator]="true"
-                  [rows]="5"
-                  styleClass="p-datatable-sm p-datatable-responsive"
-                  [rowHover]="true"
-                >
-                  <ng-template pTemplate="header">
-                    <tr>
-                      <th>Quiz Name</th>
-                      <th>Completion Date</th>
-                      <th>Score</th>
-                      <th>Time Taken</th>
-                      <th>Correct/Total</th>
-                    </tr>
-                  </ng-template>
-                  <ng-template pTemplate="body" let-attempt>
-                    <tr>
-                      <td>
-                        <span class="p-column-title">Quiz Name</span>
-                        {{ attempt.quizName }}
-                      </td>
-                      <td>
-                        <span class="p-column-title">Completion Date</span>
-                        {{ attempt.dateCompleted | date : "short" }}
-                      </td>
-                      <td>
-                        <span class="p-column-title">Score</span>
-                        <p-progressBar
-                          [value]="attempt.score"
-                          [showValue]="true"
-                          [style]="{ height: '15px' }"
-                          [styleClass]="
-                            attempt.score < 60
-                              ? 'p-progressbar-danger'
-                              : attempt.score < 80
-                              ? 'p-progressbar-warning'
-                              : 'p-progressbar-success'
-                          "
-                        >
-                        </p-progressBar>
-                      </td>
-                      <td>
-                        <span class="p-column-title">Time Taken</span>
-                        {{ attempt.timeTaken }} min
-                      </td>
-                      <td>
-                        <span class="p-column-title">Correct/Total</span>
-                        {{ attempt.correctAnswers }}/{{ attempt.totalQuestions }}
-                      </td>
-                    </tr>
-                  </ng-template>
-                  <ng-template pTemplate="emptymessage">
-                    <tr>
-                      <td colspan="5">No quiz attempts found.</td>
-                    </tr>
-                  </ng-template>
-                </p-table>
-              </div>
-  
-              <div class="grid">
-                <div class="col-12 md:col-6">
-                  <div class="card p-4">
-                    <h6 class="text-lg font-semibold mb-4">Quiz Scores</h6>
-                    <div *ngIf="performanceData?.quizScores">
-                      <p-chart
-                        type="line"
-                        [data]="performanceData?.quizScores"
-                        [options]="quizScoreOptions"
-                        height="250px"
-                      ></p-chart>
-                    </div>
-                  </div>
-                </div>
-  
-                <div class="col-12 md:col-6">
-                  <div class="card p-4">
-                    <h6 class="text-lg font-semibold mb-4">Time Spent per Quiz</h6>
-                    <div *ngIf="performanceData?.timeData">
-                      <p-chart
-                        type="bar"
-                        [data]="performanceData?.timeData"
-                        [options]="timeSpentOptions"
-                        height="250px"
-                      ></p-chart>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+                </td> -->
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="8">No students found.</td>
+            </tr>
+          </ng-template>
+        </p-table>
       </div>
+      <!-- 
+      <div *ngIf="selectedStudent">
+        <div class="mb-4">
+          <button
+            pButton
+            pRipple
+            label="Back to List"
+            icon="pi pi-arrow-left"
+            (click)="selectedStudent = null"
+            class="p-button-secondary"
+          ></button>
+          <button
+            pButton
+            pRipple
+            label="Download Report"
+            icon="pi pi-download"
+            class="ml-2 p-button-success"
+            (click)="exportStudentReport()"
+          ></button>
+        </div>
+
+        <div class="grid">
+          <div class="col-12 md:col-4">
+            <div class="card p-4 mb-4">
+              <h6 class="text-lg font-semibold mb-4">Student Information</h6>
+              <div class="student-info">
+                <div class="flex items-center mb-4">
+                  <div class="avatar mr-4">
+                    <i class="pi pi-user text-3xl"></i>
+                  </div>
+                  <div class="info">
+                    <h4 class="text-xl font-bold">
+                      {{ selectedStudent.name }}
+                    </h4>
+                    <p class="text-gray-600">{{ selectedStudent.email }}</p>
+                  </div>
+                </div>
+
+                <div class="stats">
+                  <div class="stat-item mb-2">
+                    <span class="label font-medium">Total Points:</span>
+                    <span class="value">{{ selectedStudent.totalPoints }}</span>
+                  </div>
+                  <div class="stat-item mb-2">
+                    <span class="label font-medium">Badges Earned:</span>
+                    <span class="value">{{
+                      selectedStudent.badgesEarned
+                    }}</span>
+                  </div>
+                  <div class="stat-item mb-2">
+                    <span class="label font-medium">Quizzes Completed:</span>
+                    <span class="value">{{
+                      selectedStudent.quizzesCompleted
+                    }}</span>
+                  </div>
+                  <div class="stat-item mb-2">
+                    <span class="label font-medium">Average Score:</span>
+                    <span class="value"
+                      >{{ selectedStudent.averageScore }}%</span
+                    >
+                  </div>
+                  <div class="stat-item mb-2">
+                    <span class="label font-medium">Last Active:</span>
+                    <span class="value">{{
+                      selectedStudent.lastActive | date
+                    }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card p-4">
+              <h6 class="text-lg font-semibold mb-4">Strengths & Weaknesses</h6>
+              <div *ngIf="performanceData?.strengthsWeaknesses">
+                <p-chart
+                  type="bar"
+                  [data]="performanceData?.strengthsWeaknesses"
+                  [options]="strengthsOptions"
+                  height="250px"
+                ></p-chart>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 md:col-8">
+            <div class="card p-4 mb-4">
+              <h6 class="text-lg font-semibold mb-4">Quiz Attempts</h6>
+              <p-table
+                [value]="quizAttempts"
+                [paginator]="true"
+                [rows]="5"
+                styleClass="p-datatable-sm p-datatable-responsive"
+                [rowHover]="true"
+              >
+                <ng-template pTemplate="header">
+                  <tr>
+                    <th>Quiz Name</th>
+                    <th>Completion Date</th>
+                    <th>Score</th>
+                    <th>Time Taken</th>
+                    <th>Correct/Total</th>
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-attempt>
+                  <tr>
+                    <td>
+                      <span class="p-column-title">Quiz Name</span>
+                      {{ attempt.quizName }}
+                    </td>
+                    <td>
+                      <span class="p-column-title">Completion Date</span>
+                      {{ attempt.dateCompleted | date : "short" }}
+                    </td>
+                    <td>
+                      <span class="p-column-title">Score</span>
+                      <p-progressBar
+                        [value]="attempt.score"
+                        [showValue]="true"
+                        [style]="{ height: '15px' }"
+                        [styleClass]="
+                          attempt.score < 60
+                            ? 'p-progressbar-danger'
+                            : attempt.score < 80
+                            ? 'p-progressbar-warning'
+                            : 'p-progressbar-success'
+                        "
+                      >
+                      </p-progressBar>
+                    </td>
+                    <td>
+                      <span class="p-column-title">Time Taken</span>
+                      {{ attempt.timeTaken }} min
+                    </td>
+                    <td>
+                      <span class="p-column-title">Correct/Total</span>
+                      {{ attempt.correctAnswers }}/{{ attempt.totalQuestions }}
+                    </td>
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="emptymessage">
+                  <tr>
+                    <td colspan="5">No quiz attempts found.</td>
+                  </tr>
+                </ng-template>
+              </p-table>
+            </div>
+
+            <div class="grid">
+              <div class="col-12 md:col-6">
+                <div class="card p-4">
+                  <h6 class="text-lg font-semibold mb-4">Quiz Scores</h6>
+                  <div *ngIf="performanceData?.quizScores">
+                    <p-chart
+                      type="line"
+                      [data]="performanceData?.quizScores"
+                      [options]="quizScoreOptions"
+                      height="250px"
+                    ></p-chart>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-12 md:col-6">
+                <div class="card p-4">
+                  <h6 class="text-lg font-semibold mb-4">
+                    Time Spent per Quiz
+                  </h6>
+                  <div *ngIf="performanceData?.timeData">
+                    <p-chart
+                      type="bar"
+                      [data]="performanceData?.timeData"
+                      [options]="timeSpentOptions"
+                      height="250px"
+                    ></p-chart>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div> -->
     </div>
   </div>
-  
-  <!-- Advanced Filter Overlay Panel -->
-  <p-overlayPanel
-    #op
-    [dismissable]="true"
-    [showCloseIcon]="true"
-    [style]="{ width: '450px' }"
-  >
-    <ng-template pTemplate>
-      <h5 class="text-lg font-semibold mb-4">Filter Students</h5>
-  
-      <div class="mb-4">
-        <label class="block font-medium mb-2">Points Range</label>
-        <p-slider
-          [(ngModel)]="filterOptions.pointsRange"
-          [range]="true"
-          [min]="0"
-          [max]="10000"
-          class="mt-2"
-        ></p-slider>
-        <div class="flex justify-between">
-          <span>{{ filterOptions.pointsRange[0] }}</span>
-          <span>{{ filterOptions.pointsRange[1] }}</span>
-        </div>
+</div>
+
+<!-- Advanced Filter Overlay Panel -->
+<p-overlayPanel
+  #op
+  [dismissable]="true"
+  [showCloseIcon]="true"
+  [style]="{ width: '450px' }"
+>
+  <ng-template pTemplate>
+    <h5 class="text-lg font-semibold mb-4">Filter Students</h5>
+
+    <div class="mb-4">
+      <label class="block font-medium mb-2">Points Range</label>
+      <p-slider
+        [(ngModel)]="filterOptions.pointsRange"
+        [range]="true"
+        [min]="0"
+        [max]="10000"
+        class="mt-2"
+      ></p-slider>
+      <div class="flex justify-between">
+        <span>{{ filterOptions.pointsRange[0] }}</span>
+        <span>{{ filterOptions.pointsRange[1] }}</span>
       </div>
-  
-      <div class="mb-4">
-        <label class="block font-medium mb-2">Quizzes Completed</label>
-        <p-slider
-          [(ngModel)]="filterOptions.quizzesRange"
-          [range]="true"
-          [min]="0"
-          [max]="100"
-          class="mt-2"
-        ></p-slider>
-        <div class="flex justify-between">
-          <span>{{ filterOptions.quizzesRange[0] }}</span>
-          <span>{{ filterOptions.quizzesRange[1] }}</span>
-        </div>
+    </div>
+
+    <div class="mb-4">
+      <label class="block font-medium mb-2">Quizzes Completed</label>
+      <p-slider
+        [(ngModel)]="filterOptions.quizzesRange"
+        [range]="true"
+        [min]="0"
+        [max]="100"
+        class="mt-2"
+      ></p-slider>
+      <div class="flex justify-between">
+        <span>{{ filterOptions.quizzesRange[0] }}</span>
+        <span>{{ filterOptions.quizzesRange[1] }}</span>
       </div>
-  
-      <div class="mb-4">
-        <label class="block font-medium mb-2">Average Score (%)</label>
-        <p-slider
-          [(ngModel)]="filterOptions.averageScoreRange"
-          [range]="true"
-          [min]="0"
-          [max]="100"
-          class="mt-2"
-        ></p-slider>
-        <div class="flex justify-between">
-          <span>{{ filterOptions.averageScoreRange[0] }}%</span>
-          <span>{{ filterOptions.averageScoreRange[1] }}%</span>
-        </div>
+    </div>
+
+    <div class="mb-4">
+      <label class="block font-medium mb-2">Average Score (%)</label>
+      <p-slider
+        [(ngModel)]="filterOptions.averageScoreRange"
+        [range]="true"
+        [min]="0"
+        [max]="100"
+        class="mt-2"
+      ></p-slider>
+      <div class="flex justify-between">
+        <span>{{ filterOptions.averageScoreRange[0] }}%</span>
+        <span>{{ filterOptions.averageScoreRange[1] }}%</span>
       </div>
-    </ng-template>
-  </p-overlayPanel>
+    </div>
+  </ng-template>
+</p-overlayPanel>

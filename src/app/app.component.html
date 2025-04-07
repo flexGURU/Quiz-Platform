@@ -1,6 +1,8 @@
 @if (!isLoginPage()) {
 <app-nav></app-nav>
 
+} @if(reloaded && userRole){
+<app-menubar></app-menubar>
 }
 
 <p-toast></p-toast>

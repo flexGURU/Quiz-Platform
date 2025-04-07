@@ -124,3 +124,13 @@ export interface LeaderboardEntry {
   quizzes_completed: number;
   average_score: number;
 }
+
+export interface StudentPerformance {
+  id?: string; 
+  name: string;
+  email: string;
+  total_points: number;
+  quizzes_completed: number;
+  average_score: number;
+  last_active?: string; 
+}
