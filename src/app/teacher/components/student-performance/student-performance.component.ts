@@ -39,7 +39,7 @@ interface QuizAttempt {
     ButtonModule,
     DialogModule,
     SkeletonModule,
-    ProgressSpinnerModule
+    ProgressSpinnerModule,
   ],
   providers: [MessageService],
   templateUrl: './student-performance.component.html',
@@ -74,15 +74,16 @@ export class StudentPerformanceComponent {
 
   ngOnInit() {
     this.initChartOptions();
+    this.isLoading = true;
     this.studentService.getStudentPerformance().subscribe((response) => {
       console.log('student performance', response);
 
       this.students = response;
+      this.isLoading = false;
     });
   }
 
   viewStudentDetails(student: StudentPerformance) {
-    console.log('student slected', student);
     this.selectedStudent = student;
     this.displayStudentDialog = true;
     console.log('student slected', this.selectedStudent);
@@ -135,27 +136,6 @@ export class StudentPerformanceComponent {
     };
   }
 
-  searchStudents() {}
-
-  sortStudents(field: keyof StudentPerformance) {
-    if (this.sortField === field) {
-      this.sortOrder = this.sortOrder * -1;
-    } else {
-      this.sortField = field;
-      this.sortOrder = 1;
-    }
-  }
-
-  exportStudentReport() {}
-
-  resetFilters() {
-    this.searchQuery = '';
-    this.filterOptions = {
-      pointsRange: [0, 10000],
-      quizzesRange: [0, 100],
-      averageScoreRange: [0, 100],
-    };
-  }
   closeDialog(): void {
     this.displayStudentDialog = false;
     // this.selectedStudent = null;

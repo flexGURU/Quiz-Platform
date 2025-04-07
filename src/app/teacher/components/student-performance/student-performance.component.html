@@ -40,6 +40,7 @@
           stripedRows
           [showCurrentPageReport]="true"
           currentPageReportTemplate="Showing {first} to {last} of {totalRecords} students"
+          *ngIf="!isLoading"
         >
           <ng-template pTemplate="header">
             <tr>
@@ -53,16 +54,10 @@
                 Total Points <p-sortIcon field="total_points"></p-sortIcon>
               </th>
 
-              <th
-                (click)="sortStudents('quizzes_completed')"
-                pSortableColumn="quizzes_completed"
-              >
+              <th pSortableColumn="quizzes_completed">
                 Quizzes Done<p-sortIcon field="quizzesCompleted"></p-sortIcon>
               </th>
-              <th
-                (click)="sortStudents('average_score')"
-                pSortableColumn="average_score"
-              >
+              <th pSortableColumn="average_score">
                 Avg. Score <p-sortIcon field="averageScore"></p-sortIcon>
               </th>
 
@@ -127,276 +122,186 @@
   </div>
 </div>
 
-<!-- Add this to your existing HTML template -->
-<p-dialog
-  [(visible)]="displayStudentDialog"
-  [style]="{ width: '55vw' }"
-  [modal]="true"
-  [draggable]="true"
-  [resizable]="true"
-  header="Student Details"
-  styleClass="p-fluid"
-  [dismissableMask]="true"
-  [closeOnEscape]="true"
->
-  <ng-template pTemplate="content">
-    <!-- Loading spinner option -->
-    <div
-      *ngIf="isLoading"
-      class="flex justify-content-center align-items-center"
-      style="height: 300px"
-    >
-      <p-progressSpinner
-        styleClass="w-4rem h-4rem"
-        strokeWidth="4"
-        fill="var(--surface-ground)"
-        animationDuration=".5s"
-      ></p-progressSpinner>
-    </div>
-
-    <!-- Skeleton option -->
-    <div *ngIf="isLoadingSkeleton" class="grid">
-      <!-- Student Info Card Skeleton -->
-      <div class="col-12 md:col-5">
-        <div class="p-4 flex flex-col">
-          <div class="flex gap-2 items-center mb-4">
-            <!-- Avatar skeleton -->
-            <p-skeleton shape="circle" size="4rem"></p-skeleton>
-            <!-- Name skeleton -->
-            <p-skeleton width="10rem" height="2rem"></p-skeleton>
-          </div>
-
-          <div class="">
-            <div class="mb-3">
-              <p-skeleton
-                width="4rem"
-                height="1rem"
-                styleClass="mb-2"
-              ></p-skeleton>
-              <p-skeleton width="12rem" height="1.5rem"></p-skeleton>
-            </div>
-
-            <div class="mb-3">
-              <p-skeleton
-                width="6rem"
-                height="1rem"
-                styleClass="mb-2"
-              ></p-skeleton>
-              <p-skeleton width="8rem" height="1.5rem"></p-skeleton>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Performance Card Skeleton -->
-      <div class="col-12 md:col-7">
-        <div class="p-4">
-          <p-skeleton
-            width="12rem"
-            height="1.5rem"
-            styleClass="mb-4"
-          ></p-skeleton>
-
-          <div class="mb-4">
-            <p-skeleton
-              width="8rem"
-              height="1rem"
-              styleClass="mb-2"
-            ></p-skeleton>
-            <div class="flex items-center">
-              <p-skeleton
-                shape="circle"
-                size="1.5rem"
-                styleClass="mr-2"
-              ></p-skeleton>
-              <p-skeleton width="3rem" height="1.5rem"></p-skeleton>
-            </div>
-          </div>
-
-          <div class="mb-4">
-            <p-skeleton
-              width="10rem"
-              height="1rem"
-              styleClass="mb-2"
-            ></p-skeleton>
-            <div class="flex items-center">
-              <p-skeleton
-                shape="circle"
-                size="1.5rem"
-                styleClass="mr-2"
-              ></p-skeleton>
-              <p-skeleton width="3rem" height="1.5rem"></p-skeleton>
-            </div>
-          </div>
-
-          <div class="mb-4">
-            <p-skeleton
-              width="7rem"
-              height="1rem"
-              styleClass="mb-2"
-            ></p-skeleton>
-            <p-skeleton height="20px" styleClass="mb-2"></p-skeleton>
-          </div>
-
-          <p-skeleton width="100%" height="4rem" styleClass="mt-6"></p-skeleton>
-        </div>
-      </div>
-    </div>
-
-    <!-- Actual content (shown when data is loaded) -->
-    <div *ngIf="!isLoading && !isLoadingSkeleton" class="grid">
-      <!-- Student Info Card -->
-      <div class="col-12 md:col-5">
-        <div class="p-4 flex flex-col">
-          <div class="flex gap-2 items-center mb-4">
-            <!-- Avatar placeholder - replace with actual image if available -->
-            <div
-              class="w-16 h-16 rounded-full bg-slate-700 flex items-center justify-center"
-            >
-              <i class="pi pi-user text-4xl text-green-500"></i>
-            </div>
-            <h2 class="text-xl font-bold text-center mb-4">
-              {{ selectedStudent.name }}
-            </h2>
-          </div>
-
-          <div class="">
-            <div class="mb-3">
-              <label class="block text-sm font-medium text-gray-400"
-                >Email</label
+<div *ngIf="!isLoading">
+  <p-dialog
+    [(visible)]="displayStudentDialog"
+    [style]="{ width: '55vw' }"
+    [modal]="true"
+    [draggable]="true"
+    [resizable]="true"
+    header="Student Details"
+    styleClass="p-fluid"
+    [dismissableMask]="true"
+    [closeOnEscape]="true"
+  >
+    <ng-template pTemplate="content">
+      <div class="grid">
+        <!-- Student Info Card -->
+        <div class="col-12 md:col-5">
+          <div class="p-4 flex flex-col">
+            <div class="flex gap-2 items-center mb-4">
+              <!-- Avatar placeholder - replace with actual image if available -->
+              <div
+                class="w-16 h-16 rounded-full bg-slate-700 flex items-center justify-center"
               >
-              <p class="text-green-500 font-extralight">
-                {{ selectedStudent.email }}
-              </p>
+                <i class="pi pi-user text-4xl text-green-500"></i>
+              </div>
+              <h2 class="text-xl font-bold text-center mb-4">
+                {{ selectedStudent.name }}
+              </h2>
             </div>
 
-            <div class="col-6 mb-3">
-              <label class="block text-sm font-medium text-gray-400"
-                >Student ID</label
-              >
-              <p class="text-green-500 font-extralight">
-                {{ selectedStudent.id || "N/A" }}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Performance Card -->
-      <div class="col-12 md:col-7">
-        <div class="p-4">
-          <h3 class="text-lg font-semibold mb-4">Performance Summary</h3>
-
-          <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-400 mb-1"
-              >Total Points Earned</label
-            >
-            <div class="flex items-center">
-              <i class="pi pi-star-fill text-yellow-500 mr-2"></i>
-              <span class="text-xl font-bold">{{
-                selectedStudent.total_points
-              }}</span>
-            </div>
-          </div>
-
-          <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-400 mb-1"
-              >Quizzes Completed</label
-            >
-            <div class="flex items-center">
-              <i class="pi pi-check-circle text-green-500 mr-2"></i>
-              <span class="text-xl font-bold">{{
-                selectedStudent.quizzes_completed
-              }}</span>
-            </div>
-          </div>
-
-          <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-400 mb-1"
-              >Average Score</label
-            >
-            <p-progressBar
-              [value]="selectedStudent.average_score"
-              [showValue]="true"
-              [style]="{ height: '20px' }"
-              [styleClass]="
-                selectedStudent.average_score < 60
-                  ? 'p-progressbar-danger'
-                  : selectedStudent.average_score < 80
-                  ? 'p-progressbar-warning'
-                  : 'p-progressbar-success'
-              "
-            ></p-progressBar>
-          </div>
-
-          <!-- Helper text based on performance -->
-          <div
-            class="mt-6 p-3 rounded-lg"
-            [ngClass]="{
-              'bg-red-100': selectedStudent.average_score < 60,
-              'bg-yellow-100':
-                selectedStudent.average_score >= 60 &&
-                selectedStudent.average_score < 80,
-              'bg-green-100': selectedStudent.average_score >= 80
-            }"
-          >
-            <div class="flex items-center">
-              <i
-                class="pi"
-                [ngClass]="{
-                  'pi-exclamation-triangle text-red-500':
-                    selectedStudent.average_score < 60,
-                  'pi-info-circle text-yellow-600':
-                    selectedStudent.average_score >= 60 &&
-                    selectedStudent.average_score < 80,
-                  'pi-check-circle text-green-600':
-                    selectedStudent.average_score >= 80
-                }"
-              ></i>
-              <span
-                class="ml-2"
-                [ngClass]="{
-                  'text-red-700': selectedStudent.average_score < 60,
-                  'text-yellow-700':
-                    selectedStudent.average_score >= 60 &&
-                    selectedStudent.average_score < 80,
-                  'text-green-700': selectedStudent.average_score >= 80
-                }"
-              >
-                <ng-container *ngIf="selectedStudent.average_score < 60">
-                  This student may need additional support to improve their
-                  performance.
-                </ng-container>
-                <ng-container
-                  *ngIf="
-                    selectedStudent.average_score >= 60 &&
-                    selectedStudent.average_score < 80
-                  "
+            <div class="">
+              <div class="mb-3">
+                <label class="block text-sm font-medium text-gray-400"
+                  >Email</label
                 >
-                  This student is performing adequately but has room for
-                  improvement.
-                </ng-container>
-                <ng-container *ngIf="selectedStudent.average_score >= 80">
-                  This student is performing well across their quizzes.
-                </ng-container>
-              </span>
+                <p class="text-green-500 font-extralight">
+                  {{ selectedStudent.email }}
+                </p>
+              </div>
+
+              <div class="col-6 mb-3">
+                <label class="block text-sm font-medium text-gray-400"
+                  >Student ID</label
+                >
+                <p class="text-green-500 font-extralight">
+                  {{ selectedStudent.id || "N/A" }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Performance Card -->
+        <div class="col-12 md:col-7">
+          <div class="p-4">
+            <h3 class="text-lg font-semibold mb-4">Performance Summary</h3>
+
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-400 mb-1"
+                >Total Points Earned</label
+              >
+              <div class="flex items-center">
+                <i class="pi pi-star-fill text-yellow-500 mr-2"></i>
+                <span class="text-xl font-bold">{{
+                  selectedStudent.total_points
+                }}</span>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-400 mb-1"
+                >Quizzes Completed</label
+              >
+              <div class="flex items-center">
+                <i class="pi pi-check-circle text-green-500 mr-2"></i>
+                <span class="text-xl font-bold">{{
+                  selectedStudent.quizzes_completed
+                }}</span>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-400 mb-1"
+                >Average Score</label
+              >
+              <p-progressBar
+                [value]="selectedStudent.average_score"
+                [showValue]="true"
+                [style]="{ height: '20px' }"
+                [styleClass]="
+                  selectedStudent.average_score < 60
+                    ? 'p-progressbar-danger'
+                    : selectedStudent.average_score < 80
+                    ? 'p-progressbar-warning'
+                    : 'p-progressbar-success'
+                "
+              ></p-progressBar>
+            </div>
+
+            <!-- Additional metrics could be added here if you fetch more data -->
+
+            <!-- Helper text based on performance -->
+            <div
+              class="mt-6 p-3 rounded-lg"
+              [ngClass]="{
+                'bg-red-100': selectedStudent.average_score < 60,
+                'bg-yellow-100':
+                  selectedStudent.average_score >= 60 &&
+                  selectedStudent.average_score < 80,
+                'bg-green-100': selectedStudent.average_score >= 80
+              }"
+            >
+              <div class="flex items-center">
+                <i
+                  class="pi"
+                  [ngClass]="{
+                    'pi-exclamation-triangle text-red-500':
+                      selectedStudent.average_score < 60,
+                    'pi-info-circle text-yellow-600':
+                      selectedStudent.average_score >= 60 &&
+                      selectedStudent.average_score < 80,
+                    'pi-check-circle text-green-600':
+                      selectedStudent.average_score >= 80
+                  }"
+                ></i>
+                <span
+                  class="ml-2"
+                  [ngClass]="{
+                    'text-red-700': selectedStudent.average_score < 60,
+                    'text-yellow-700':
+                      selectedStudent.average_score >= 60 &&
+                      selectedStudent.average_score < 80,
+                    'text-green-700': selectedStudent.average_score >= 80
+                  }"
+                >
+                  <ng-container *ngIf="selectedStudent.average_score < 60">
+                    This student may need additional support to improve their
+                    performance.
+                  </ng-container>
+                  <ng-container
+                    *ngIf="
+                      selectedStudent.average_score >= 60 &&
+                      selectedStudent.average_score < 80
+                    "
+                  >
+                    This student is performing adequately but has room for
+                    improvement.
+                  </ng-container>
+                  <ng-container *ngIf="selectedStudent.average_score >= 80">
+                    This student is performing well across their quizzes.
+                  </ng-container>
+                </span>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  </ng-template>
+    </ng-template>
 
-  <ng-template pTemplate="footer">
-    <div class="flex justify-content-end">
-      <button
-        pButton
-        pRipple
-        label="Close"
-        icon="pi pi-times"
-        class="p-button-text"
-        (click)="closeDialog()"
-      ></button>
-    </div>
-  </ng-template>
-</p-dialog>
+    <ng-template pTemplate="footer">
+      <div class="flex justify-content-end">
+        <button
+          pButton
+          pRipple
+          label="Close"
+          icon="pi pi-times"
+          class="p-button-text"
+          (click)="closeDialog()"
+        ></button>
+      </div>
+    </ng-template>
+  </p-dialog>
+</div>
+
+@if (isLoading) {
+<div class="flex justify-center items-center" style="height: 300px">
+  <p-progressSpinner
+    styleClass="w-4rem h-4rem"
+    strokeWidth="4"
+    fill="var(--surface-ground)"
+    ariaLabel="loading"
+  ></p-progressSpinner>
+</div>
+}
