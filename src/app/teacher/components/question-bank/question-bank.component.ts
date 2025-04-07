@@ -63,6 +63,7 @@ export class QuestionBankComponent {
   dbQuestions = signal<QuestionsDB[]>([]);
   quizList: QuizDB[] = [];
   selectedQuiz = signal<string>('');
+  hasSelectedQuiz: boolean = false;
   questions: Questions[] = [];
 
   quizForm!: FormGroup;
@@ -202,6 +203,10 @@ export class QuestionBankComponent {
     this.dbQuestions.update((prev) => [...prev, ...formattedQuestions]);
   };
 
+  clearUpload() {
+    this.dbQuestions.set([]);
+  }
+
   createQuizz = () => {
     this.supabaseService.addQuestions(this.dbQuestions()).subscribe({
       next: (resp) => {
@@ -225,5 +230,6 @@ export class QuestionBankComponent {
   onQuizChange = (event: any) => {
     const title = event.value;
     this.selectedQuiz.set(title);
+    this.hasSelectedQuiz = true;
   };
 }
