@@ -1,0 +1,432 @@
+<!-- quiz-management.component.html -->
+<div class="w-full p-4">
+  <div class="bg-slate-50 dark:bg-slate-900 rounded-lg shadow-md p-6 mb-6">
+    <h2 class="text-2xl font-bold mb-2">Quiz Management</h2>
+    <p class="text-gray-400 mb-6">
+      Create and manage quizzes and their questions
+    </p>
+
+    <p-toast></p-toast>
+    <p-confirmDialog [style]="{ width: '450px' }"></p-confirmDialog>
+
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+      <!-- Quizzes Panel -->
+      <div class="md:col-span-4">
+        <div class="rounded-lg shadow p-2">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-semibold">Quizzes</h3>
+          </div>
+
+          <p-table
+            [value]="quizzes"
+            [rows]="10"
+            [rowHover]="true"
+            styleClass="p-datatable-md border rounded-lg border-green-500"
+          >
+            <ng-template pTemplate="header">
+              <tr class="bg-gray-50">
+                <th class="text-left p-2">Title</th>
+                <th class="text-left p-2">Subject</th>
+                <th class="text-center p-2">Actions</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-quiz>
+              <tr
+                [ngClass]="{ 'bg-blue-50': selectedQuiz?.id === quiz.id }"
+                class="cursor-pointer hover:bg-gray-50 transition-colors"
+                (click)="onQuizSelect(quiz)"
+              >
+                <td class="p-3">{{ quiz.title }}</td>
+                <td class="p-3">{{ quiz.subject }}</td>
+                <td class="p-3 text-center">
+                  <button
+                    pButton
+                    icon="pi pi-pencil"
+                    class="p-button-rounded p-button-success p-button-sm mr-5"
+                    (click)="openQuizDialog(quiz); $event.stopPropagation()"
+                  ></button>
+                  <button
+                    pButton
+                    icon="pi pi-trash"
+                    class="p-button-rounded p-button-danger p-button-sm"
+                    (click)="deleteQuiz(quiz.id); $event.stopPropagation()"
+                  ></button>
+                </td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td colspan="3" class="p-4 text-center text-gray-500">
+                  No quizzes found.
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </div>
+
+      <!-- Questions Panel -->
+      <div class="md:col-span-8">
+        <div class="rounded-lg shadow p-4">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-semibold" *ngIf="selectedQuiz">
+              Questions for {{ selectedQuiz.title }}
+            </h3>
+            <p-button
+              label="Add Question"
+              icon="pi pi-plus"
+              [disabled]="!selectedQuiz"
+              (onClick)="openQuestionDialog()"
+              styleClass="p-button-sm"
+            ></p-button>
+          </div>
+          <div
+            *ngIf="loadSpinner"
+            class="flex flex-col items-center justify-center"
+          >
+            <p-progressSpinner
+              strokeWidth="8"
+              fill="transparent"
+              animationDuration=".5s"
+              [style]="{ width: '80px', height: '80px' }"
+            ></p-progressSpinner>
+            <span>Loading...</span>
+          </div>
+
+          <p-table
+            *ngIf="!loadSpinner"
+            [value]="questions"
+            [paginator]="true"
+            [rows]="10"
+            [rowHover]="true"
+            styleClass="p-datatable-sm border rounded-lg border-green-500"
+          >
+            <ng-template pTemplate="header">
+              <tr class="bg-gray-50">
+                <th class="text-left p-2">Question</th>
+                <th class="text-left p-2">Type</th>
+                <th class="text-center p-2">Points</th>
+                <th class="text-center p-2">Actions</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-question>
+              <tr class="hover:bg-gray-50 transition-colors">
+                <td class="p-3">
+                  <span class="block truncate max-w-md">{{
+                    question.question_text
+                  }}</span>
+                </td>
+                <td class="p-3">
+                  <p-tag
+                    [value]="getQuestionTypeLabel(question.question_type)"
+                    [severity]="getQuestionTypeSeverity(question.question_type)"
+                  >
+                  </p-tag>
+                </td>
+                <td class="p-3 text-center">{{ question.points }}</td>
+                <td class="p-3 text-center">
+                  <button
+                    pButton
+                    icon="pi pi-pencil"
+                    class="p-button-rounded p-button-success p-button-sm mr-2"
+                    (click)="openQuestionDialog(question)"
+                  ></button>
+                  <button
+                    pButton
+                    icon="pi pi-trash"
+                    class="p-button-rounded p-button-danger p-button-sm"
+                    (click)="deleteQuestion(question.id)"
+                  ></button>
+                </td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td colspan="4" class="p-4 text-center text-gray-500">
+                  {{
+                    selectedQuiz
+                      ? "No questions found for this quiz."
+                      : "Please select a quiz to view questions."
+                  }}
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quiz Dialog -->
+  <p-dialog
+    [(visible)]="displayQuizDialog"
+    [style]="{ width: '450px' }"
+    header="{{ isNewQuiz ? 'Create Quiz' : 'Edit Quiz' }}"
+    [modal]="true"
+    styleClass="p-fluid"
+    [closeOnEscape]="true"
+    [dismissableMask]="true"
+  >
+    <form [formGroup]="quizForm" class="p-4">
+      <div class="mb-4">
+        <label for="title" class="block text-sm font-medium text-green-500 mb-1"
+          >Title</label
+        >
+        <input
+          type="text"
+          pInputText
+          id="title"
+          formControlName="title"
+          required
+          class="w-full input"
+        />
+        <small
+          class="text-red-500 text-xs"
+          *ngIf="
+            quizForm.get('title')?.invalid && quizForm.get('title')?.touched
+          "
+        >
+          Title is required (max 100 characters).
+        </small>
+      </div>
+
+      <div class="mb-4">
+        <label
+          for="subject"
+          class="block text-sm font-medium text-green-500 mb-1"
+          >Subject</label
+        >
+        <input
+          type="text"
+          pInputText
+          id="subject"
+          formControlName="subject"
+          required
+          class="w-full input"
+        />
+        <small
+          class="text-red-500 text-xs"
+          *ngIf="
+            quizForm.get('subject')?.invalid && quizForm.get('subject')?.touched
+          "
+        >
+          Subject is required (max 100 characters).
+        </small>
+      </div>
+
+      <div class="mb-4">
+        <label
+          for="difficulty"
+          class="block text-sm font-medium text-green-500 mb-1"
+          >Difficulty</label
+        >
+        <p-select
+          id="difficulty"
+          [options]="difficultyLevels"
+          formControlName="difficulty"
+          optionLabel="label"
+          optionValue="value"
+          styleClass="w-full"
+        ></p-select>
+      </div>
+
+      <!-- <div class="mb-4">
+        <label
+          for="numberOfQuestions"
+          class="block text-sm font-medium text-green-500 mb-1"
+          >Number of Questions</label
+        >
+        <p-inputNumber
+          id="numberOfQuestions"
+          formControlName="numberOfQuestions"
+          [min]="1"
+          [showButtons]="true"
+          styleClass="w-full"
+        ></p-inputNumber>
+      </div> -->
+    </form>
+
+    <ng-template pTemplate="footer">
+      <div class="flex justify-end gap-2">
+        <button
+          pButton
+          label="Cancel"
+          icon="pi pi-times"
+          class="p-button-text"
+          (click)="displayQuizDialog = false"
+        ></button>
+        <button
+          pButton
+          label="Save"
+          icon="pi pi-check"
+          class="p-button-text"
+          (click)="saveQuiz()"
+        ></button>
+      </div>
+    </ng-template>
+  </p-dialog>
+
+  <!-- Question Dialog -->
+  <p-dialog
+    [(visible)]="displayQuestionDialog"
+    [style]="{ width: '600px' }"
+    header="{{ isNewQuestion ? 'Create Question' : 'Edit Question' }}"
+    [modal]="true"
+    styleClass="p-fluid"
+    [closeOnEscape]="true"
+    [dismissableMask]="true"
+  >
+    <form [formGroup]="questionForm" class="p-4">
+      <div class="mb-4">
+        <label
+          for="question_text"
+          class="block text-sm font-medium text-green-500 mb-1"
+          >Question Text</label
+        >
+        <textarea
+          pInputTextarea
+          id="question_text"
+          formControlName="question_text"
+          rows="3"
+          required
+          class="w-full input resize-y "
+        ></textarea>
+      </div>
+
+      <!-- <div class="mb-4">
+        <label
+          for="question_type"
+          class="block text-sm font-medium text-green-500 mb-1"
+          >Question Type</label
+        >
+        <p-select
+          id="question_type"
+          [options]="questionTypes"
+          formControlName="question_type"
+          optionLabel="label"
+          optionValue="value"
+          styleClass="w-full"
+          (onChange)="onQuestionTypeChange()"
+        ></p-select>
+      </div> -->
+
+      <div
+        class="mb-4"
+      >
+        <label class="block text-sm font-medium text-green-500 mb-2"
+          >Options</label
+        >
+        <div formArrayName="options">
+          <div
+            class="grid grid-cols-12 gap-2 items-center mb-2"
+            *ngFor="let option of optionsArray.controls; let i = index"
+          >
+            <div class="col-span-10">
+              <div class="flex">
+                <span
+                  class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm"
+                >
+                  {{ i + 1 }}
+                </span>
+                <input
+                  type="text"
+                  pInputText
+                  [formControlName]="i"
+                  placeholder="Option {{ i + 1 }}"
+                  class="w-full input rounded-r-md"
+                />
+              </div>
+            </div>
+            <div class="col-span-2 text-right">
+              <button
+                pButton
+                type="button"
+                icon="pi pi-trash"
+                class="p-button-danger p-button-sm"
+                (click)="removeOption(i)"
+                *ngIf="optionsArray.length > 2"
+              ></button>
+            </div>
+          </div>
+          <button
+            pButton
+            type="button"
+            label="Add Option"
+            icon="pi pi-plus"
+            class="p-button-secondary p-button-sm mt-2"
+            (click)="addOption()"
+            *ngIf="questionForm.get('question_type')?.value === 'mcq'"
+          ></button>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <label
+          for="correct_answer"
+          class="block text-sm font-medium text-green-500 mb-1"
+          >Correct Answer</label
+        >
+        <div [ngSwitch]="questionForm.get('question_type')?.value">
+          <div *ngSwitchCase="'mcq'">
+            <p-select
+              id="correct_answer"
+              formControlName="correct_answer"
+              styleClass="w-full"
+              [options]="optionsArray.value"
+              [disabled]="optionsArray.length === 0"
+            ></p-select>
+          </div>
+          <div *ngSwitchCase="'true_false'">
+            <p-select
+              id="correct_answer"
+              formControlName="correct_answer"
+              styleClass="w-full"
+              [options]="['True', 'False']"
+            ></p-select>
+          </div>
+          <div *ngSwitchDefault>
+            <input
+              type="text"
+              pInputText
+              id="correct_answer"
+              formControlName="correct_answer"
+              class="w-full"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- <div class="mb-4">
+        <label for="points" class="block text-sm font-medium text-green-500 mb-1"
+          >Points</label
+        >
+        <p-inputNumber
+          id="points"
+          formControlName="points"
+          [min]="1"
+          [showButtons]="true"
+          styleClass="w-full"
+        ></p-inputNumber>
+      </div> -->
+    </form>
+
+    <ng-template pTemplate="footer">
+      <div class="flex justify-end gap-2">
+        <button
+          pButton
+          label="Cancel"
+          icon="pi pi-times"
+          class="p-button-text"
+          (click)="displayQuestionDialog = false"
+        ></button>
+        <button
+          pButton
+          label="Save"
+          icon="pi pi-check"
+          class="p-button-text"
+          (click)="saveQuestion()"
+        ></button>
+      </div>
+    </ng-template>
+  </p-dialog>
+</div>

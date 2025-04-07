@@ -15,6 +15,7 @@ import { OperationsComponent } from './admin/components/operations/operations.co
 import { ViolationsComponent } from './admin/components/violations/violations.component';
 import { authGuard } from './shared/auth/auth.guard';
 import { roleGuard } from './shared/auth/role.guard';
+import { ManageQuizComponent } from './teacher/components/manage-quiz/manage-quiz.component';
 
 export const routes: Routes = [
   {
@@ -47,6 +48,7 @@ export const routes: Routes = [
       { path: 'question-bank', component: QuestionBankComponent },
       { path: 'point-rule', component: PointRulesComponent },
       { path: 'student-performance', component: StudentPerformanceComponent },
+      { path: 'manage-quizzes', component: ManageQuizComponent },
     ],
     canActivate: [authGuard, roleGuard],
     data: { roles: ['teacher'] },

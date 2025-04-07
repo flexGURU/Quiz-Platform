@@ -10,14 +10,21 @@ import { MenubarModule } from 'primeng/menubar';
   styleUrl: './menubar.component.css',
 })
 export class MenubarComponent {
+  baseUrl = '/teacher/';
   items = [
     {
       label: 'Question Bank',
-      routerLink: '/teacher/question-bank'   
+      routerLink: `${this.baseUrl}` + 'question-bank',
+      styleClass: 'menu-link',
     },
     {
       label: 'Student Performance',
-      routerLink: '/teacher/student-performance'  
+      styleClass: 'menu-link',
+      routerLink: `${this.baseUrl}` + 'student-performance',
+    }, {
+      label: 'Manage Quizzes',
+      styleClass: 'menu-link',
+      routerLink: `${this.baseUrl}` + 'manage-quizzes',
     },
   ];
 }
