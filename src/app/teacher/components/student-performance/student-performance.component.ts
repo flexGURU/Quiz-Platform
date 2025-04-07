@@ -2,15 +2,18 @@ import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MessageService } from 'primeng/api';
-import { OverlayModule } from 'primeng/overlay';
-import { Slider, SliderModule } from 'primeng/slider';
+import { SliderModule } from 'primeng/slider';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { ChartModule } from 'primeng/chart';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { TableModule } from 'primeng/table';
-import { ButtonLabel, ButtonModule } from 'primeng/button';
+import { ButtonModule } from 'primeng/button';
 import { StudentPerformance } from '../../../shared/models';
 import { PerformanceService } from '../../services/performance.service';
+import { DialogModule } from 'primeng/dialog';
+import { ChipModule } from 'primeng/chip';
+import { SkeletonModule } from 'primeng/skeleton';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 
 interface QuizAttempt {
   id: number;
@@ -20,12 +23,6 @@ interface QuizAttempt {
   timeTaken: number;
   correctAnswers: number;
   totalQuestions: number;
-}
-
-interface PerformanceData {
-  quizScores: any[];
-  strengthsWeaknesses: any[];
-  timeData: any[];
 }
 
 @Component({
@@ -40,6 +37,9 @@ interface PerformanceData {
     TableModule,
     ReactiveFormsModule,
     ButtonModule,
+    DialogModule,
+    SkeletonModule,
+    ProgressSpinnerModule
   ],
   providers: [MessageService],
   templateUrl: './student-performance.component.html',
@@ -47,21 +47,19 @@ interface PerformanceData {
 })
 export class StudentPerformanceComponent {
   students: StudentPerformance[] = [];
-
+  isLoadingSkeleton = false;
+  isLoading = false;
   quizAttempts: QuizAttempt[] = [];
+  displayStudentDialog: boolean = false;
+  selectedStudent!: StudentPerformance;
 
-  performanceData: PerformanceData | null = {
-    quizScores: [],
-    strengthsWeaknesses: [],
-    timeData: [],
-  };
+  quizChartData: any;
+  quizChartOptions: any;
 
-  // Charts
   quizScoreOptions: any;
   timeSpentOptions: any;
   strengthsOptions: any;
 
-  // Filters
   searchQuery: string = '';
   sortField: string = 'name';
   sortOrder: number = 1;
@@ -77,17 +75,39 @@ export class StudentPerformanceComponent {
   ngOnInit() {
     this.initChartOptions();
     this.studentService.getStudentPerformance().subscribe((response) => {
-      console.log("student performance", response);
-      
+      console.log('student performance', response);
+
       this.students = response;
     });
   }
 
-  viewStudentDetails() {}
+  viewStudentDetails(student: StudentPerformance) {
+    console.log('student slected', student);
+    this.selectedStudent = student;
+    this.displayStudentDialog = true;
+    console.log('student slected', this.selectedStudent);
+  }
+
+  updateChartData(quizHistory: QuizAttempt[]): void {
+    const labels = quizHistory.map((quiz) => quiz.quizName);
+    const scores = quizHistory.map((quiz) => quiz.score);
+
+    this.quizChartData = {
+      labels: labels,
+      datasets: [
+        {
+          label: 'Quiz Scores',
+          data: scores,
+          fill: false,
+          borderColor: '#42A5F5',
+          tension: 0.4,
+        },
+      ],
+    };
+  }
 
   loadStudentPerformance(studentId: number) {
     // Dummy data already loaded
-    this.updateCharts();
   }
 
   initChartOptions() {
@@ -115,11 +135,6 @@ export class StudentPerformanceComponent {
     };
   }
 
-  updateCharts() {
-    if (!this.performanceData) return;
-    // Update chart data here
-  }
-
   searchStudents() {}
 
   sortStudents(field: keyof StudentPerformance) {
@@ -140,5 +155,9 @@ export class StudentPerformanceComponent {
       quizzesRange: [0, 100],
       averageScoreRange: [0, 100],
     };
+  }
+  closeDialog(): void {
+    this.displayStudentDialog = false;
+    // this.selectedStudent = null;
   }
 }
