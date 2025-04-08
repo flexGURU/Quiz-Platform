@@ -1,101 +1,301 @@
-<!-- forum-home.component.html -->
-<div class="container mx-auto p-4">
-  <div class="flex justify-between items-center mb-6">
-    <h1 class="text-3xl font-bold text-blue-800">Forum Home</h1>
-    <p-button
-      label="Ask a Question"
-      icon="pi pi-plus"
-      styleClass="p-button-primary"
-      routerLink="/forum/ask"
-    ></p-button>
+<!-- forum.component.html -->
+<div class="forum-container p-10 bg-slate-50 dark:bg-slate-900 flex flex-col items-center">
+  <p-toast></p-toast>
+
+  <!-- Header -->
+  <div class="flex flex-col gap-4 justify-between items-center mb-4">
+    <h2 class="m-0 text-2xl">Student Forum</h2>
+    <div class="flex gap-2">
+      <p-button
+        *ngIf="!showNewPostForm && !showReplies"
+        label="New Post"
+        icon="pi pi-plus"
+        (onClick)="toggleNewPostForm()"
+      ></p-button>
+      <p-button
+        *ngIf="showReplies"
+        label="Back to Forum"
+        icon="pi pi-arrow-left"
+        (onClick)="backToMainForum()"
+      ></p-button>
+    </div>
   </div>
 
-  <div class="mb-6">
-    <span class="p-input-icon-left w-full">
-      <i class="pi pi-search"></i>
-      <input
-        type="text"
-        pInputText
-        placeholder="Search discussions..."
-        class="w-full p-3"
-        [(ngModel)]="searchText"
-      />
-    </span>
-  </div>
-
-  <p-tabView>
-    <p-tabPanel header="All Discussions">
-      <div class="discussion-list">
-        <p-card
-          *ngFor="let thread of filteredThreads"
-          styleClass="mb-4 p-0 shadow-sm hover:shadow-md transition-shadow"
+  <!-- New Post Form -->
+  <p-card *ngIf="showNewPostForm" class="mb-4 w-full md:w-1/2">
+    <form [formGroup]="postForm" (ngSubmit)="submitPost()">
+      <div class="field mb-4">
+        <label for="title">Title</label>
+        <input
+          id="title"
+          type="text"
+          pInputText
+          formControlName="title"
+          class="w-full input"
+        />
+        <small
+          *ngIf="
+            postForm.get('title')?.invalid && postForm.get('title')?.touched
+          "
+          class="text-red-600"
         >
-          <div class="flex">
-            <div
-              class="p-3 flex flex-col items-center justify-center bg-gray-50 w-20"
-            >
-              <div class="text-xl font-bold">{{ thread.votes }}</div>
-              <div class="text-sm text-gray-600">votes</div>
-              <div class="text-lg font-semibold mt-2">
-                {{ thread.answerCount }}
-              </div>
-              <div class="text-sm text-gray-600">answers</div>
-            </div>
-            <div class="p-4 flex-grow">
-              <div class="flex justify-between items-start">
-                <a
-                  [routerLink]="['/forum/thread', thread.id]"
-                  class="text-xl font-semibold text-blue-700 hover:text-blue-900"
-                >
-                  {{ thread.title }}
-                </a>
-                <p-tag
-                  *ngIf="thread.hasBounty"
-                  value="Bounty: {{ thread.bountyAmount }} pts"
-                  severity="success"
-                ></p-tag>
-              </div>
-              <p class="text-gray-700 mt-2 line-clamp-2">
-                {{ thread.preview }}
-              </p>
-              <div class="flex items-center mt-3 text-sm text-gray-600">
-                <p-avatar
-                  [image]="thread.authorAvatar"
-                  shape="circle"
-                  size="normal"
-                ></p-avatar>
-                <span class="ml-2">{{ thread.author }}</span>
-                <span class="mx-2">•</span>
-                <span>Posted {{ thread.postedTime }}</span>
-                <span class="ml-auto flex items-center gap-2">
-                  <span
-                    *ngFor="let tag of thread.tags"
-                    class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs"
-                  >
-                    {{ tag }}
-                  </span>
-                </span>
-              </div>
+          Title is required (max 255 characters)
+        </small>
+      </div>
+
+      <div class="field mb-4">
+        <label for="content">Content</label>
+        <textarea
+          id="content"
+          pInputTextarea
+          formControlName="content"
+          class="w-full input"
+          rows="10"
+        ></textarea>
+        <small
+          *ngIf="
+            postForm.get('content')?.invalid && postForm.get('content')?.touched
+          "
+          class="text-red-600"
+        >
+          Content is required
+        </small>
+      </div>
+
+      <div class="flex gap-4 justify-content-end">
+        <p-button
+          label="Cancel"
+          class="p-button-outlined p-button-secondary mr-2"
+          (onClick)="toggleNewPostForm()"
+        ></p-button>
+        <p-button
+          label="Post"
+          type="submit"
+          [disabled]="postForm.invalid"
+        ></p-button>
+      </div>
+    </form>
+  </p-card>
+
+  <!-- Loading Indicator -->
+  <div *ngIf="loading" class="flex justify-center my-8">
+    <p-progressSpinner></p-progressSpinner>
+  </div>
+
+  <!-- Main Forum View -->
+  <div *ngIf="!loading && !showReplies && posts.length === 0" class="empty-state text-center p-4 flex flex-col gap-4">
+    <i class="pi pi-comments text-5xl text-500 mb-3"></i>
+    <h3>No posts yet</h3>
+    <p>Be the first to start a discussion!</p>
+  </div>
+
+  <!-- Posts List -->
+  <div *ngIf="!loading && !showReplies" class="forum-posts mb-8 w-full md:w-3/4">
+    <p-card *ngFor="let post of posts" class="mb-3">
+      <ng-template pTemplate="header">
+        <div class="flex justify-between items-center p-3 border-b-2">
+          <div class="flex items-center">
+            <p-avatar
+              [label]="post.user_full_name.charAt(0)"
+              class="mr-2"
+              [style]="{ 'background-color': '#2196F3', color: '#ffffff' }"
+            ></p-avatar>
+            <div>
+              <h4 class="m-0">{{ post.title }}</h4>
+              <span class="text-500">{{ post.user_full_name }}</span>
             </div>
           </div>
-        </p-card>
+          <span class="text-500">{{ post.created_at | date : "medium" }}</span>
+        </div>
+      </ng-template>
 
-        <div
-          *ngIf="filteredThreads.length === 0"
-          class="p-6 text-center text-gray-500"
+      <div class="p-card-content">
+        <p>{{ post.content }}</p>
+      </div>
+      
+      <ng-template pTemplate="footer">
+        <div class="flex justify-between items-center">
+          <div class="flex items-center">
+            <button
+              pButton
+              class="p-button-text p-button-rounded"
+              icon="pi pi-thumbs-up"
+              [label]="post.likes.toString()"
+              (click)="reactToPost(post.id, 'like')"
+            ></button>
+            <button
+              pButton
+              class="p-button-text p-button-rounded ml-2"
+              icon="pi pi-thumbs-down"
+              [label]="post.dislikes.toString()"
+              (click)="reactToPost(post.id, 'dislike')"
+            ></button>
+          </div>
+
+          <div>
+            <p-button
+              *ngIf="post.reply_count === 0"
+              label="Reply"
+              icon="pi pi-reply"
+              class="p-button-text"
+              (onClick)="startReply(post.id)"
+            ></p-button>
+
+            <p-button
+              *ngIf="post"
+              [label]="'View Replies (' + post.reply_count + ')'"
+              icon="pi pi-comments"
+              class="p-button-text"
+              (onClick)="viewReplies(post.id)"
+            ></p-button>
+          </div>
+        </div>
+      </ng-template>
+    </p-card>
+  </div>
+
+  <!-- Reply Form -->
+  <p-card *ngIf="replyingToPostId && !showReplies" class="mb-4 w-full md:w-1/2">
+    <h3>Write a Reply</h3>
+    <form [formGroup]="replyForm" (ngSubmit)="submitReply()">
+      <div class="field">
+        <label for="replyContent">Your Reply</label>
+        <textarea
+          id="replyContent"
+          pInputTextarea
+          formControlName="content"
+          class="w-full input"
+          rows="3"
+        ></textarea>
+        <small
+          *ngIf="
+            replyForm.get('content')?.invalid && replyForm.get('content')?.touched
+          "
+          class="text-red-600"
         >
-          <i class="pi pi-search text-4xl"></i>
-          <p class="mt-3">No discussions found matching your criteria</p>
+          Reply content is required
+        </small>
+      </div>
+
+      <div class="flex gap-4 justify-content-end mt-3">
+        <p-button
+          label="Cancel"
+          class="p-button-outlined p-button-secondary mr-2"
+          (onClick)="cancelReply()"
+        ></p-button>
+        <p-button
+          label="Post Reply"
+          type="submit"
+          [disabled]="replyForm.invalid"
+        ></p-button>
+      </div>
+    </form>
+  </p-card>
+
+  <!-- View Replies -->
+  <div *ngIf="showReplies" class="replies-view w-full md:w-3/4">
+    <!-- Original Post with Replies -->
+    <p-card *ngIf="selectedPost" class="mb-4 bg-blue-50 dark:bg-blue-900">
+      <ng-template pTemplate="header">
+        <div class="flex justify-between items-center p-3 border-b-2">
+          <div class="flex items-center">
+            <p-avatar
+              [label]="selectedPost.user_full_name.charAt(0)"
+              class="mr-2"
+              [style]="{ 'background-color': '#2196F3', color: '#ffffff' }"
+            ></p-avatar>
+            <div>
+              <h4 class="m-0">{{ selectedPost.title }}</h4>
+              <span class="text-500">{{ selectedPost.user_full_name }}</span>
+            </div>
+          </div>
+          <span class="text-500">{{ selectedPost.created_at | date : "medium" }}</span>
+        </div>
+      </ng-template>
+
+      <div class="p-card-content">
+        <p>{{ selectedPost.content }}</p>
+      </div>
+    </p-card>
+
+    <!-- Reply Form in Replies View -->
+    <p-card class="mb-4">
+      <h3>Add a Reply</h3>
+      <form [formGroup]="replyForm" (ngSubmit)="submitReply()">
+        <div class="field">
+          <textarea
+            pInputTextarea
+            formControlName="content"
+            class="w-full input"
+            rows="3"
+            placeholder="Write your reply here..."
+          ></textarea>
+          <small
+            *ngIf="
+              replyForm.get('content')?.invalid && replyForm.get('content')?.touched
+            "
+            class="text-red-600"
+          >
+            Reply content is required
+          </small>
         </div>
 
-        <p-paginator
-          [rows]="10"
-          [totalRecords]="totalThreads"
-          (onPageChange)="onPageChange($event)"
-        ></p-paginator>
+        <div class="flex justify-end mt-3">
+          <p-button
+            label="Post Reply"
+            type="submit"
+            [disabled]="replyForm.invalid"
+          ></p-button>
+        </div>
+      </form>
+    </p-card>
+
+    <!-- Replies List -->
+    <h3 class="mb-3" *ngIf="replies.length > 0">Replies ({{ replies.length }})</h3>
+    
+    <div *ngIf="loading" class="flex justify-center my-4">
+      <p-progressSpinner></p-progressSpinner>
+    </div>
+
+    <div *ngIf="!loading && replies.length === 0" class="text-center p-4 my-4 bg-gray-50 dark:bg-gray-800 rounded">
+      <p>No replies yet. Be the first to reply!</p>
+    </div>
+
+    <p-card *ngFor="let reply of replies" class="mb-3">
+      <div class="flex justify-between items-center mb-2">
+        <div class="flex items-center">
+          <p-avatar
+            [label]="reply.user_full_name?.charAt(0) || 'A'"
+            class="mr-2"
+            [style]="{ 'background-color': '#4CAF50', color: '#ffffff' }"
+          ></p-avatar>
+          <span>{{ reply.user_full_name }}</span>
+        </div>
+        <span class="text-500">{{ reply.created_at | date : "medium" }}</span>
       </div>
-    </p-tabPanel>
-    <p-tabPanel header="My Questions"></p-tabPanel>
-    <p-tabPanel header="Hot Topics"></p-tabPanel>
-  </p-tabView>
+      
+      <div class="p-card-content">
+        <p>{{ reply.content }}</p>
+      </div>
+      
+      <ng-template pTemplate="footer">
+        <div class="flex items-center">
+          <button
+            pButton
+            class="p-button-text p-button-rounded"
+            icon="pi pi-thumbs-up"
+            [label]="reply.likes.toString()"
+            (click)="reactToReply(reply.id, 'like')"
+          ></button>
+          <button
+            pButton
+            class="p-button-text p-button-rounded ml-2"
+            icon="pi pi-thumbs-down"
+            [label]="reply.dislikes.toString()"
+            (click)="reactToReply(reply.id, 'dislike')"
+          ></button>
+        </div>
+      </ng-template>
+    </p-card>
+  </div>
 </div>

@@ -126,11 +126,42 @@ export interface LeaderboardEntry {
 }
 
 export interface StudentPerformance {
-  id?: string; 
+  id?: string;
   name: string;
   email: string;
   total_points: number;
   quizzes_completed: number;
   average_score: number;
-  last_active?: string; 
+  last_active?: string;
+}
+
+export interface ForumPost {
+  id: string;
+  title: string;
+  content: string;
+  parent_id: string | null;
+  likes: number;
+  dislikes: number;
+  replies: any[];
+  created_at: string;
+  updated_at: string;
+  user_id: string;
+  user_full_name: string;
+  user_email: string;
+  user_role: string;
+  reply_count: number;
+}
+
+export interface ForumReply {
+  id: string;
+  post_id: string;
+  user_id: string;
+  content: string;
+  likes: number;
+  dislikes: number;
+  created_at: string;
+  updated_at: string;
+  user_full_name?: string;
+  user_email?: string;
+  user_role?: string;
 }

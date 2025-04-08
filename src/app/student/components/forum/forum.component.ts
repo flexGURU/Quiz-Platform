@@ -7,20 +7,18 @@ import { TabViewModule } from 'primeng/tabview';
 import { TagModule } from 'primeng/tag';
 import { AvatarModule } from 'primeng/avatar';
 import { PaginatorModule } from 'primeng/paginator';
-import { FormsModule } from '@angular/forms';
-interface ThreadSummary {
-  id: number;
-  title: string;
-  preview: string;
-  votes: number;
-  answerCount: number;
-  author: string;
-  authorAvatar: string;
-  postedTime: string;
-  tags: string[];
-  hasBounty: boolean;
-  bountyAmount?: number;
-}
+import {
+  FormBuilder,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import { ForumPost, ForumReply } from '../../../shared/models';
+import { ConfirmationService, MessageService } from 'primeng/api';
+import { ForumService } from '../../services/forum.service';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { ToastModule } from 'primeng/toast';
 
 @Component({
   selector: 'app-forum',
@@ -29,93 +27,189 @@ interface ThreadSummary {
     TabViewModule,
     CommonModule,
     CardModule,
-    RouterLink,
+    ToastModule,
     TagModule,
     AvatarModule,
     PaginatorModule,
     FormsModule,
+    ProgressSpinnerModule,
+    ReactiveFormsModule,
   ],
   templateUrl: './forum.component.html',
   styleUrl: './forum.component.css',
 })
 export class ForumComponent {
-  threads: ThreadSummary[] = [];
-  filteredThreads: ThreadSummary[] = [];
-  totalThreads: number = 0;
-  searchText: string = '';
-  currentPage: number = 0;
+  posts: ForumPost[] = [];
+  replies: ForumReply[] = [];
+  loading = true;
+  postForm: FormGroup;
+  replyForm: FormGroup;
+  showNewPostForm = false;
+  replyingToPostId: string | null = null;
+  showReplies = false;
+  selectedPost: ForumPost | null = null;
 
-  constructor() {}
+  constructor(
+    private forumService: ForumService,
+    private fb: FormBuilder,
+    private confirmationService: ConfirmationService,
+    private messageService: MessageService
+  ) {
+    this.postForm = this.fb.group({
+      title: ['', [Validators.required, Validators.maxLength(255)]],
+      content: ['', [Validators.required]],
+    });
 
-  ngOnInit() {
-    this.loadThreads();
+    this.replyForm = this.fb.group({
+      content: ['', [Validators.required]],
+    });
   }
 
-  loadThreads() {
-    // Static data instead of calling the service
-    this.threads = [
-      {
-        id: 1,
-        title: 'How to use Angular?',
-        preview: "A beginner's guide to Angular...",
-        votes: 10,
-        answerCount: 3,
-        author: 'JohnDoe',
-        authorAvatar: 'https://example.com/avatar1.jpg',
-        postedTime: '2023-10-01',
-        tags: ['Angular', 'Beginner'],
-        hasBounty: true,
-        bountyAmount: 50,
-      },
-      {
-        id: 2,
-        title: 'Advanced TypeScript Tips',
-        preview: 'Learn advanced TypeScript techniques...',
-        votes: 25,
-        answerCount: 7,
-        author: 'JaneSmith',
-        authorAvatar: 'https://example.com/avatar2.jpg',
-        postedTime: '2023-09-25',
-        tags: ['TypeScript', 'Advanced'],
-        hasBounty: false,
-      },
-      {
-        id: 3,
-        title: 'Getting Started with RxJS',
-        preview: 'Introduction to Reactive Programming...',
-        votes: 15,
-        answerCount: 5,
-        author: 'AliceJohnson',
-        authorAvatar: 'https://example.com/avatar3.jpg',
-        postedTime: '2023-09-20',
-        tags: ['RxJS', 'Reactive Programming'],
-        hasBounty: true,
-        bountyAmount: 30,
-      },
-    ];
+  ngOnInit(): void {
+    this.loadPosts();
 
-    this.filteredThreads = [...this.threads];
-    this.totalThreads = this.threads.length;
-    this.applyFilters();
+    this.forumService.forumPosts$.subscribe((posts) => {
+      this.posts = posts;
+      this.loading = false;
+
+      // If we're viewing a post's replies, update the selected post
+      if (this.replyingToPostId && this.showReplies) {
+        this.selectedPost =
+          this.posts.find((p) => p.id === this.replyingToPostId) || null;
+      }
+    });
+
+    this.forumService.replies$.subscribe((replies) => {
+      this.replies = replies;
+    });
   }
 
-  onPageChange(event: any) {
-    this.currentPage = event.page;
-    this.loadThreads();
+  loadPosts(): void {
+    this.loading = true;
+    this.forumService.getForumPosts().subscribe();
   }
 
-  applyFilters() {
-    if (!this.searchText.trim()) {
-      this.filteredThreads = [...this.threads];
+  toggleNewPostForm(): void {
+    this.showNewPostForm = !this.showNewPostForm;
+    this.replyingToPostId = null;
+    this.resetForm();
+  }
+
+  startReply(postId: string): void {
+    this.replyingToPostId = postId;
+    this.resetReplyForm();
+  }
+
+  cancelReply(): void {
+    this.replyingToPostId = null;
+  }
+
+  resetForm(): void {
+    this.postForm.reset();
+  }
+
+  resetReplyForm(): void {
+    this.replyForm.reset();
+  }
+
+  submitPost(): void {
+    if (this.postForm.invalid) {
+      this.postForm.markAllAsTouched();
       return;
     }
 
-    const searchLower = this.searchText.toLowerCase();
-    this.filteredThreads = this.threads.filter(
-      (thread) =>
-        thread.title.toLowerCase().includes(searchLower) ||
-        thread.preview.toLowerCase().includes(searchLower) ||
-        thread.tags.some((tag) => tag.toLowerCase().includes(searchLower))
+    const { title, content } = this.postForm.value;
+
+    this.forumService.createForumPost(title, content).subscribe(
+      (response) => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Post Created',
+          detail: 'Your forum post has been created successfully.',
+        });
+        this.toggleNewPostForm();
+      },
+      (error) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to create post. Please try again.',
+        });
+      }
     );
+  }
+
+  submitReply(): void {
+    if (this.replyForm.invalid || !this.replyingToPostId) {
+      this.replyForm.markAllAsTouched();
+      return;
+    }
+
+    const { content } = this.replyForm.value;
+
+    this.forumService.createReply(this.replyingToPostId, content).subscribe({
+      next: () => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Reply Posted',
+          detail: 'Your reply has been posted successfully.',
+        });
+        this.replyForm.reset();
+
+        // If we're in the replies view, refresh replies
+        if (this.showReplies && this.replyingToPostId) {
+          this.forumService.getReplies(this.replyingToPostId).subscribe();
+        } else {
+          // If we're in the main view, refresh posts to update reply count
+          this.loadPosts();
+          this.cancelReply();
+        }
+      },
+      error: (error) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to post reply. Please try again.',
+        });
+      },
+    });
+  }
+
+  reactToPost(postId: string, reaction: 'like' | 'dislike'): void {
+    this.forumService.updatePostReactions(postId, reaction).subscribe(
+      () => {
+        // Success handling if needed
+      },
+      (error) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: `Failed to ${reaction} the post. Please try again.`,
+        });
+      }
+    );
+  }
+
+  reactToReply(replyId: string, reaction: 'like' | 'dislike'): void {
+    if (!this.replyingToPostId) return;
+
+    this.forumService
+      .updateReplyReactions(replyId, reaction, this.replyingToPostId)
+      .subscribe();
+  }
+
+  viewReplies(postId: string): void {
+    this.replyingToPostId = postId;
+    this.showReplies = true;
+    this.selectedPost = this.posts.find((p) => p.id === postId) || null;
+    this.forumService.getReplies(postId).subscribe();
+  }
+
+  backToMainForum(): void {
+    this.showReplies = false;
+    this.replyingToPostId = null;
+    this.selectedPost = null;
+    this.replies = [];
+    this.loadPosts();
   }
 }
