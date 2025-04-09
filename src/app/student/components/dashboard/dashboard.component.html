@@ -11,7 +11,7 @@
     </div>
 
     <!-- Stat Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
       <!-- Progress Card -->
       <div class="transform transition-all duration-300 hover:scale-105">
         <p-card
@@ -236,6 +236,81 @@
           </div>
         </div>
       </div>
+      <div class="transform transition-all duration-300 hover:scale-105">
+        <p-card
+          routerLink="/students/forums"
+          [style]="{ width: '100%', overflow: 'hidden', cursor: 'pointer' }"
+          class="border-l-4 border-yellow-500 shadow-lg rounded-lg"
+          *ngIf="!loading"
+        >
+          <ng-template #header>
+            <div
+              class="flex justify-between items-center p-4 bg-blue-50 dark:bg-yellow-900/30"
+            >
+              <i class="pi pi-comments text-2xl text-yellow-500"></i>
+              <div class="text-right">
+                <span class="text-sm text-slate-500 dark:text-slate-400"
+                  >Engage with Peers</span
+                >
+              </div>
+            </div>
+          </ng-template>
+          <ng-template #title>Forum Activity</ng-template>
+          <ng-template #subtitle>
+            <div class="flex items-center">
+              <span
+                class="text-2xl font-bold text-yellow-600 dark:text-yellow-400"
+                >{{ forumCount }}</span
+              >
+              <span class="ml-2 text-sm text-slate-500 dark:text-slate-400"
+                >new discussions this week</span
+              >
+            </div>
+          </ng-template>
+          <ng-template #footer>
+            <div class="text-right">
+              <span
+                class="text-sm text-yellow-500 hover:text-yellow-700 flex items-center justify-end"
+              >
+                Participate in Discussions
+                <i class="pi pi-arrow-right ml-2"></i>
+              </span>
+            </div>
+          </ng-template>
+        </p-card>
+
+        <!-- Skeleton for Leaderboard Position Card -->
+        <div
+          class="border-l-4 border-purple-500 shadow-lg rounded-lg bg-white dark:bg-slate-800 overflow-hidden"
+          *ngIf="loading"
+        >
+          <div class="p-4 bg-purple-50 dark:bg-purple-900/30">
+            <p-skeleton
+              width="2rem"
+              height="2rem"
+              styleClass="mb-2"
+            ></p-skeleton>
+          </div>
+          <div class="p-4">
+            <p-skeleton
+              width="80%"
+              height="1.5rem"
+              styleClass="mb-2"
+            ></p-skeleton>
+            <div class="flex items-center mt-2">
+              <p-skeleton width="2rem" height="2rem"></p-skeleton>
+              <p-skeleton
+                width="60%"
+                height="1rem"
+                styleClass="ml-2"
+              ></p-skeleton>
+            </div>
+          </div>
+          <div class="p-4 flex justify-end">
+            <p-skeleton width="40%" height="1rem"></p-skeleton>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Recent Quizzes -->
@@ -291,7 +366,6 @@
               <td class="text-slate-600 dark:text-slate-400">
                 {{ quizz.date }}
               </td>
-
             </tr>
           </ng-template>
           <ng-template #emptymessage>

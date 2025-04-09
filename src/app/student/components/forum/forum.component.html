@@ -1,5 +1,7 @@
 <!-- forum.component.html -->
-<div class="forum-container p-10 bg-slate-50 dark:bg-slate-900 flex flex-col items-center">
+<div
+  class="forum-container p-10 bg-slate-50 dark:bg-slate-900 flex flex-col items-center"
+>
   <p-toast></p-toast>
 
   <!-- Header -->
@@ -11,6 +13,14 @@
         label="New Post"
         icon="pi pi-plus"
         (onClick)="toggleNewPostForm()"
+      ></p-button>
+      <p-button
+        *ngIf="!showNewPostForm && !showReplies"
+        label="Go To Dashboard"
+        icon="pi pi-arrow-left"
+        variant="outlined"
+        severity="danger"
+        routerLink="/students/dashboard"
       ></p-button>
       <p-button
         *ngIf="showReplies"
@@ -83,15 +93,21 @@
   </div>
 
   <!-- Main Forum View -->
-  <div *ngIf="!loading && !showReplies && posts.length === 0" class="empty-state text-center p-4 flex flex-col gap-4">
+  <div
+    *ngIf="!loading && !showReplies && posts.length === 0"
+    class="empty-state text-center p-4 flex flex-col gap-4"
+  >
     <i class="pi pi-comments text-5xl text-500 mb-3"></i>
     <h3>No posts yet</h3>
     <p>Be the first to start a discussion!</p>
   </div>
 
   <!-- Posts List -->
-  <div *ngIf="!loading && !showReplies" class="forum-posts mb-8 w-full md:w-3/4">
-    <p-card *ngFor="let post of posts" class="mb-3">
+  <div
+    *ngIf="!loading && !showReplies"
+    class="flex flex-col gap-5 mb-8 w-full md:w-3/4"
+  >
+    <p-card *ngFor="let post of posts" class="">
       <ng-template pTemplate="header">
         <div class="flex justify-between items-center p-3 border-b-2">
           <div class="flex items-center">
@@ -112,7 +128,7 @@
       <div class="p-card-content">
         <p>{{ post.content }}</p>
       </div>
-      
+
       <ng-template pTemplate="footer">
         <div class="flex justify-between items-center">
           <div class="flex items-center">
@@ -137,13 +153,13 @@
               *ngIf="post.reply_count === 0"
               label="Reply"
               icon="pi pi-reply"
-              class="p-button-text"
+              class="p-button-text mr-3"
               (onClick)="startReply(post.id)"
             ></p-button>
 
             <p-button
               *ngIf="post"
-              [label]="'View Replies (' + post.reply_count + ')'"
+              [label]="'View Replies '"
               icon="pi pi-comments"
               class="p-button-text"
               (onClick)="viewReplies(post.id)"
@@ -169,7 +185,8 @@
         ></textarea>
         <small
           *ngIf="
-            replyForm.get('content')?.invalid && replyForm.get('content')?.touched
+            replyForm.get('content')?.invalid &&
+            replyForm.get('content')?.touched
           "
           class="text-red-600"
         >
@@ -195,28 +212,32 @@
   <!-- View Replies -->
   <div *ngIf="showReplies" class="replies-view w-full md:w-3/4">
     <!-- Original Post with Replies -->
-    <p-card *ngIf="selectedPost" class="mb-4 bg-blue-50 dark:bg-blue-900">
-      <ng-template pTemplate="header">
-        <div class="flex justify-between items-center p-3 border-b-2">
-          <div class="flex items-center">
-            <p-avatar
-              [label]="selectedPost.user_full_name.charAt(0)"
-              class="mr-2"
-              [style]="{ 'background-color': '#2196F3', color: '#ffffff' }"
-            ></p-avatar>
-            <div>
-              <h4 class="m-0">{{ selectedPost.title }}</h4>
-              <span class="text-500">{{ selectedPost.user_full_name }}</span>
+    <div class="mb-4 border rounded-lg border-green-500">
+      <p-card *ngIf="selectedPost" class="bg-blue-50 dark:bg-blue-900">
+        <ng-template pTemplate="header">
+          <div class="flex justify-between items-center p-3 border-b-2">
+            <div class="flex items-center">
+              <p-avatar
+                [label]="selectedPost.user_full_name.charAt(0)"
+                class="mr-2"
+                [style]="{ 'background-color': '#2196F3', color: '#ffffff' }"
+              ></p-avatar>
+              <div>
+                <h4 class="m-0">{{ selectedPost.title }}</h4>
+                <span class="text-500">{{ selectedPost.user_full_name }}</span>
+              </div>
             </div>
+            <span class="text-500">{{
+              selectedPost.created_at | date : "medium"
+            }}</span>
           </div>
-          <span class="text-500">{{ selectedPost.created_at | date : "medium" }}</span>
-        </div>
-      </ng-template>
+        </ng-template>
 
-      <div class="p-card-content">
-        <p>{{ selectedPost.content }}</p>
-      </div>
-    </p-card>
+        <div class="p-card-content">
+          <p>{{ selectedPost.content }}</p>
+        </div>
+      </p-card>
+    </div>
 
     <!-- Reply Form in Replies View -->
     <p-card class="mb-4">
@@ -232,7 +253,8 @@
           ></textarea>
           <small
             *ngIf="
-              replyForm.get('content')?.invalid && replyForm.get('content')?.touched
+              replyForm.get('content')?.invalid &&
+              replyForm.get('content')?.touched
             "
             class="text-red-600"
           >
@@ -251,51 +273,58 @@
     </p-card>
 
     <!-- Replies List -->
-    <h3 class="mb-3" *ngIf="replies.length > 0">Replies ({{ replies.length }})</h3>
-    
+    <h3 class="mb-3 text-lg my-4 text-green-500" *ngIf="replies.length > 0">
+      Replies ({{ replies.length }})
+    </h3>
+
     <div *ngIf="loading" class="flex justify-center my-4">
       <p-progressSpinner></p-progressSpinner>
     </div>
 
-    <div *ngIf="!loading && replies.length === 0" class="text-center p-4 my-4 bg-gray-50 dark:bg-gray-800 rounded">
+    <div
+      *ngIf="!loading && replies.length === 0"
+      class="text-center p-4 my-4 bg-gray-50 dark:bg-gray-800 rounded"
+    >
       <p>No replies yet. Be the first to reply!</p>
     </div>
 
-    <p-card *ngFor="let reply of replies" class="mb-3">
-      <div class="flex justify-between items-center mb-2">
-        <div class="flex items-center">
-          <p-avatar
-            [label]="reply.user_full_name?.charAt(0) || 'A'"
-            class="mr-2"
-            [style]="{ 'background-color': '#4CAF50', color: '#ffffff' }"
-          ></p-avatar>
-          <span>{{ reply.user_full_name }}</span>
+    <div class="flex flex-col gap-4">
+      <p-card *ngFor="let reply of replies" class="mb-3">
+        <div class="flex justify-between items-center mb-2">
+          <div class="flex items-center">
+            <p-avatar
+              [label]="reply.user_full_name?.charAt(0) || 'A'"
+              class="mr-2"
+              [style]="{ 'background-color': '#4CAF50', color: '#ffffff' }"
+            ></p-avatar>
+            <span>{{ reply.user_full_name }}</span>
+          </div>
+          <span class="text-500">{{ reply.created_at | date : "medium" }}</span>
         </div>
-        <span class="text-500">{{ reply.created_at | date : "medium" }}</span>
-      </div>
-      
-      <div class="p-card-content">
-        <p>{{ reply.content }}</p>
-      </div>
-      
-      <ng-template pTemplate="footer">
-        <div class="flex items-center">
-          <button
-            pButton
-            class="p-button-text p-button-rounded"
-            icon="pi pi-thumbs-up"
-            [label]="reply.likes.toString()"
-            (click)="reactToReply(reply.id, 'like')"
-          ></button>
-          <button
-            pButton
-            class="p-button-text p-button-rounded ml-2"
-            icon="pi pi-thumbs-down"
-            [label]="reply.dislikes.toString()"
-            (click)="reactToReply(reply.id, 'dislike')"
-          ></button>
+
+        <div class="p-card-content">
+          <p>{{ reply.content }}</p>
         </div>
-      </ng-template>
-    </p-card>
+
+        <ng-template pTemplate="footer">
+          <div class="flex items-center">
+            <button
+              pButton
+              class="p-button-text p-button-rounded"
+              icon="pi pi-thumbs-up"
+              [label]="reply.likes.toString()"
+              (click)="reactToReply(reply.id, 'like')"
+            ></button>
+            <button
+              pButton
+              class="p-button-text p-button-rounded ml-2"
+              icon="pi pi-thumbs-down"
+              [label]="reply.dislikes.toString()"
+              (click)="reactToReply(reply.id, 'dislike')"
+            ></button>
+          </div>
+        </ng-template>
+      </p-card>
+    </div>
   </div>
 </div>

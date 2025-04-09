@@ -34,6 +34,7 @@ import { ToastModule } from 'primeng/toast';
     FormsModule,
     ProgressSpinnerModule,
     ReactiveFormsModule,
+    RouterLink,
   ],
   templateUrl: './forum.component.html',
   styleUrl: './forum.component.css',
@@ -70,6 +71,7 @@ export class ForumComponent {
 
     this.forumService.forumPosts$.subscribe((posts) => {
       this.posts = posts;
+
       this.loading = false;
 
       // If we're viewing a post's replies, update the selected post

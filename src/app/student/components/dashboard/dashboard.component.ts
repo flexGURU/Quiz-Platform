@@ -13,6 +13,8 @@ import { TagModule } from 'primeng/tag';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { AuthService } from '../../../shared/services/auth.service';
 import { SkeletonModule } from 'primeng/skeleton';
+import { ForumService } from '../../services/forum.service';
+import { response } from 'express';
 
 @Component({
   selector: 'app-dashboard',
@@ -35,6 +37,7 @@ import { SkeletonModule } from 'primeng/skeleton';
 export class DashboardComponent {
   private quizService = inject(QuizService);
   private authService = inject(AuthService);
+  private forumService = inject(ForumService);
   quizzList: QuizDB[] = [];
   totalQuizzNumber: number = 0;
   completedQuizNumber!: number;
@@ -42,12 +45,22 @@ export class DashboardComponent {
   loading: boolean = true;
   progress!: number;
   recentQuizzes: any[] = [];
+  forumCount!: number;
 
   ngOnInit(): void {
     this.getQuizzes();
     this.authService.currentUser$.subscribe((response) => {
       console.log('current user', response);
     });
+
+    this.forumService.forumCount$.subscribe((response) => {
+      console.log("hhh",response);
+      
+      if (response) {
+        this.forumCount = response;
+      }
+    });
+
     this.userID = this.authService.userId;
     this.recentQuizzesCount();
 

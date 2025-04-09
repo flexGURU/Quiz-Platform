@@ -17,6 +17,7 @@ import { AuthService } from '../../shared/services/auth.service';
 export const GET_FROM_POST_RPC = 'get_forum_posts';
 export const FORUM_POST_TABLE = 'forum_posts';
 export const FORUM_REPLIES_TABLE = 'forum_replies';
+export const FORUM_POSTS_TABLE = 'forum_posts';
 
 @Injectable({
   providedIn: 'root',
@@ -28,12 +29,14 @@ export class ForumService {
   repliesSubject = new BehaviorSubject<ForumReply[]>([]);
   private userId!: string;
   replies$ = this.repliesSubject.asObservable();
-
+  private forumCountSubject = new BehaviorSubject<number | null>(0);
+  forumCount$ = this.forumCountSubject.asObservable();
 
   authService = inject(AuthService);
 
   constructor() {
     this.userId = this.authService.userId;
+    this.getForumCount().subscribe()
   }
 
   getForumPosts = (
@@ -244,4 +247,22 @@ export class ForumService {
       })
     );
   }
+
+  getForumCount = (): Observable<number> => {
+    const promise = this.supabaseClient
+      .from(FORUM_POST_TABLE)
+      .select('*', { count: 'exact', head: true });
+  
+    return from(promise).pipe(
+      map(({ data, count, error }) => {
+        if (error) throw error;
+        return count || 0;
+      }),
+      tap((response) => {
+        this.forumCountSubject.next(response);
+        console.log('counts of forum', response);
+      })
+    );
+  };
+  
 }
