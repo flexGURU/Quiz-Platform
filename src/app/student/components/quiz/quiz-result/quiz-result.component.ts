@@ -8,6 +8,7 @@ import { GradingService } from '../../../services/grading.service';
 import { QuestionResult, QuizResult } from '../../../../shared/models';
 import { response } from 'express';
 import { SpinnerComponent } from '../../../../shared/components/spinner/spinner.component';
+import { AuthService } from '../../../../shared/services/auth.service';
 
 @Component({
   selector: 'app-quiz-result',
@@ -30,21 +31,27 @@ export class QuizResultComponent {
   quizResult: QuizResult | null = null;
   questionResults: QuestionResult[] = [];
   showPerformanceQuestions: Boolean = false;
+  userID!: string;
 
   loadSpinner = false;
 
   constructor(private route: ActivatedRoute) {}
   private supabaseClient = inject(GradingService);
+  private authService = inject(AuthService);
 
   ngOnInit(): void {
     this.route.queryParams.subscribe((response) => {
       this.quizId = response['id'];
     });
 
-    this.supabaseClient.getGradedQuiz(this.quizId).subscribe((response) => {
-      this.quizResult = response;
-      console.log('graded quiz', this.quizResult);
-    });
+    this.userID = this.authService.userId;
+
+    this.supabaseClient
+      .getGradedQuiz(this.quizId, this.userID)
+      .subscribe((response) => {
+        this.quizResult = response;
+        console.log('graded quiz', this.quizResult);
+      });
     // this.prepareChartData();
 
     setTimeout(() => {

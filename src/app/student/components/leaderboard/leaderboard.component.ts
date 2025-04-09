@@ -19,7 +19,7 @@ import { RouterLink } from '@angular/router';
     DropdownModule,
     CardModule,
     TableModule,
-    
+    RouterLink,
   ],
   templateUrl: './leaderboard.component.html',
   styleUrl: './leaderboard.component.css',

@@ -14,13 +14,14 @@ export class GradingService {
 
   constructor() {}
 
-  getGradedQuiz = (quizId: string): Observable<QuizResult | null> => {
+  getGradedQuiz = (quizId: string, userId: string): Observable<QuizResult | null> => {
     const promise = this.supabaseClient
       .from(QUIZ_RESULTS_TABLE)
       .select('*')
       .eq('quiz_id', quizId)
+      .eq('user_id', userId)  
       .single();
-
+    
     return from(promise).pipe(
       map((response) => {
         if (response.error || !response.data) {

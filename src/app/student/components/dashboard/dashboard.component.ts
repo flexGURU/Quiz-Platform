@@ -5,7 +5,7 @@ import { TableModule } from 'primeng/table';
 import { ListboxModule } from 'primeng/listbox';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { QuizService } from '../../services/quiz.service';
 import { QuizDB } from '../../../shared/models';
 import { ButtonModule } from 'primeng/button';
@@ -38,6 +38,7 @@ export class DashboardComponent {
   private quizService = inject(QuizService);
   private authService = inject(AuthService);
   private forumService = inject(ForumService);
+  
   quizzList: QuizDB[] = [];
   totalQuizzNumber: number = 0;
   completedQuizNumber!: number;
@@ -46,6 +47,8 @@ export class DashboardComponent {
   progress!: number;
   recentQuizzes: any[] = [];
   forumCount!: number;
+
+  constructor(private router: Router){}
 
   ngOnInit(): void {
     this.getQuizzes();
@@ -112,6 +115,7 @@ export class DashboardComponent {
       console.log('which quizzes', response);
 
       const quizr = response.map((quiz) => ({
+        quizId: quiz.quiz_id,
         name: quiz.name,
         score: quiz.score,
         date: quiz.date,
@@ -145,5 +149,15 @@ export class DashboardComponent {
         (this.completedQuizNumber * 100) / this.totalQuizzNumber;
       this.progress = Math.round(percentage);
     }
+  }
+
+  showQuizResult(quizId: string){
+    console.log("selected done quiz", quizId);
+
+    this.router.navigate(['/students/quiz-result'],{
+      queryParams: {
+        id: quizId
+      }
+    })
   }
 }
