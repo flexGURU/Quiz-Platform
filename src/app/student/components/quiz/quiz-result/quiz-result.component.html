@@ -1,12 +1,12 @@
-<div class="container mx-auto p-4" *ngIf="quizResult">
+<div class="container mx-auto  dark:bg-slate-900  p-8" *ngIf="quizResult">
   <!-- Score Summary Section -->
-  <p-card styleClass="mb-6 shadow-lg">
+  <p-card styleClass="mb-6 shadow-lg border-b border-green-500 rounded-lg">
     <ng-template pTemplate="header">
-      <div class="bg-blue-50 p-4 text-center">
-        <h1 class="text-2xl font-bold mb-2 text-slate-900">
+      <div class="bg-blue-50 dark:bg-slate-800 p-4 text-center">
+        <h1 class="text-2xl font-bold mb-2 text-white">
           {{ quizResult.quiz_title }} - Results
         </h1>
-        <p class="text-gray-500">Completed in {{ quizResult.completed_at }}</p>
+        <p class="text-slate-300 font-thin">Completed in {{ quizResult.completed_at | date}}</p>
       </div>
     </ng-template>
 

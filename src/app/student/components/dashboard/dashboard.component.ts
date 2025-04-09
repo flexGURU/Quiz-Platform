@@ -112,7 +112,6 @@ export class DashboardComponent {
 
   recentQuizzesapi = () => {
     this.quizService.getRecentQuizzes(this.userID).subscribe((response) => {
-      console.log('which quizzes', response);
 
       const quizr = response.map((quiz) => ({
         quizId: quiz.quiz_id,
@@ -129,7 +128,6 @@ export class DashboardComponent {
     this.quizService
       .getUpcomingQuizzesCount(this.userID)
       .subscribe((response) => {
-        console.log('rcent quizzes', response);
       });
   };
 
@@ -137,7 +135,6 @@ export class DashboardComponent {
     this.quizService
       .getCompletedQuizzesCount(this.userID)
       .subscribe((response) => {
-        console.log('comploted quizzes', response);
         this.completedQuizNumber = response;
         this.updateProgress();
       });
@@ -152,7 +149,6 @@ export class DashboardComponent {
   }
 
   showQuizResult(quizId: string){
-    console.log("selected done quiz", quizId);
 
     this.router.navigate(['/students/quiz-result'],{
       queryParams: {
