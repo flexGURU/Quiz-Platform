@@ -91,8 +91,6 @@ export class QuizHomeComponent {
   }
 
   startQuiz(quizId: string | undefined, quizTitle: string): void {
-    console.log(`Starting quiz with ID: ${quizId}`);
-    // In a real application, navigate to the quiz page with the selected quiz ID
     this.router.navigate(['/students/quiz-test'], {
       queryParams: {
         quiz_id: quizId,
@@ -103,7 +101,6 @@ export class QuizHomeComponent {
 
   upcomingQuizzes = () => {
     this.quizService.getUpcomingQuizzes(this.userID).subscribe((response) => {
-      console.log('upcomi quizzes', response);
       this.subjectList = response;
     });
   };

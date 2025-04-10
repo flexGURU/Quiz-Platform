@@ -19,6 +19,9 @@ import {
 import { AuthService } from '../../../../../shared/services/auth.service';
 import { SpinnerComponent } from '../../../../../shared/components/spinner/spinner.component';
 import { InstructionsComponent } from '../instructions/instructions.component';
+import { ViolationDirective } from '../violation/violation.directive';
+import { Violation } from '../violation/types';
+import { ViolationService } from '../../../../services/violation.service';
 
 @Component({
   selector: 'app-quiz-test',
@@ -34,6 +37,7 @@ import { InstructionsComponent } from '../instructions/instructions.component';
     ProgressBarModule,
     SpinnerComponent,
     InstructionsComponent,
+    ViolationDirective,
   ],
   templateUrl: './quiz-test.component.html',
   styleUrl: './quiz-test.component.css',
@@ -53,11 +57,13 @@ export class QuizTestComponent {
   quizResultId!: number;
   loadSpinner = false;
   isQuizStarted = signal<boolean>(false);
+  quizViolations = signal<Violation[]>([]);
+  userId!: string;
 
   constructor(private route: ActivatedRoute, private router: Router) {}
   private supabaseClient = inject(QuizService);
   private authService = inject(AuthService);
-  userId!: string;
+  private violationService = inject(ViolationService);
 
   ngOnInit(): void {
     this.route.queryParams.subscribe((value) => {
@@ -77,8 +83,10 @@ export class QuizTestComponent {
         id: this.quizIDParam,
         title: this.quizTitleParam,
         questions: response,
-        timeLimit: 20044,
+        timeLimit: 5,
       };
+      // response.length * 120
+
       this.generateStepsModel();
       if (this.sampleQuiz.timeLimit > 0) {
         this.remainingTime = this.sampleQuiz.timeLimit;
@@ -93,7 +101,6 @@ export class QuizTestComponent {
   startQuiz() {
     this.isQuizStarted.set(true);
     this.loadSampleQuiz(this.quizIDParam);
-
   }
 
   generateStepsModel(): void {
@@ -168,6 +175,7 @@ export class QuizTestComponent {
     console.log('quiz result', this.quizResult);
 
     this.saveQuizResults(this.quizResult);
+    this.saveViolations(this.userId, this.quizIDParam, this.quizViolations());
   }
 
   saveQuizResults(result: QuizResult): void {
@@ -249,5 +257,15 @@ export class QuizTestComponent {
       question_results: questionResults,
       completed_at: new Date().toISOString(),
     };
+  }
+
+  onDetectQuizViolation(violation: Violation) {
+    this.quizViolations.update((prev) => [...prev, violation]);
+    console.log('violation', this.quizViolations());
+  }
+  saveViolations(userId: string, quizId: string, violations: Violation[]) {
+    this.violationService
+      .recordViolation(userId, quizId, violations)
+      .subscribe();
   }
 }

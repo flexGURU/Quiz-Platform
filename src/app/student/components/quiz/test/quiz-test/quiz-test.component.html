@@ -1,8 +1,11 @@
-
 @if (loadSpinner) {
-  <app-spinner></app-spinner>
+<app-spinner></app-spinner>
 }
-<div class="container mx-auto p-4 bg-slate-50 dark:bg-slate-900 " *ngIf="sampleQuiz ">
+<div
+  class="container mx-auto p-4 bg-slate-50 dark:bg-slate-900"
+  *ngIf="sampleQuiz"
+  appViolation (quizViolation)="onDetectQuizViolation($event)"
+>
   <div class="flex justify-between items-center mb-4">
     <h1 class="text-2xl font-bold">{{ sampleQuiz.title }}</h1>
     <!-- Timer Section -->
@@ -12,7 +15,7 @@
         <span class="text-xl font-bold">{{ formatTime(remainingTime) }}</span>
       </div>
       <p-progressBar
-        [value]="(remainingTime / sampleQuiz.timeLimit) * 100"
+        [value]="(remainingTime / sampleQuiz.timeLimit) * 1000"
         [showValue]="false"
         [style]="{ height: '6px' }"
         styleClass="mt-1"
@@ -29,7 +32,10 @@
   ></p-steps>
 
   <!-- Question Display Section -->
-  <p-card *ngIf="currentQuestion" styleClass="bg-slate-50 dark:bg-slate-900 my-10 p-5">
+  <p-card
+    *ngIf="currentQuestion"
+    styleClass="bg-slate-50 dark:bg-slate-900 my-10 p-5"
+  >
     <div class="mb-4">
       <h2 class="text-xl font-semibold mb-3">
         Question {{ currentQuestionIndex + 1 }}
@@ -117,8 +123,9 @@
         label="View Results"
         icon="pi pi-chart-bar"
         class="p-button-success"
-        [routerLink]="'/students/quiz-result'" [queryParams]="{ id: quizIDParam}"
-        ></p-button>
+        [routerLink]="'/students/quiz-result'"
+        [queryParams]="{ id: quizIDParam }"
+      ></p-button>
     </div>
   </div>
 </p-dialog>

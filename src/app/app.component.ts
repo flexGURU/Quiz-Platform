@@ -20,7 +20,6 @@ export class AppComponent {
 
   constructor(private router: Router, private authService: AuthService) {
     this.authService.userRole$.subscribe((response) => {
-      console.log('role', response);
       if (response && response === 'teacher') {
         this.userRole = true;
       }

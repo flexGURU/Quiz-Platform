@@ -56,7 +56,6 @@ export class QuizService {
           console.log('Error getting quiz questions:', response.error.message);
           return [];
         }
-        console.log('Supabase response:', response.data);
 
         return response.data.map((q: QuestionMinimal, index: number) => ({
           id: q.id,
