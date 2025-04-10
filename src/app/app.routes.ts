@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 import { DashboardComponent } from './student/components/dashboard/dashboard.component';
 import { QuizHomeComponent } from './student/components/quiz/quiz-home/quiz-home.component';
-import { QuizTestComponent } from './student/components/quiz/quiz-test/quiz-test.component';
+import { QuizTestComponent } from './student/components/quiz/test/quiz-test/quiz-test.component';
 import { QuizResultComponent } from './student/components/quiz/quiz-result/quiz-result.component';
 import { LeaderboardComponent } from './student/components/leaderboard/leaderboard.component';
 import { AchievementsComponent } from './student/components/achievements/achievements.component';

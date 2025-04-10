@@ -9,15 +9,16 @@ import { CardModule } from 'primeng/card';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
-import { QuizService } from '../../../services/quiz.service';
+import { QuizService } from '../../../../services/quiz.service';
 import {
   QuestionResult,
   QuizResult,
   SampleQuiz,
   SampleQuizQuestion,
-} from '../../../../shared/models';
-import { AuthService } from '../../../../shared/services/auth.service';
-import { SpinnerComponent } from '../../../../shared/components/spinner/spinner.component';
+} from '../../../../../shared/models';
+import { AuthService } from '../../../../../shared/services/auth.service';
+import { SpinnerComponent } from '../../../../../shared/components/spinner/spinner.component';
+import { InstructionsComponent } from '../instructions/instructions.component';
 
 @Component({
   selector: 'app-quiz-test',
@@ -32,6 +33,7 @@ import { SpinnerComponent } from '../../../../shared/components/spinner/spinner.
     DialogModule,
     ProgressBarModule,
     SpinnerComponent,
+    InstructionsComponent,
   ],
   templateUrl: './quiz-test.component.html',
   styleUrl: './quiz-test.component.css',
@@ -50,6 +52,7 @@ export class QuizTestComponent {
   awardedPoints: number = 0;
   quizResultId!: number;
   loadSpinner = false;
+  isQuizStarted = signal<boolean>(false);
 
   constructor(private route: ActivatedRoute, private router: Router) {}
   private supabaseClient = inject(QuizService);
@@ -63,7 +66,6 @@ export class QuizTestComponent {
     this.route.queryParams.subscribe((value) => {
       this.quizTitleParam = value['quiz_title'];
     });
-    this.loadSampleQuiz(this.quizIDParam);
 
     this.userId = this.authService.userId;
   }
@@ -80,11 +82,19 @@ export class QuizTestComponent {
       this.generateStepsModel();
       if (this.sampleQuiz.timeLimit > 0) {
         this.remainingTime = this.sampleQuiz.timeLimit;
-        this.startTimer();
+        if (this.isQuizStarted()) {
+          this.startTimer();
+        }
       }
       this.loadSpinner = false;
     });
   };
+
+  startQuiz() {
+    this.isQuizStarted.set(true);
+    this.loadSampleQuiz(this.quizIDParam);
+
+  }
 
   generateStepsModel(): void {
     if (this.sampleQuiz) {
