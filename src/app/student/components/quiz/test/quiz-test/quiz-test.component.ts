@@ -83,7 +83,7 @@ export class QuizTestComponent {
         id: this.quizIDParam,
         title: this.quizTitleParam,
         questions: response,
-        timeLimit: 5,
+        timeLimit: response.length * 120,
       };
       // response.length * 120
 
