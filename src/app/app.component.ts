@@ -5,10 +5,17 @@ import { ToastModule } from 'primeng/toast';
 import { AuthService } from './shared/services/auth.service';
 import { User } from '@supabase/supabase-js';
 import { MenubarComponent } from './teacher/components/menubar/menubar.component';
+import { AdminMenubarComponent } from './admin/components/admin-menubar/admin-menubar.component';
 
 @Component({
   selector: 'app-root',
-  imports: [NavComponent, RouterOutlet, ToastModule, MenubarComponent],
+  imports: [
+    NavComponent,
+    RouterOutlet,
+    ToastModule,
+    MenubarComponent,
+    AdminMenubarComponent,
+  ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
 })
@@ -17,6 +24,7 @@ export class AppComponent {
   loadSpinner = false;
   userRole: boolean = false;
   reloaded: boolean = false;
+  adminRole!: string;
 
   constructor(private router: Router, private authService: AuthService) {
     this.authService.userRole$.subscribe((response) => {
@@ -24,6 +32,9 @@ export class AppComponent {
         this.userRole = true;
       }
       this.reloaded = true;
+      if (response === 'admin') {
+        this.adminRole = response;
+      }
     });
   }
 

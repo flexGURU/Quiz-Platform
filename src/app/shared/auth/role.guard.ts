@@ -19,7 +19,7 @@ export const roleGuard: CanActivateFn = async (route, state) => {
     console.log('Insufficient permissions - redirecting to default route');
     
     if (authService.hasRole('admin')) {
-      router.navigate(['/admin/operations']);
+      router.navigate(['/admin/manage-users']);
     } else if (authService.hasRole('teacher')) {
       router.navigate(['/teacher/question-bank']);
     } else {

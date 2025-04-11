@@ -57,7 +57,7 @@ export const routes: Routes = [
   {
     path: 'admin',
     children: [
-      { path: 'operations', component: OperationsComponent },
+      { path: 'manage-users', component: OperationsComponent },
       { path: 'violations', component: ViolationsComponent },
     ],
     canActivate: [authGuard, roleGuard],

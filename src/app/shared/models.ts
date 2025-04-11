@@ -165,3 +165,25 @@ export interface ForumReply {
   user_email?: string;
   user_role?: string;
 }
+
+export interface Violation {
+  type: string;
+  timestamp?: Date;
+}
+
+export interface QuizViolation {
+  violation_id: number;
+  user_id: string;
+  full_name: string; 
+  email: string;
+  quiz_id: string;
+  quiz_title: string;
+  violations: Violation[];
+  created_at: Date;
+}
+
+export interface ViolationSummary {
+  totalViolations: number;
+  violationsByType: Map<string, number>;
+  mostCommonViolation: string;
+}

@@ -3,8 +3,10 @@
 
 } @if(reloaded && userRole){
 <app-menubar></app-menubar>
-}
+} @if(adminRole === 'admin'){
+<app-admin-menubar></app-admin-menubar>
 
+}
 <p-toast></p-toast>
 
 <router-outlet></router-outlet>

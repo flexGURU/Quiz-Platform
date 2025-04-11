@@ -1,249 +1,186 @@
-import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { AvatarModule } from 'primeng/avatar';
-import { ButtonModule } from 'primeng/button';
+import {
+  QuizViolation,
+  Violation,
+  ViolationSummary,
+} from '../../../shared/models';
+import { Observable, tap, catchError, of } from 'rxjs';
+import { ViolationService } from '../../services/violation.service';
+import { CommonModule } from '@angular/common';
 import { CardModule } from 'primeng/card';
-import { DropdownModule } from 'primeng/dropdown';
-import { SelectButtonModule } from 'primeng/selectbutton';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
-import { TimelineModule } from 'primeng/timeline';
+import { ButtonModule } from 'primeng/button';
+import { BadgeModule } from 'primeng/badge';
+import { DialogModule } from 'primeng/dialog';
+import { DividerModule } from 'primeng/divider';
 
 @Component({
   selector: 'app-violations',
   imports: [
     CommonModule,
-    FormsModule,
-    SelectButtonModule,
+    CardModule,
     TableModule,
     TagModule,
-    AvatarModule,
-    CardModule,
-    DropdownModule,
-    TimelineModule, 
-    ButtonModule
+    ButtonModule,
+    BadgeModule,
+    DialogModule,
+    DividerModule,
   ],
   templateUrl: './violations.component.html',
   styleUrl: './violations.component.css',
   providers: [MessageService, ConfirmationService],
 })
 export class ViolationsComponent {
-  // Reports listing
-  reports: any[] = [];
-  reportSearchTerm: string = '';
-  selectedStatus: string = 'pending';
-  reportStatusOptions: any[] = [
-    { label: 'Pending', value: 'pending' },
-    { label: 'Resolved', value: 'resolved' },
-    { label: 'All', value: 'all' },
-  ];
+  violations$!: Observable<QuizViolation[]>;
+  loading = true;
+  selectedViolation: QuizViolation | null = null;
+  displayViolationDialog = false;
 
-  // Selected report
-  selectedReport: any = null;
-
-  // Action options
-  selectedAction: string = 'dismiss';
-  actionOptions: any[] = [
-    { label: 'Dismiss', value: 'dismiss' },
-    { label: 'Warn User', value: 'warn' },
-    { label: 'Temporarily Ban', value: 'temporarily-ban' },
-    { label: 'Permanently Ban', value: 'permanently-ban' },
-  ];
-
-  // Ban duration options
-  selectedBanDuration: string = '24h';
-  banDurationOptions: any[] = [
-    { label: '24 Hours', value: '24h' },
-    { label: '3 Days', value: '3d' },
-    { label: '7 Days', value: '7d' },
-    { label: '30 Days', value: '30d' },
-  ];
-
-  // Action comment
-  actionComment: string = '';
+  // For the summary section
+  violationSummary: ViolationSummary = {
+    totalViolations: 0,
+    violationsByType: new Map<string, number>(),
+    mostCommonViolation: '',
+  };
 
   constructor(
-    private confirmationService: ConfirmationService,
+    private violationService: ViolationService,
     private messageService: MessageService
   ) {}
 
-  ngOnInit() {
-    this.loadReports();
+  ngOnInit(): void {
+    this.loadViolations();
   }
 
-  loadReports() {
-    // Sample report data
-    this.reports = [
-      {
-        id: 1,
-        type: 'Inappropriate Content',
-        reporter: 'Alice Johnson',
-        reporterAvatar: 'https://via.placeholder.com/150',
-        reportedUser: 'John Doe',
-        reportedUserAvatar: 'https://via.placeholder.com/150',
-        status: 'pending',
-        date: new Date(2025, 2, 22, 14, 30), // March 22, 2025, 2:30 PM
-        reason:
-          'This user posted content that violates community guidelines regarding appropriate classroom discussion topics.',
-        evidenceType: 'text',
-        evidenceText:
-          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non mauris vitae erat consequat auctor eu in elit. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.',
-        history: [],
-      },
-      {
-        id: 2,
-        type: 'Harassment',
-        reporter: 'Bob Smith',
-        reporterAvatar: 'https://via.placeholder.com/150',
-        reportedUser: 'Jane Williams',
-        reportedUserAvatar: 'https://via.placeholder.com/150',
-        status: 'pending',
-        date: new Date(2025, 2, 21, 10, 15), // March 21, 2025, 10:15 AM
-        reason:
-          'This user has been repeatedly sending harassing messages to other students in the class chat.',
-        evidenceType: 'screenshot',
-        evidenceImage: 'https://via.placeholder.com/800x400',
-        history: [],
-      },
-      {
-        id: 3,
-        type: 'Cheating',
-        reporter: 'David Brown',
-        reporterAvatar: 'https://via.placeholder.com/150',
-        reportedUser: 'Michael Wilson',
-        reportedUserAvatar: 'https://via.placeholder.com/150',
-        status: 'pending',
-        date: new Date(2025, 2, 20, 9, 45), // March 20, 2025, 9:45 AM
-        reason:
-          'I believe this student has been sharing answers during online exams based on the similarity of responses.',
-        evidenceType: 'text',
-        evidenceText:
-          'The answers submitted by this student are identical to three other students, including the same unusual phrasing and even the same typographical errors.',
-        history: [],
-      },
-      {
-        id: 4,
-        type: 'Inappropriate Content',
-        reporter: 'Eva Davis',
-        reporterAvatar: 'https://via.placeholder.com/150',
-        reportedUser: 'Sarah Taylor',
-        reportedUserAvatar: 'https://via.placeholder.com/150',
-        status: 'resolved',
-        date: new Date(2025, 2, 18, 13, 20), // March 18, 2025, 1:20 PM
-        reason:
-          "This user posted inappropriate content in the discussion forum that doesn't align with our community standards.",
-        evidenceType: 'screenshot',
-        evidenceImage: 'https://via.placeholder.com/800x400',
-        history: [
-          {
-            action: 'Report Received',
-            by: 'System',
-            date: new Date(2025, 2, 18, 13, 20), // March 18, 2025, 1:20 PM
-            comment: 'Automatic ticket created',
-          },
-          {
-            action: 'Warning Issued',
-            by: 'Admin',
-            date: new Date(2025, 2, 19, 10, 30), // March 19, 2025, 10:30 AM
-            comment:
-              'First-time offense. User has been warned about community guidelines.',
-          },
-          {
-            action: 'Report Resolved',
-            by: 'Admin',
-            date: new Date(2025, 2, 19, 10, 35), // March 19, 2025, 10:35 AM
-            comment: 'Content removed and user notified',
-          },
-        ],
-      },
-    ];
-  }
-
-  getTagSeverity(type: string): 'success' | 'secondary' | 'info' | 'warn' | 'danger' | 'contrast' | undefined {
-    switch (type) {
-      case 'Harassment':
-        return 'danger';
-      case 'Inappropriate Content':
-        return 'warn';
-      case 'Cheating':
-        return 'info';
-      default:
-        return 'info';
-    }
-  }
-  
-
-  getStatusSeverity(status: string): 'success' | 'secondary' | 'info' | 'warn' | 'danger' | 'contrast' | undefined {
-    switch (status) {
-      case 'pending':
-        return 'warn';
-      case 'resolved':
-        return 'success';
-      default:
-        return 'info';
-    }
-  }
-
-  selectReport(report: any) {
-    this.selectedReport = report;
-    this.selectedAction = 'dismiss';
-    this.actionComment = '';
-  }
-
-  cancelAction() {
-    this.selectedReport = null;
-  }
-
-  resolveReport() {
-    this.confirmationService.confirm({
-      message: `Are you sure you want to ${this.getActionText()} ${
-        this.selectedReport.reportedUser
-      }?`,
-      header: 'Confirm Action',
-      icon: 'pi pi-exclamation-triangle',
-      accept: () => {
-        // Add to history
-        const now = new Date();
-        this.selectedReport.history.push({
-          action: this.getActionText(),
-          by: 'Admin',
-          date: now,
-          comment: this.actionComment,
-        });
-
-        // Update status
-        this.selectedReport.status = 'resolved';
-
-        // Show message
+  loadViolations(): void {
+    this.loading = true;
+    this.violations$ = this.violationService.getQuizViolations().pipe(
+      tap((violations) => {
+        this.calculateViolationSummary(violations);
+        this.loading = false;
+      }),
+      catchError((error) => {
         this.messageService.add({
-          severity: 'success',
-          summary: 'Report Resolved',
-          detail: `Action taken: ${this.getActionText()}`,
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to load violations data: ' + error.message,
         });
-
-        // Reset selection
-        this.selectedReport = null;
-      },
-    });
+        this.loading = false;
+        return of([]);
+      })
+    );
   }
 
-  getActionText(): string {
-    switch (this.selectedAction) {
-      case 'dismiss':
-        return 'Dismiss Report';
-      case 'warn':
-        return 'Warn User';
-      case 'temporarily-ban':
-        const duration = this.banDurationOptions.find(
-          (o) => o.value === this.selectedBanDuration
-        )?.label;
-        return `Temporarily Ban User (${duration})`;
-      case 'permanently-ban':
-        return 'Permanently Ban User';
-      default:
-        return 'Take Action';
-    }
+  showViolationDetails(violation: QuizViolation): void {
+    this.selectedViolation = violation;
+    this.displayViolationDialog = true;
+  }
+
+  closeViolationDialog(): void {
+    this.displayViolationDialog = false;
+    this.selectedViolation = null;
+  }
+
+  getViolationTypeLabel(type: string): string {
+    // Map violation types to more readable labels
+    const violationLabels: { [key: string]: string } = {
+      tab_change: 'Tab Change',
+      window_blur: 'Window Left Focus',
+      copy_attempt: 'Copy Attempt',
+      multiple_screens: 'Multiple Screens Detected',
+      face_not_detected: 'Face Not Detected',
+      multiple_faces: 'Multiple Faces Detected',
+      speaking: 'Speaking Detected',
+    };
+
+    return violationLabels[type] || type;
+  }
+
+  getViolationTypeIcon(type: string): string {
+    // Map violation types to appropriate icons
+    const violationIcons: { [key: string]: string } = {
+      tab_change: 'pi pi-external-link',
+      window_blur: 'pi pi-window-minimize',
+      copy_attempt: 'pi pi-copy',
+      multiple_screens: 'pi pi-desktop',
+      face_not_detected: 'pi pi-user-minus',
+      multiple_faces: 'pi pi-users',
+      speaking: 'pi pi-volume-up',
+    };
+
+    return violationIcons[type] || 'pi pi-exclamation-triangle';
+  }
+
+  getViolationSeverity(type: string): 'success' | 'secondary' | 'info' | 'warn' | 'danger' | 'contrast' {
+    // Map violation types to severity levels for visual indicators
+    const violationSeverity: { [key: string]: 'success' | 'secondary' | 'info' | 'warn' | 'danger' | 'contrast' } = {
+      tab_change: 'warn',
+      window_blur: 'warn',
+      copy_attempt: 'danger',
+      multiple_screens: 'danger',
+      face_not_detected: 'danger',
+      multiple_faces: 'danger',
+      speaking: 'warn',
+    };
+
+    return violationSeverity[type] || 'info';
+  }
+
+  // Add this method to your component class
+  getViolationTypeKeys(violations: Violation[]): string[] {
+    const types = new Set<string>();
+    violations.forEach((v) => types.add(v.type));
+    return Array.from(types);
+  }
+
+  private calculateViolationSummary(violations: QuizViolation[]): void {
+    let totalCount = 0;
+    const typeCount = new Map<string, number>();
+
+    violations.forEach((v) => {
+      v.violations.forEach((violation) => {
+        totalCount++;
+        const currentCount = typeCount.get(violation.type) || 0;
+        typeCount.set(violation.type, currentCount + 1);
+      });
+    });
+
+    // Find most common violation type
+    let maxCount = 0;
+    let mostCommon = '';
+    typeCount.forEach((count, type) => {
+      if (count > maxCount) {
+        maxCount = count;
+        mostCommon = type;
+      }
+    });
+
+    this.violationSummary = {
+      totalViolations: totalCount,
+      violationsByType: typeCount,
+      mostCommonViolation: this.getViolationTypeLabel(mostCommon),
+    };
+  }
+
+  // Format date for display
+  formatDate(date: Date): string {
+    return date.toLocaleString();
+  }
+
+  // Get count of violations by type from a violation object
+  getViolationTypeCounts(violations: Violation[]): Map<string, number> {
+    const counts = new Map<string, number>();
+    violations.forEach((v) => {
+      const current = counts.get(v.type) || 0;
+      counts.set(v.type, current + 1);
+    });
+    return counts;
+  }
+
+  // Get total violations count for a student
+  getViolationCount(violations: Violation[]): number {
+    return violations.length;
   }
 }

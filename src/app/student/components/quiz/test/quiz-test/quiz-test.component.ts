@@ -175,7 +175,9 @@ export class QuizTestComponent {
     console.log('quiz result', this.quizResult);
 
     this.saveQuizResults(this.quizResult);
-    this.saveViolations(this.userId, this.quizIDParam, this.quizViolations());
+    if (this.quizViolations() || this.quizViolations().length > 0) {
+      this.saveViolations(this.userId, this.quizIDParam, this.quizViolations());
+    }
   }
 
   saveQuizResults(result: QuizResult): void {
