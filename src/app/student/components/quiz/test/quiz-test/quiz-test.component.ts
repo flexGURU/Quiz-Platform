@@ -22,6 +22,7 @@ import { InstructionsComponent } from '../instructions/instructions.component';
 import { ViolationDirective } from '../violation/violation.directive';
 import { Violation } from '../violation/types';
 import { ViolationService } from '../../../../services/violation.service';
+import { BadgeService } from '../../../../services/badge.service';
 
 @Component({
   selector: 'app-quiz-test',
@@ -54,7 +55,7 @@ export class QuizTestComponent {
   sampleQuiz!: SampleQuiz;
   quizResult!: QuizResult;
   awardedPoints: number = 0;
-  quizResultId!: number;
+  quizResultId!: string;
   loadSpinner = false;
   isQuizStarted = signal<boolean>(false);
   quizViolations = signal<Violation[]>([]);
@@ -64,6 +65,7 @@ export class QuizTestComponent {
   private supabaseClient = inject(QuizService);
   private authService = inject(AuthService);
   private violationService = inject(ViolationService);
+  private badgeService = inject(BadgeService);
 
   ngOnInit(): void {
     this.route.queryParams.subscribe((value) => {
@@ -85,7 +87,6 @@ export class QuizTestComponent {
         questions: response,
         timeLimit: response.length * 120,
       };
-      // response.length * 120
 
       this.generateStepsModel();
       if (this.sampleQuiz.timeLimit > 0) {
@@ -175,7 +176,7 @@ export class QuizTestComponent {
     console.log('quiz result', this.quizResult);
 
     this.saveQuizResults(this.quizResult);
-    if (this.quizViolations() || this.quizViolations().length > 0) {
+    if (this.quizViolations() && this.quizViolations().length > 0) {
       this.saveViolations(this.userId, this.quizIDParam, this.quizViolations());
     }
   }
@@ -192,6 +193,8 @@ export class QuizTestComponent {
             this.awardedPoints = response;
 
             if (this.quizResultId) {
+              console.log("quiz id", this.quizResultId);
+              
               this.supabaseClient.awardPoints(
                 this.userId,
                 this.quizResultId,

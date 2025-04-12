@@ -7,14 +7,45 @@ import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { Router, RouterLink } from '@angular/router';
 import { QuizService } from '../../services/quiz.service';
-import { QuizDB } from '../../../shared/models';
+import { LeaderboardEntry, QuizDB } from '../../../shared/models';
 import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { AuthService } from '../../../shared/services/auth.service';
 import { SkeletonModule } from 'primeng/skeleton';
 import { ForumService } from '../../services/forum.service';
-import { response } from 'express';
+import { LeaderboardService } from '../../services/leaderboard.service';
+
+export interface Badge {
+  id: string;
+  name: string;
+  description: string;
+  image_url: string;
+  points_threshold: number;
+}
+const STATIC_BADGES: Badge[] = [
+  {
+    id: 'explorer',
+    name: 'Knowledge Explorer',
+    description: 'Mastered 50 points in easy quizzes - Solid fundamentals!',
+    image_url: '/badges/explorer.png',
+    points_threshold: 5,
+  },
+  {
+    id: 'challenger',
+    name: 'Skilled Challenger',
+    description: 'Earned 150 points in medium quizzes - Tackling complex problems!',
+    image_url: '/badges/challenger.png',
+    points_threshold: 150,
+  },
+  {
+    id: 'mastermind',
+    name: 'Expert Mastermind',
+    description: 'Achieved 200 points in hard quizzes - Top-tier performance!',
+    image_url: '/badges/mastermind.png',
+    points_threshold: 200,
+  }
+];
 
 @Component({
   selector: 'app-dashboard',
@@ -38,7 +69,8 @@ export class DashboardComponent {
   private quizService = inject(QuizService);
   private authService = inject(AuthService);
   private forumService = inject(ForumService);
-  
+  private leaderboardService = inject(LeaderboardService);
+
   quizzList: QuizDB[] = [];
   totalQuizzNumber: number = 0;
   completedQuizNumber!: number;
@@ -47,18 +79,21 @@ export class DashboardComponent {
   progress!: number;
   recentQuizzes: any[] = [];
   forumCount!: number;
+  currentUserRank: LeaderboardEntry | null = null;
+  badges: Badge[] = [];
 
-  constructor(private router: Router){}
+  constructor(private router: Router) {}
 
   ngOnInit(): void {
+    this.getCurrentUserRank();
     this.getQuizzes();
     this.authService.currentUser$.subscribe((response) => {
       console.log('current user', response);
     });
 
     this.forumService.forumCount$.subscribe((response) => {
-      console.log("hhh",response);
-      
+      console.log('hhh', response);
+
       if (response) {
         this.forumCount = response;
       }
@@ -69,35 +104,42 @@ export class DashboardComponent {
 
     this.completedQuizzesCount();
     this.recentQuizzesapi();
+
+
+    const x = this.getAwardedBadges(4)
+    console.log("ddd", x);
+    
   }
 
+  getAwardedBadges(points: number): Badge[] {
+    return STATIC_BADGES.filter((badge) => points >= badge.points_threshold);
+  }
+
+  getCurrentUserRank(): void {
+    const currentUserId = this.authService.userId;
+    if (currentUserId) {
+      this.leaderboardService.getCurrentUserRank(currentUserId).subscribe({
+        next: (data) => {
+          console.log('user rank', data);
+
+          this.currentUserRank = data;
+          if (this.currentUserRank && this.currentUserRank.total_points) {
+            console.log('user points', this.currentUserRank.total_points);
+
+            this.badges = this.getAwardedBadges(
+              this.currentUserRank.total_points
+            );
+            console.log('Awarded Badges:', this.badges);
+          }
+          console.log('Awarded Badges:', this.badges);
+        },
+        error: (error) => {
+          console.error('Failed to load user rank:', error);
+        },
+      });
+    }
+  }
   // Simulated achievements and badges
-  badges = [
-    {
-      name: 'Quiz Master',
-      description: 'Scored 90+ on 3 quizzes',
-      icon: 'pi pi-sign-out',
-      category: 'me',
-      date: 'today',
-      earned: 'success',
-    },
-    {
-      name: 'Speedster',
-      description: 'Completed a quiz in under 2 minutes',
-      icon: 'pi pi-sign-out',
-      category: 'me',
-      date: 'today',
-      earned: 'success',
-    },
-    {
-      name: 'Consistency King',
-      description: 'Completed 5 quizzes in a row',
-      icon: 'pi pi-sign-out',
-      category: 'me',
-      date: 'today',
-      earned: 'success',
-    },
-  ];
 
   getQuizzes = () => {
     this.loading = true;
@@ -112,7 +154,6 @@ export class DashboardComponent {
 
   recentQuizzesapi = () => {
     this.quizService.getRecentQuizzes(this.userID).subscribe((response) => {
-
       const quizr = response.map((quiz) => ({
         quizId: quiz.quiz_id,
         name: quiz.name,
@@ -127,8 +168,7 @@ export class DashboardComponent {
   recentQuizzesCount = () => {
     this.quizService
       .getUpcomingQuizzesCount(this.userID)
-      .subscribe((response) => {
-      });
+      .subscribe((response) => {});
   };
 
   completedQuizzesCount = () => {
@@ -148,12 +188,11 @@ export class DashboardComponent {
     }
   }
 
-  showQuizResult(quizId: string){
-
-    this.router.navigate(['/students/quiz-result'],{
+  showQuizResult(quizId: string) {
+    this.router.navigate(['/students/quiz-result'], {
       queryParams: {
-        id: quizId
-      }
-    })
+        id: quizId,
+      },
+    });
   }
 }

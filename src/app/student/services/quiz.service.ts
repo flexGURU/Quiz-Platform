@@ -71,7 +71,7 @@ export class QuizService {
   };
 
   // First function: Save the main quiz result
-  saveQuizResult = (result: QuizResult): Observable<number> => {
+  saveQuizResult = (result: QuizResult): Observable<string> => {
     let resultObject = {
       user_id: result.user_id,
       quiz_id: result.quiz_id,
@@ -164,9 +164,9 @@ export class QuizService {
           'easy' | 'medium' | 'hard',
           number
         > = {
-          easy: 1,
-          medium: 1.5,
-          hard: 2,
+          easy: 50,
+          medium: 150,
+          hard: 200,
         };
 
         const difficulty =
@@ -184,7 +184,7 @@ export class QuizService {
 
   awardPoints = (
     userId: string,
-    quizResultId: number,
+    quizResultId: string,
     points: number
   ): void => {
     const promise = this.supabaseClient.from(USER_POINTS_TABLE).insert([

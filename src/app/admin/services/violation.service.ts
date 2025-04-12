@@ -7,7 +7,7 @@ import { QuizViolation, Violation } from '../../shared/models';
   providedIn: 'root'
 })
 export class ViolationService {
-  supabase = Supabase
+  private supabase = Supabase
 
   constructor() { }
 

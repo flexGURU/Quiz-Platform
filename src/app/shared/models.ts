@@ -174,7 +174,7 @@ export interface Violation {
 export interface QuizViolation {
   violation_id: number;
   user_id: string;
-  full_name: string; 
+  full_name: string;
   email: string;
   quiz_id: string;
   quiz_title: string;
@@ -186,4 +186,19 @@ export interface ViolationSummary {
   totalViolations: number;
   violationsByType: Map<string, number>;
   mostCommonViolation: string;
+}
+
+export interface Badge {
+  id: string;
+  name: string;
+  description: string;
+  points_threshold: number;
+}
+
+export interface UserBadge {
+  id: string;
+  user_id: string;
+  badge_id: string;
+  earned_at: string;
+  badge: Badge;
 }

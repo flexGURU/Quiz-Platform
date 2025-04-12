@@ -1,0 +1,19 @@
+/* Add these animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Add this to your component's host or global styles */
+.badge-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform, box-shadow;
+}
+
+.badge-card:hover {
+  transform: perspective(1000px) rotateX(5deg);
+}

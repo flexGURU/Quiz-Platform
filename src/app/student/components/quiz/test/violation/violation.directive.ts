@@ -16,11 +16,6 @@ export class ViolationDirective {
     });
   }
 
-  @HostListener('window:blur', ['$event'])
-  onCopy(): void {
-    this.recordViolation({ type: 'User switched tab' });
-  }
-
   @HostListener('document:visibilitychange', ['$event'])
   onVisibilityChange(event: Event) {
     if (document.hidden) {
