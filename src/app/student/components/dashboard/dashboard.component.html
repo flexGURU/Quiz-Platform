@@ -414,8 +414,8 @@
     </div>
 
     <!-- Achievements & Badges -->
-    <div>
-      <div class="flex justify-between items-center mb-4">
+    <div class="mb-10">
+      <div class="flex justify-between items-center mb-20">
         <h2 class="text-2xl font-bold text-slate-800 dark:text-white">
           Achievements & Badges
         </h2>
@@ -426,7 +426,7 @@
         *ngIf="!(badges.length > 0)"
         class="text-2xl text-center font-light text-slate-500 tracking-widest"
       >
-        Do a Quiz To Earn Badges
+        <span class="border p-4 rounded-xl">Do a Quiz To Earn Badges</span>
       </h2>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">

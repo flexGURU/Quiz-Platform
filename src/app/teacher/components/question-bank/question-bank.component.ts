@@ -205,6 +205,7 @@ export class QuestionBankComponent {
 
   clearUpload() {
     this.dbQuestions.set([]);
+    this.selectedQuiz.set('');
   }
 
   createQuizz = () => {
@@ -213,6 +214,7 @@ export class QuestionBankComponent {
         this.notification.showSuccess('Quiz', 'Quiz added successfully!');
         console.log('✅ Questions Added:', resp);
         this.dbQuestions.set([]);
+        this.selectedQuiz.set('');
       },
       error: (err) => {
         console.error('🚨 Error Adding Questions:', err.message);

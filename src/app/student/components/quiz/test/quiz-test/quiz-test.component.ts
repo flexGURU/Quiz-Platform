@@ -22,7 +22,6 @@ import { InstructionsComponent } from '../instructions/instructions.component';
 import { ViolationDirective } from '../violation/violation.directive';
 import { Violation } from '../violation/types';
 import { ViolationService } from '../../../../services/violation.service';
-import { BadgeService } from '../../../../services/badge.service';
 
 @Component({
   selector: 'app-quiz-test',
@@ -65,7 +64,6 @@ export class QuizTestComponent {
   private supabaseClient = inject(QuizService);
   private authService = inject(AuthService);
   private violationService = inject(ViolationService);
-  private badgeService = inject(BadgeService);
 
   ngOnInit(): void {
     this.route.queryParams.subscribe((value) => {
@@ -142,14 +140,21 @@ export class QuizTestComponent {
 
   saveAnswer(value: string): void {
     if (this.currentQuestion) {
+      console.log('Saving answer:', {
+        questionId: this.currentQuestion.id,
+        questionText: this.currentQuestion.question_text,
+        selectedValue: value
+      });
       this.userAnswers.update((answers) => ({
         ...answers,
         [this.currentQuestion.id]: value,
       }));
     }
   }
-
-  saveAnsEffect = effect(() => {});
+  saveAnsEffect = effect(() => {
+    console.log("user answers", this.userAnswers());
+    
+  });
 
   previousQuestion(): void {
     if (this.currentQuestionIndex > 0) {
@@ -193,8 +198,8 @@ export class QuizTestComponent {
             this.awardedPoints = response;
 
             if (this.quizResultId) {
-              console.log("quiz id", this.quizResultId);
-              
+              console.log('quiz id', this.quizResultId);
+
               this.supabaseClient.awardPoints(
                 this.userId,
                 this.quizResultId,
