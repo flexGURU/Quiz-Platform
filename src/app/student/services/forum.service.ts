@@ -260,7 +260,6 @@ export class ForumService {
       }),
       tap((response) => {
         this.forumCountSubject.next(response);
-        console.log('counts of forum', response);
       })
     );
   };

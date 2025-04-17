@@ -65,7 +65,6 @@ export class QuizHomeComponent {
   loadQuizzes = () => {
     this.loading = true;
     this.quizService.getQuizzes().subscribe((reponse) => {
-      console.log('quizzes', reponse);
 
       this.loading = false;
     });

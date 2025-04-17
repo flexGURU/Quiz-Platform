@@ -75,10 +75,6 @@ export class QuestionBankComponent {
 
   difficultyLevels!: any[];
 
-  quizChangeEffect = effect(() => {
-    console.log('selected quiz', this.selectedQuiz());
-  });
-
   constructor(
     private fb: FormBuilder,
     private notification: NotificationService
@@ -144,9 +140,7 @@ export class QuestionBankComponent {
           `Error adding quiz: ${err.message}`
         );
       },
-      complete: () => {
-        console.log('Request completed');
-      },
+      complete: () => {},
     });
 
     this.displayAddModal = false;
@@ -176,7 +170,6 @@ export class QuestionBankComponent {
 
   getQuestions = () => {
     this.supabaseService.getQuestions().subscribe((resp) => {
-      console.log('questions:', resp);
       this.questions = resp;
     });
   };
@@ -212,16 +205,13 @@ export class QuestionBankComponent {
     this.supabaseService.addQuestions(this.dbQuestions()).subscribe({
       next: (resp) => {
         this.notification.showSuccess('Quiz', 'Quiz added successfully!');
-        console.log('✅ Questions Added:', resp);
         this.dbQuestions.set([]);
         this.selectedQuiz.set('');
       },
       error: (err) => {
         console.error('🚨 Error Adding Questions:', err.message);
       },
-      complete: () => {
-        console.log('🎉 Completed Adding Questions');
-      },
+      complete: () => {},
     });
   };
 

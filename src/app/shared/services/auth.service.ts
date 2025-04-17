@@ -38,7 +38,6 @@ export class AuthService {
 
   private initializeAuth(): void {
     this.supabaseClient.auth.onAuthStateChange((event, session) => {
-      console.log('Auth state changed:', event);
       this.handleAuthChange(session);
     });
 
@@ -137,9 +136,7 @@ export class AuthService {
         ).pipe(
           map(({ data: userData, error: userFetchError }) => {
             if (userData) {
-              console.log('usedr', userData.id);
               this.userId = userData.id;
-              console.log("saved user id", this.userId);
               
             }
             if (userFetchError) {
@@ -171,13 +168,11 @@ export class AuthService {
   }
 
   private set userId(id: string) {
-    console.log('Setting userId:', id);
     localStorage.setItem(this.storedUserKeyID, id);
   }
 
   get userId(): string {
     const id = localStorage.getItem(this.storedUserKeyID) || '';
-    console.log('Getting userId:', id);
     return id;
   }
 

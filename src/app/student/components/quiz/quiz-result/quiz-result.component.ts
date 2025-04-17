@@ -50,7 +50,6 @@ export class QuizResultComponent {
       .getGradedQuiz(this.quizId, this.userID)
       .subscribe((response) => {
         this.quizResult = response;
-        console.log('graded quiz', this.quizResult);
       });
     // this.prepareChartData();
 
@@ -65,7 +64,6 @@ export class QuizResultComponent {
       this.supabaseClient.getQuestionResults(this.quizResult.id).subscribe({
         next: (response) => {
           this.loadSpinner = false;
-          console.log('response by geeee', response);
           this.showPerformanceQuestions = true;
           this.questionResults = response;
         },
@@ -104,20 +102,5 @@ export class QuizResultComponent {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
     return `${minutes}m ${remainingSeconds}s`;
-  }
-
-  retryQuiz(): void {
-    // In a real app, navigate to quiz attempt page
-    console.log('Retrying quiz', this.quizResult?.quiz_id);
-  }
-
-  viewLeaderboard(): void {
-    // In a real app, navigate to leaderboard page
-    console.log('Viewing leaderboard');
-  }
-
-  viewSimilarQuizzes(): void {
-    // In a real app, navigate to home page with filters
-    console.log('Viewing similar quizzes');
   }
 }

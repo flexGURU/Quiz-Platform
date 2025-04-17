@@ -88,7 +88,6 @@ export class OperationsComponent {
     this.isNewUser = false;
     this.userDialog = true;
     this.dialogTitle = 'Edit';
-    console.log('user', user);
 
     this.userForm.patchValue({
       id: user.id,
@@ -115,7 +114,6 @@ export class OperationsComponent {
       return;
     }
 
-    console.log('User form data:', userFormValues);
 
     const userForm = {
       email: userFormValues.email,
@@ -167,7 +165,6 @@ export class OperationsComponent {
   }
 
   updateUser() {
-    console.log('updating user', this.userForm.getRawValue());
 
     const updateValue: User = {
       email: this.userForm.getRawValue().email,
@@ -178,7 +175,6 @@ export class OperationsComponent {
     this.userService
       .updateUsers(this.userForm.getRawValue().id, updateValue)
       .subscribe((response) => {
-        console.log('updated', response);
       });
 
     this.messageService.add({

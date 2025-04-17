@@ -110,7 +110,6 @@ export class LoginComponent {
     }
 
     const { email, password } = this.loginForm.getRawValue();
-    console.log(email, password);
 
     this.authService.login(email, password).subscribe({
       next: (response) => {

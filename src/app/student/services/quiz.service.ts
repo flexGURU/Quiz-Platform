@@ -37,7 +37,7 @@ export class QuizService {
     return from(promise).pipe(
       map((response) => {
         if (response.error) {
-          console.log(response.error);
+          return [];
         }
         return response.data as QuizDB[];
       })
@@ -53,7 +53,6 @@ export class QuizService {
     return from(promise).pipe(
       map((response) => {
         if (response.error) {
-          console.log('Error getting quiz questions:', response.error.message);
           return [];
         }
 

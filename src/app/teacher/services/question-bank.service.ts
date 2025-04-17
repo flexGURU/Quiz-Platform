@@ -21,7 +21,6 @@ export class QuestionBankService {
     return from(promise).pipe(
       map((response) => {
         if (response.error) {
-          console.log(response.error);
         }
         return response.data as Questions[];
       })
@@ -52,8 +51,6 @@ export class QuestionBankService {
 
     return from(promise).pipe(
       map((response) => {
-        console.log(response);
-
         if (response.error) {
           console.error('error adding subject', response.error);
         }

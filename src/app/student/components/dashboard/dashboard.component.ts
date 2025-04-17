@@ -15,6 +15,7 @@ import { AuthService } from '../../../shared/services/auth.service';
 import { SkeletonModule } from 'primeng/skeleton';
 import { ForumService } from '../../services/forum.service';
 import { LeaderboardService } from '../../services/leaderboard.service';
+import { NotificationService } from '../../../shared/services/notification.service';
 
 export interface Badge {
   id: string;
@@ -29,22 +30,23 @@ const STATIC_BADGES: Badge[] = [
     name: 'Knowledge Explorer',
     description: 'Mastered 50 points in easy quizzes - Solid fundamentals!',
     image_url: '/badges/explorer.png',
-    points_threshold: 5,
+    points_threshold: 300,
   },
   {
     id: 'challenger',
     name: 'Skilled Challenger',
-    description: 'Earned 150 points in medium quizzes - Tackling complex problems!',
+    description:
+      'Earned 150 points in medium quizzes - Tackling complex problems!',
     image_url: '/badges/challenger.png',
-    points_threshold: 150,
+    points_threshold: 500,
   },
   {
     id: 'mastermind',
     name: 'Expert Mastermind',
     description: 'Achieved 200 points in hard quizzes - Top-tier performance!',
     image_url: '/badges/mastermind.png',
-    points_threshold: 200,
-  }
+    points_threshold: 1000,
+  },
 ];
 
 @Component({
@@ -70,6 +72,7 @@ export class DashboardComponent {
   private authService = inject(AuthService);
   private forumService = inject(ForumService);
   private leaderboardService = inject(LeaderboardService);
+  private notificaionService = inject(NotificationService);
 
   quizzList: QuizDB[] = [];
   totalQuizzNumber: number = 0;
@@ -87,13 +90,9 @@ export class DashboardComponent {
   ngOnInit(): void {
     this.getCurrentUserRank();
     this.getQuizzes();
-    this.authService.currentUser$.subscribe((response) => {
-      console.log('current user', response);
-    });
+    this.authService.currentUser$.subscribe((response) => {});
 
     this.forumService.forumCount$.subscribe((response) => {
-      console.log('hhh', response);
-
       if (response) {
         this.forumCount = response;
       }
@@ -104,11 +103,9 @@ export class DashboardComponent {
 
     this.completedQuizzesCount();
     this.recentQuizzesapi();
-
-
-    const x = this.getAwardedBadges(4)
-    console.log("ddd", x);
-    
+    if (this.currentUserRank?.total_points) {
+      this.getAwardedBadges(this.currentUserRank?.total_points);
+    }
   }
 
   getAwardedBadges(points: number): Badge[] {
@@ -120,21 +117,18 @@ export class DashboardComponent {
     if (currentUserId) {
       this.leaderboardService.getCurrentUserRank(currentUserId).subscribe({
         next: (data) => {
-          console.log('user rank', data);
-
           this.currentUserRank = data;
           if (this.currentUserRank && this.currentUserRank.total_points) {
-            console.log('user points', this.currentUserRank.total_points);
-
             this.badges = this.getAwardedBadges(
               this.currentUserRank.total_points
             );
-            console.log('Awarded Badges:', this.badges);
           }
-          console.log('Awarded Badges:', this.badges);
         },
         error: (error) => {
-          console.error('Failed to load user rank:', error);
+          this.notificaionService.showError(
+            'failed to get Leaderboar stats',
+            'failure'
+          );
         },
       });
     }

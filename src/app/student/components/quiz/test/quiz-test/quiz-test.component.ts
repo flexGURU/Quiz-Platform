@@ -140,21 +140,15 @@ export class QuizTestComponent {
 
   saveAnswer(value: string): void {
     if (this.currentQuestion) {
-      console.log('Saving answer:', {
-        questionId: this.currentQuestion.id,
-        questionText: this.currentQuestion.question_text,
-        selectedValue: value
-      });
       this.userAnswers.update((answers) => ({
         ...answers,
         [this.currentQuestion.id]: value,
       }));
     }
   }
-  saveAnsEffect = effect(() => {
-    console.log("user answers", this.userAnswers());
-    
-  });
+  // saveAnsEffect = effect(() => {
+  //   console.log('user answers', this.userAnswers());
+  // });
 
   previousQuestion(): void {
     if (this.currentQuestionIndex > 0) {
@@ -178,7 +172,6 @@ export class QuizTestComponent {
     this.quizSubmitted = true;
 
     this.quizResult = this.gradeQuiz();
-    console.log('quiz result', this.quizResult);
 
     this.saveQuizResults(this.quizResult);
     if (this.quizViolations() && this.quizViolations().length > 0) {
@@ -189,24 +182,19 @@ export class QuizTestComponent {
   saveQuizResults(result: QuizResult): void {
     this.supabaseClient.saveQuizResult(result).subscribe({
       next: (resp) => {
-        console.log('response from obs', resp);
         this.quizResultId = resp;
         this.supabaseClient
           .calculateQuizPoints(this.quizResult)
           .subscribe((response) => {
-            console.log('awarded points', response);
             this.awardedPoints = response;
 
             if (this.quizResultId) {
-              console.log('quiz id', this.quizResultId);
-
               this.supabaseClient.awardPoints(
                 this.userId,
                 this.quizResultId,
                 this.awardedPoints
               );
             } else {
-              console.log('quiz result does not have an id');
             }
           });
       },
@@ -226,7 +214,6 @@ export class QuizTestComponent {
     const questionResults: QuestionResult[] = [];
     let correctCount = 0;
     let wrongCount = 0;
-    console.log('sssss', this.sampleQuiz);
 
     // Process each question
     this.sampleQuiz.questions.forEach((question) => {

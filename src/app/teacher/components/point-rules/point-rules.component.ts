@@ -200,8 +200,6 @@ export class PointRulesComponent {
 
   deleteRule(ruleId: number) {
     this.pointRules = this.pointRules.filter((r) => r.id !== ruleId);
-    console.log("deleted");
-    
   }
 
   deleteReward(rewardId: number) {
@@ -212,7 +210,5 @@ export class PointRulesComponent {
     rule.isActive = !rule.isActive;
   }
 
-  saveAllChanges() {
-    console.log('All changes saved successfully');
-  }
+  saveAllChanges() {}
 }

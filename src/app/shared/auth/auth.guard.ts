@@ -12,11 +12,9 @@ export const authGuard: CanActivateFn = async (route, state) => {
   
   // Now we can safely check authentication state
   if (authService.isAuthenticated) {
-    console.log("User is authenticated");
     return true;
   }
 
-  console.log('User is not authenticated - redirecting to login');
   router.navigate(['/login']);
   return false;
 };

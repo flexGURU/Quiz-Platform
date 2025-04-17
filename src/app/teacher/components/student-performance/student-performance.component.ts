@@ -76,7 +76,6 @@ export class StudentPerformanceComponent {
     this.initChartOptions();
     this.isLoading = true;
     this.studentService.getStudentPerformance().subscribe((response) => {
-      console.log('student performance', response);
 
       this.students = response;
       this.isLoading = false;
@@ -86,7 +85,6 @@ export class StudentPerformanceComponent {
   viewStudentDetails(student: StudentPerformance) {
     this.selectedStudent = student;
     this.displayStudentDialog = true;
-    console.log('student slected', this.selectedStudent);
   }
 
   updateChartData(quizHistory: QuizAttempt[]): void {
