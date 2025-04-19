@@ -1,12 +1,9 @@
-@if (!isLoginPage()) {
-<app-nav></app-nav>
+<app-nav *ngIf="!isLoginPage()"></app-nav>
 
-} @if(reloaded && userRole){
-<app-menubar></app-menubar>
-} @if(adminRole === 'admin'){
-<app-admin-menubar></app-admin-menubar>
+<app-menubar *ngIf="teacherRole === 'teacher'"></app-menubar>
 
-}
+<app-admin-menubar *ngIf="adminRole === 'admin'"></app-admin-menubar>
+
 <p-toast></p-toast>
 
 <router-outlet></router-outlet>

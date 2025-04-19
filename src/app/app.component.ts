@@ -6,6 +6,7 @@ import { AuthService } from './shared/services/auth.service';
 import { User } from '@supabase/supabase-js';
 import { MenubarComponent } from './teacher/components/menubar/menubar.component';
 import { AdminMenubarComponent } from './admin/components/admin-menubar/admin-menubar.component';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-root',
@@ -14,7 +15,7 @@ import { AdminMenubarComponent } from './admin/components/admin-menubar/admin-me
     RouterOutlet,
     ToastModule,
     MenubarComponent,
-    AdminMenubarComponent,
+    AdminMenubarComponent, CommonModule
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
@@ -22,20 +23,26 @@ import { AdminMenubarComponent } from './admin/components/admin-menubar/admin-me
 export class AppComponent {
   title = 'lms';
   loadSpinner = false;
-  userRole: boolean = false;
+  teacherRole!: string;
   reloaded: boolean = false;
   adminRole!: string;
 
   constructor(private router: Router, private authService: AuthService) {
-    this.authService.userRole$.subscribe((response) => {
-      if (response && response === 'teacher') {
-        this.userRole = true;
-      }
+    this.authService.userRole$.subscribe((role) => {
       this.reloaded = true;
-      if (response === 'admin') {
-        this.adminRole = response;
+    
+      // Reset both roles first
+      this.teacherRole = '';
+      this.adminRole = '';
+    
+      // Then re-assign if a valid role is received
+      if (role === 'teacher') {
+        this.teacherRole = 'teacher';
+      } else if (role === 'admin') {
+        this.adminRole = 'admin';
       }
     });
+    
   }
 
   isLoginPage = (): boolean => {
