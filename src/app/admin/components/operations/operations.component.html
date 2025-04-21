@@ -1,6 +1,6 @@
-<div class="flex justify-center">
+<div class="flex justify-center bg-slate-200 min-h-screen p-8">
   <!-- HTML Template -->
-  <div class="p-8 w-11/12 flex flex-col gap-8">
+  <div class="p-8 w-11/12 flex flex-col gap-4">
     <h2 class="mb-4 text-3xl">User Management</h2>
 
     <!-- Add New User Button -->
@@ -16,13 +16,12 @@
     <p-table
       #dt
       [value]="users"
-      [paginator]="true"
       [rows]="10"
       [rowsPerPageOptions]="[5, 10, 25]"
       [globalFilterFields]="['full_name', 'email', 'role']"
       styleClass="p-datatable-gridlines p-datatable-sm"
     >
-      <ng-template pTemplate="caption">
+      <!-- <ng-template pTemplate="caption">
         <div class="p-d-flex p-jc-between p-ai-center">
           <span class="p-input-icon-left flex gap-4 items-center">
             <i class="pi pi-search"></i>
@@ -35,7 +34,7 @@
             />
           </span>
         </div>
-      </ng-template>
+      </ng-template> -->
 
       <ng-template pTemplate="header">
         <tr>
@@ -58,23 +57,15 @@
           <td>{{ user.email }}</td>
           <td>{{ user.role }}</td>
           <td class="">
-            <p-button
-              icon="pi pi-pencil"
-              pTooltip="Edit User"
-              tooltipPosition="top"
+            <i
+              class="pi pi-pencil bg-green-500 p-2 text-white rounded-lg mr-2 cursor-pointer"
               (click)="editUser(user)"
-              styleClass="p-button-lg p-button-outlined p-button-primary mr-2"
-              class="mr-2"
-            >
-            </p-button>
-            <p-button
-              icon="pi pi-trash"
-              pTooltip="Delete User"
-              tooltipPosition="top"
+            ></i>
+
+            <i
+              class="pi pi-check bg-red-500 p-2 text-white rounded-lg cursor-pointer"
               (click)="confirmDelete(user)"
-              styleClass="p-button-lg p-button-outlined p-button-danger"
-            >
-            </p-button>
+            ></i>
           </td>
         </tr>
       </ng-template>
@@ -122,16 +113,16 @@
 
         <div class="p-field mb-3">
           <label for="role" class="block mb-1">Role</label>
-          <p-select
+          <select
             id="role"
-            [options]="roleOptions"
             formControlName="role"
-            placeholder="Select a Role"
-            optionLabel="label"
-            optionValue="value"
-            appendTo="body"
-            class="w-full"
-          ></p-select>
+            class="w-full text-black input"
+          >
+            <option value="" disabled selected>Select a Role</option>
+            <option *ngFor="let option of roleOptions" [value]="option.value">
+              {{ option.label }}
+            </option>
+          </select>
         </div>
 
         <div class="p-field mb-3" *ngIf="isNewUser">

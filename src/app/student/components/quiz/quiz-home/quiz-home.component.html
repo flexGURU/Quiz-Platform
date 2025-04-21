@@ -1,10 +1,8 @@
-<div class="p-6 bg-slate-50 dark:bg-slate-900 min-h-screen">
+<div class="p-6 bg-white dark:bg-slate-200 min-h-screen">
   <div class="max-w-7xl mx-auto">
     <div class="mb-8">
-      <h1 class="text-3xl font-bold text-slate-800 dark:text-white">
-        Available Quizzes
-      </h1>
-      <p class="text-slate-500 dark:text-slate-400 mt-2">
+      <h1 class="text-3xl font-bold text-black">Available Quizzes</h1>
+      <p class="text-slate-700 dark:text-slate-700 mt-2">
         Find and take quizzes to test your knowledge
       </p>
     </div>
@@ -15,7 +13,7 @@
         <!-- Actual Quiz Cards -->
 
         <div *ngIf="!loading && (!subjectList || subjectList.length === 0)">
-          <span class="text-3xl text-green-500  font-semibold"
+          <span class="text-3xl text-green-500 font-semibold"
             >NO QUIZZES AVAILABLE!</span
           >
         </div>
@@ -28,20 +26,27 @@
           <p-card class="shadow-lg border-l-4">
             <ng-template pTemplate="header">
               <div
-                class="bg-slate-50 dark:bg-slate-800 p-4 flex justify-between items-center"
+                class="bg-slate-50 dark:bg-slate-400 p-4 flex justify-between items-center"
               >
                 <div class="flex items-center">
-                  <span class="text-sm text-slate-500 dark:text-slate-400">{{
+                  <span class="text-sm text-slate-700 dark:text-slate-700">{{
                     quiz.subject
                   }}</span>
                 </div>
-                <span class="text-sm px-3 py-1 rounded-full">
+                <span
+                  class="text-sm px-3 py-1 rounded-full text-white"
+                  [ngClass]="{
+                    'bg-green-500': quiz.difficulty === 'easy',
+                    'bg-yellow-500': quiz.difficulty === 'medium',
+                    'bg-red-500': quiz.difficulty === 'hard'
+                  }"
+                >
                   {{ quiz.difficulty }}
                 </span>
               </div>
             </ng-template>
             <ng-template pTemplate="title">
-              <div class="font-bold text-lg text-slate-800 dark:text-white">
+              <div class="font-bold text-lg text-black">
                 {{ quiz.title }}
               </div>
             </ng-template>

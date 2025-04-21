@@ -1,11 +1,9 @@
-<div class="p-6 bg-slate-50 dark:bg-slate-900 min-h-screen">
+<div class="p-6 bg-white dark:bg-slate-200 min-h-screen">
   <div class="max-w-7xl mx-auto">
     <!-- Header with welcome message -->
     <div class="mb-8">
-      <h1 class="text-3xl font-bold text-slate-800 dark:text-white">
-        Student Dashboard
-      </h1>
-      <p class="text-slate-500 dark:text-slate-400 mt-2">
+      <h1 class="text-3xl font-bold text-black">Student Dashboard</h1>
+      <p class="text-slate-700 dark:text-slate-700 mt-2">
         Welcome back! Here's your learning progress at a glance.
       </p>
     </div>
@@ -27,7 +25,7 @@
             >
               <i class="pi pi-chart-line text-2xl text-emerald-500"></i>
               <div class="text-right">
-                <span class="text-sm text-slate-500 dark:text-slate-400"
+                <span class="text-sm text-slate-700 dark:text-slate-700"
                   >Overall</span
                 >
               </div>
@@ -51,7 +49,7 @@
 
         <!-- Skeleton for Progress Card -->
         <div
-          class="border-l-4 border-emerald-500 shadow-lg rounded-lg bg-white dark:bg-slate-800 overflow-hidden"
+          class="border-l-4 border-emerald-500 shadow-lg bg-white rounded-lg overflow-hidden"
           *ngIf="loading"
         >
           <div class="p-4 bg-emerald-50 dark:bg-emerald-900/30">
@@ -93,7 +91,7 @@
             >
               <i class="pi pi-calendar-plus text-2xl text-blue-500"></i>
               <div class="text-right">
-                <span class="text-sm text-slate-500 dark:text-slate-400"
+                <span class="text-sm text-slate-700 dark:text-slate-700"
                   >This Week</span
                 >
               </div>
@@ -102,7 +100,7 @@
           <ng-template #title>Quiz Stats</ng-template>
           <ng-template #subtitle>
             <div class="flex flex-col justify-center">
-              <span class="text-xl text-slate-500 dark:text-slate-400"
+              <span class="text-xl text-slate-700 dark:text-slate-700"
                 >Total Quizzes
                 <span
                   class="ml-2 text-2xl font-bold text-blue-600 dark:text-blue-400"
@@ -110,7 +108,7 @@
                 >
               </span>
 
-              <span class="text-xl text-slate-500 dark:text-slate-400"
+              <span class="text-xl text-slate-700 dark:text-slate-700"
                 >Completed
                 <span
                   class="ml-2 text-2xl font-bold text-blue-600 dark:text-blue-400"
@@ -132,7 +130,7 @@
 
         <!-- Skeleton for Upcoming Quizzes Card -->
         <div
-          class="border-l-4 border-blue-500 shadow-lg rounded-lg bg-white dark:bg-slate-800 overflow-hidden"
+          class="border-l-4 border-blue-500 shadow-lg rounded-lg bg-white overflow-hidden"
           *ngIf="loading"
         >
           <div class="p-4 bg-blue-50 dark:bg-blue-900/30">
@@ -178,7 +176,7 @@
             >
               <i class="pi pi-star text-2xl text-purple-500"></i>
               <div class="text-right">
-                <span class="text-sm text-slate-500 dark:text-slate-400"
+                <span class="text-sm text-slate-700 dark:text-slate-700"
                   >Your Rank</span
                 >
               </div>
@@ -193,7 +191,7 @@
                 {{ currentUserRank?.rank }}
               </span>
 
-              <span class="ml-2 text-sm text-slate-500 dark:text-slate-400"
+              <span class="ml-2 text-sm text-slate-700 dark:text-slate-700"
                 >with total points
                 <span
                   class="text-xl font-bold text-purple-600 dark:text-purple-400"
@@ -215,7 +213,7 @@
 
         <!-- Skeleton for Leaderboard Position Card -->
         <div
-          class="border-l-4 border-purple-500 shadow-lg rounded-lg bg-white dark:bg-slate-800 overflow-hidden"
+          class="border-l-4 border-purple-500 shadow-lg rounded-lg bg-white overflow-hidden"
           *ngIf="loading"
         >
           <div class="p-4 bg-purple-50 dark:bg-purple-900/30">
@@ -258,7 +256,7 @@
             >
               <i class="pi pi-comments text-2xl text-yellow-500"></i>
               <div class="text-right">
-                <span class="text-sm text-slate-500 dark:text-slate-400"
+                <span class="text-sm text-slate-700 dark:text-slate-700"
                   >Engage with Peers</span
                 >
               </div>
@@ -271,7 +269,7 @@
                 class="text-2xl font-bold text-yellow-600 dark:text-yellow-400"
                 >{{ forumCount }}</span
               >
-              <span class="ml-2 text-sm text-slate-500 dark:text-slate-400"
+              <span class="ml-2 text-sm text-slate-700 dark:text-slate-700"
                 >new discussions this week</span
               >
             </div>
@@ -290,13 +288,13 @@
 
         <!-- Skeleton for Leaderboard Position Card -->
         <div
-          class="border-l-4 border-yellow-500 shadow-lg rounded-lg bg-white dark:bg-slate-800 overflow-hidden"
+          class="border-l-4 border-yellow-500 shadow-lg rounded-lg bg-white overflow-hidden"
           *ngIf="loading"
         >
           <div class="p-4 bg-purple-50 dark:bg-yellow-900/30">
             <p-skeleton
               width="2rem"
-              height="5rem"
+              height="2rem"
               styleClass="mb-2"
             ></p-skeleton>
           </div>
@@ -325,9 +323,7 @@
     <!-- Recent Quizzes -->
     <div class="mb-8">
       <div class="flex justify-between items-center mb-4">
-        <h2 class="text-2xl font-bold text-slate-800 dark:text-white">
-          Recent Quizzes
-        </h2>
+        <h2 class="text-2xl font-bold text-black">Recent Quizzes</h2>
 
         <p-skeleton width="8rem" height="2.5rem" *ngIf="loading"></p-skeleton>
       </div>
@@ -338,7 +334,7 @@
         <p-table
           [value]="recentQuizzes"
           [tableStyle]="{ 'min-width': '50rem' }"
-          styleClass="p-datatable-sm"
+          styleClass="p-datatable-sm bg-white"
           [rows]="5"
           *ngIf="!loading"
         >
@@ -399,7 +395,7 @@
         </p-table>
 
         <!-- Skeleton for table -->
-        <div class="p-4" *ngIf="loading">
+        <div class="p-4" *ngIf="loading"  class="bg-slate-200">
           <p-skeleton height="2rem" styleClass="mb-2"></p-skeleton>
           <p-skeleton height="3.5rem" styleClass="mb-2"></p-skeleton>
           <p-skeleton height="3.5rem" styleClass="mb-2"></p-skeleton>
@@ -416,9 +412,7 @@
     <!-- Achievements & Badges -->
     <div class="mb-10">
       <div class="flex justify-between items-center mb-20">
-        <h2 class="text-2xl font-bold text-slate-800 dark:text-white">
-          Achievements & Badges
-        </h2>
+        <h2 class="text-2xl font-bold text-black">Achievements & Badges</h2>
 
         <p-skeleton width="8rem" height="2.5rem" *ngIf="loading"></p-skeleton>
       </div>
@@ -478,9 +472,7 @@
               <!-- Title with improved styling -->
               <ng-template pTemplate="title">
                 <div class="flex items-center justify-center mt-2 pb-1">
-                  <span
-                    class="font-bold text-xl text-slate-800 dark:text-white tracking-tight"
-                  >
+                  <span class="font-bold text-xl text-black tracking-tight">
                     {{ badge.name }}
                   </span>
                   <i
@@ -492,7 +484,7 @@
               <!-- Subtitle with better readability -->
               <ng-template pTemplate="subtitle">
                 <p
-                  class="text-center text-slate-600 dark:text-slate-300 px-4 py-2 text-sm leading-relaxed"
+                  class="text-center text-slate-800 dark:text-slate-500 px-4 py-2 text-sm leading-relaxed"
                 >
                   {{ badge.description }}
                 </p>
@@ -506,7 +498,7 @@
                   <div class="flex items-center">
                     <i class="pi pi-star-fill text-amber-400 mr-1"></i>
                     <span
-                      class="text-xs font-medium text-slate-700 dark:text-slate-300"
+                      class="text-xs font-medium text-slate-700 dark:text-slate-800"
                       >{{ badge.name }}</span
                     >
                   </div>

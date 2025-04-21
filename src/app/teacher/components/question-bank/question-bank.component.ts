@@ -220,8 +220,8 @@ export class QuestionBankComponent {
   filterQuestions(event: any, field: keyof Question) {}
 
   onQuizChange = (event: any) => {
-    const title = event.value;
-    this.selectedQuiz.set(title);
+    // const title = event.value;
+    // this.selectedQuiz.set(title);
     this.hasSelectedQuiz = true;
   };
 }

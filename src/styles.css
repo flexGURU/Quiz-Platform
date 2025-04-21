@@ -9,6 +9,73 @@ body {
 }
 body {
   font-family: "Lexend", sans-serif;
+  color: #333 !important;
+}
+/* Force black text in dropdown */
+.p-dropdown {
+  color: black !important;
+}
+.black-text-select .p-dropdown-label,
+.black-text-select .p-dropdown-item {
+  color: black !important;
+}
+/* If you want the selected value to be black */
+.p-dropdown-label {
+  color: black !important;
+}
+
+/* If you want the options in the dropdown panel to be black */
+.p-dropdown-item {
+  color: black !important;
+}
+.p-select {
+  background-color: red !important;
+  color: #333 !important;
+}
+
+.p-select .p-dropdown,
+.p-select .p-dropdown {
+  background-color: #22c55e !important;
+
+  color: black !important;
+}
+
+.p-component {
+  background-color: white !important;
+  color: #333 !important;
+}
+
+.p-menubar {
+  background-color: green !important;
+}
+
+.p-radioButton {
+  background-color: white !important;
+}
+
+.p-button {
+  background-color: var(--primary-color, #22c55e) !important;
+  color: var(--primary-color-text, #ffffff) !important;
+}
+.p-datatable .p-datatable-thead > tr > th,
+.p-datatable .p-datatable-tbody > tr > td,
+.p-datatable .p-datatable-tfoot > tr > td {
+  background-color: white !important;
+  color: #333;
+}
+
+.p-datatable .p-datatable-wrapper,
+.p-datatable {
+  background-color: white !important;
+  color: #333;
+}
+.p-toast .p-toast-message .p-toast-summary,
+.p-toast .p-toast-message .p-toast-detail {
+  color: #000000 !important;
+  font-weight: 500;
+}
+.p-datatable-striped .p-datatable-tbody > tr:nth-child(even) {
+  background-color: #f8f9fa !important;
 }
 
 button,
@@ -31,11 +98,11 @@ textarea {
 }
 
 .input {
-  @apply p-2  border-2 my-2 rounded-xl border-green-500;
+  @apply p-2   border-2 my-2 rounded-xl border-green-500;
 }
 
 .login {
-  @apply p-2 border border-green-500 rounded-lg;
+  @apply p-2 border text-slate-600 border-slate-500 rounded-lg;
 }
 
 .custom-password .p-inputtext {

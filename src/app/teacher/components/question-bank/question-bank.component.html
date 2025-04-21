@@ -1,7 +1,9 @@
-<div class="grid">
-  <div class="p-2">
+<div class="grid min-h-screen">
+  <div class="p-2 bg-slate-200">
     <div class="p-4">
-      <h5 class="text-2xl font-bold mb-4 tracking-wider">Create a Quiz</h5>
+      <h5 class="text-2xl font-bold mb-4 tracking-wider text-black">
+        Create a Quiz
+      </h5>
 
       <!-- Action Buttons -->
       <div class="flex gap-10">
@@ -17,21 +19,23 @@
 
             <div>
               <label class="block m-2 tracking-wider">Select Quiz</label>
-              <p-select
-                [options]="quizList"
+              <select
+                class="text-black input"
                 [(ngModel)]="selectedQuiz"
-                optionLabel="title"
-                optionValue="id"
-                placeholder="Select Quiz"
-                (onChange)="onQuizChange($event)"
-                [showClear]="true"
-              ></p-select>
+                (change)="onQuizChange($event)"
+              >
+                <option value="" disabled selected>Select Quiz</option>
+                <option *ngFor="let quiz of quizList" [value]="quiz.id">
+                  {{ quiz.title }}
+                </option>
+              </select>
             </div>
           </div>
         </div>
 
         <div class="my-8">
           <p-fileUpload
+            chooseIcon="pi pi-upload"
             mode="basic"
             name="questions[]"
             accept=".xlsx,.xls"
@@ -67,8 +71,8 @@
               ></p-select>
             </div>
           </div> -->
-           </div>  
-          </div>
+        </div>
+      </div>
 
       <!-- Questions Table -->
       <div *ngIf="dbQuestions">
@@ -110,25 +114,26 @@
           </ng-template>
           <ng-template pTemplate="emptymessage">
             <tr>
-              <td
-                colspan="6"
-                class="text-center text-xl tracking-widest text-amber-400"
-              >
-                Upload Questions Using Bulk Import to view them here
+              <td colspan="6">
+                <span
+                  class="text-center text-xl tracking-widest text-amber-400"
+                >
+                  Upload Questions Using Bulk Import to view them here
+                </span>
               </td>
             </tr>
           </ng-template>
         </p-table>
 
         <div class="my-4 flex justify-end">
-          <p-button
-            label="Clear Upload"
-            class="p-button-lg"
-            icon="pi pi-times"
-            severity="danger"
-            [raised]="true"
+          <button
+            class="p-2 bg-amber-500 text-white cursor-pointer"
             (click)="clearUpload()"
-          ></p-button>
+            *ngIf="dbQuestions().length > 0"
+          >
+            <i class="pi pi-times"></i>
+            Clear Upload
+          </button>
           <p-button
             label="Create Quiz"
             class="p-button-lg"
@@ -174,7 +179,7 @@
       </div>
       <div class="mb-4">
         <label for="difficulty" class="label_modal">Add Difficulty Level</label>
-        <p-select
+        <!-- <p-select
           id="difficulty"
           formControlName="difficulty"
           [options]="difficultyLevels"
@@ -184,7 +189,23 @@
           appendTo="body"
           [showClear]="false"
           optionValue="value"
-        ></p-select>
+        ></p-select> -->
+
+        <select
+          name=""
+          id="difficulty"
+          formControlName="difficulty"
+          class="w-full p-2 border rounded"
+          required
+        >
+          <option value="" disabled selected>Select Difficulty</option>
+          <option
+            *ngFor="let difficulty of difficultyLevels"
+            value="difficulty.value"
+          >
+            {{ difficulty.label }}
+          </option>
+        </select>
       </div>
       <div>
         <label class="label_modal">Add Number of Questions</label>

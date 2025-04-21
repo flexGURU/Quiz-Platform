@@ -1,4 +1,4 @@
-<nav class="flex items-center justify-between p-10 shadow-md">
+<nav class="flex items-center justify-between p-10 shadow-md bg-white">
   <div class="flex items-center space-x-3">
     @if(userRole == 'student'){
 
@@ -8,7 +8,7 @@
     ></i>
 
     }
-    <span class="text-2xl font-semibold">
+    <span class="text-2xl font-semibold text-black">
       Welcome back,
       <span class="text-primary text-green-500 ml-3">
         {{ (userName$ | async)?.user_metadata?.['username'] || 'Guest' }}
@@ -17,11 +17,10 @@
   </div>
 
   <button
-    pButton
     type="button"
     label="Logout"
     icon="pi pi-sign-out"
-    class="p-button-danger p-button-outlined"
+    class="p-2 text-white rounded-lg cursor-pointer hover:bg-red-400 duration-300 bg-red-500"
     (click)="logout()"
-  ></button>
+  >Logout</button>
 </nav>

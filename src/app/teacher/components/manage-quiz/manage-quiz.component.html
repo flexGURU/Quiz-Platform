@@ -1,8 +1,8 @@
 <!-- quiz-management.component.html -->
-<div class="w-full p-4">
-  <div class="bg-slate-50 dark:bg-slate-900 rounded-lg shadow-md p-6 mb-6">
+<div class="w-full">
+  <div class="bg-white dark:bg-slate-200 shadow-md p-6 mb-6">
     <h2 class="text-2xl font-bold mb-2">Quiz Management</h2>
-    <p class="text-gray-400 mb-6">
+    <p class="text-gray-600 mb-6">
       Create and manage quizzes and their questions
     </p>
 
@@ -42,15 +42,16 @@
                   <button
                     pButton
                     icon="pi pi-pencil"
-                    class="p-button-rounded p-button-success p-button-sm mr-5"
+                    class="p-button-rounded p-button-success p-button-sm mb-3"
                     (click)="openQuizDialog(quiz); $event.stopPropagation()"
                   ></button>
                   <button
-                    pButton
                     icon="pi pi-trash"
-                    class="p-button-rounded p-button-danger p-button-sm"
+                    class="bg-red-500 p-2 w-10 h-10 text-white rounded-full cursor-pointer"
                     (click)="deleteQuiz(quiz.id); $event.stopPropagation()"
-                  ></button>
+                  >
+                    <i class="pi pi-trash"></i>
+                  </button>
                 </td>
               </tr>
             </ng-template>
@@ -124,7 +125,7 @@
                   </p-tag>
                 </td>
                 <td class="p-3 text-center">{{ question.points }}</td>
-                <td class="p-3 text-center">
+                <td class="p-3 text-center flex items-center">
                   <button
                     pButton
                     icon="pi pi-pencil"
@@ -132,11 +133,12 @@
                     (click)="openQuestionDialog(question)"
                   ></button>
                   <button
-                    pButton
                     icon="pi pi-trash"
-                    class="p-button-rounded p-button-danger p-button-sm"
+                    class="bg-red-500 p-2 w-10 h-10 text-white rounded-full cursor-pointer"
                     (click)="deleteQuestion(question.id)"
-                  ></button>
+                  >
+                    <i class="pi pi-trash"></i>
+                  </button>
                 </td>
               </tr>
             </ng-template>
@@ -289,7 +291,7 @@
           formControlName="question_text"
           rows="3"
           required
-          class="w-full input resize-y "
+          class="w-full input resize-y"
         ></textarea>
       </div>
 
@@ -310,9 +312,7 @@
         ></p-select>
       </div> -->
 
-      <div
-        class="mb-4"
-      >
+      <div class="mb-4">
         <label class="block text-sm font-medium text-green-500 mb-2"
           >Options</label
         >
@@ -375,7 +375,6 @@
               [options]="optionsArray.value"
               [disabled]="optionsArray.length === 0"
               appendTo="body"
-
             ></p-select>
           </div>
           <div *ngSwitchCase="'true_false'">

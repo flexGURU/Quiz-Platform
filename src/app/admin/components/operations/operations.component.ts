@@ -114,7 +114,6 @@ export class OperationsComponent {
       return;
     }
 
-
     const userForm = {
       email: userFormValues.email,
       password: userFormValues.password,
@@ -160,12 +159,21 @@ export class OperationsComponent {
       message: 'Are you sure you want to delete ' + user.full_name + '?',
       header: 'Confirm',
       icon: 'pi pi-exclamation-triangle',
-      accept: () => {},
+      accept: () => {
+        console.log('user', user.id);
+        this.userService.deleteUser(user.id).subscribe({
+          next: () => {
+            this.notification.showSuccess('Success', 'User deleted ');
+          },
+          error: () => {
+            this.notification.showError('Error', 'Deleting user');
+          },
+        });
+      },
     });
   }
 
   updateUser() {
-
     const updateValue: User = {
       email: this.userForm.getRawValue().email,
       full_name: this.userForm.getRawValue().full_name,
@@ -174,8 +182,7 @@ export class OperationsComponent {
 
     this.userService
       .updateUsers(this.userForm.getRawValue().id, updateValue)
-      .subscribe((response) => {
-      });
+      .subscribe((response) => {});
 
     this.messageService.add({
       severity: 'success',
