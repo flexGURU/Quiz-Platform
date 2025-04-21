@@ -18,12 +18,12 @@ import { ToastModule } from 'primeng/toast';
 import { FileUploadModule } from 'primeng/fileupload';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { MessagesModule } from 'primeng/messages';
-import { ConfirmationService } from 'primeng/api';
 import * as XLSX from 'xlsx';
 import { Questions, QuestionsDB, QuizDB, Topic } from '../../../shared/models';
 import { QuestionBankService } from '../../services/question-bank.service';
 import { NotificationService } from '../../../shared/services/notification.service';
 import { SelectModule } from 'primeng/select';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 
 interface Question {
   id: number;
@@ -39,6 +39,7 @@ interface Question {
 @Component({
   selector: 'app-question-bank',
   imports: [
+    ProgressSpinnerModule,
     ButtonModule,
     InputNumberModule,
     DropdownModule,
@@ -74,6 +75,8 @@ export class QuestionBankComponent {
   isEditing: boolean = false;
 
   difficultyLevels!: any[];
+
+  loadSpinner: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -202,11 +205,13 @@ export class QuestionBankComponent {
   }
 
   createQuizz = () => {
+    this.loadSpinner = true;
     this.supabaseService.addQuestions(this.dbQuestions()).subscribe({
       next: (resp) => {
         this.notification.showSuccess('Quiz', 'Quiz added successfully!');
         this.dbQuestions.set([]);
         this.selectedQuiz.set('');
+        this.loadSpinner = false;
       },
       error: (err) => {
         console.error('🚨 Error Adding Questions:', err.message);

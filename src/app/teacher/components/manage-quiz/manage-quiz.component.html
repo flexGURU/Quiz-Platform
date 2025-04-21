@@ -2,7 +2,7 @@
 <div class="w-full">
   <div class="bg-white dark:bg-slate-200 shadow-md p-6 mb-6">
     <h2 class="text-2xl font-bold mb-2">Quiz Management</h2>
-    <p class="text-gray-600 mb-6">
+    <p class="text-gray-400 mb-6">
       Create and manage quizzes and their questions
     </p>
 
@@ -38,20 +38,19 @@
               >
                 <td class="p-3">{{ quiz.title }}</td>
                 <td class="p-3">{{ quiz.subject }}</td>
-                <td class="p-3 text-center">
+                <td class="p-3 text-center flex">
                   <button
                     pButton
                     icon="pi pi-pencil"
-                    class="p-button-rounded p-button-success p-button-sm mb-3"
+                    class="p-button-rounded p-button-success p-button-sm mr-2"
                     (click)="openQuizDialog(quiz); $event.stopPropagation()"
                   ></button>
                   <button
+                    pButton
                     icon="pi pi-trash"
-                    class="bg-red-500 p-2 w-10 h-10 text-white rounded-full cursor-pointer"
+                    class="p-button-rounded b p-button-danger p-button-sm"
                     (click)="deleteQuiz(quiz.id); $event.stopPropagation()"
-                  >
-                    <i class="pi pi-trash"></i>
-                  </button>
+                  ></button>
                 </td>
               </tr>
             </ng-template>
@@ -97,7 +96,6 @@
           <p-table
             *ngIf="!loadSpinner"
             [value]="questions"
-            [paginator]="true"
             [rows]="10"
             [rowHover]="true"
             styleClass="p-datatable-sm border rounded-lg border-green-500"
@@ -125,7 +123,7 @@
                   </p-tag>
                 </td>
                 <td class="p-3 text-center">{{ question.points }}</td>
-                <td class="p-3 text-center flex items-center">
+                <td class="p-3 text-center">
                   <button
                     pButton
                     icon="pi pi-pencil"
@@ -133,12 +131,11 @@
                     (click)="openQuestionDialog(question)"
                   ></button>
                   <button
+                    pButton
                     icon="pi pi-trash"
-                    class="bg-red-500 p-2 w-10 h-10 text-white rounded-full cursor-pointer"
+                    class="p-button-rounded p-button-danger p-button-sm"
                     (click)="deleteQuestion(question.id)"
-                  >
-                    <i class="pi pi-trash"></i>
-                  </button>
+                  ></button>
                 </td>
               </tr>
             </ng-template>
@@ -229,6 +226,7 @@
           optionLabel="label"
           optionValue="value"
           styleClass="w-full"
+          appendTo="body"
         ></p-select>
       </div>
 

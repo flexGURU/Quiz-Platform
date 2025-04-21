@@ -1,8 +1,7 @@
 @import "tailwindcss";
 @import "primeicons/primeicons.css";
-@import "../node_modules/quill/dist/quill.core.css";
-@import "../node_modules/quill/dist/quill.snow.css";
 
+/* OR Aura Light Theme */
 html,
 body {
   height: 100%;
@@ -11,78 +10,17 @@ body {
   font-family: "Lexend", sans-serif;
   color: #333 !important;
 }
-/* Force black text in dropdown */
-.p-dropdown {
-  color: black !important;
-}
-.black-text-select .p-dropdown-label,
-.black-text-select .p-dropdown-item {
-  color: black !important;
-}
-/* If you want the selected value to be black */
-.p-dropdown-label {
-  color: black !important;
-}
-
-/* If you want the options in the dropdown panel to be black */
-.p-dropdown-item {
-  color: black !important;
-}
-.p-select {
-  background-color: red !important;
-  color: #333 !important;
-}
-
-.p-select .p-dropdown,
-.p-select .p-dropdown {
-  background-color: #22c55e !important;
-
-  color: black !important;
-}
-
-.p-component {
-  background-color: white !important;
-  color: #333 !important;
-}
-
-.p-menubar {
-  background-color: green !important;
-}
-
-.p-radioButton {
-  background-color: white !important;
-}
-
-.p-button {
-  background-color: var(--primary-color, #22c55e) !important;
-  color: var(--primary-color-text, #ffffff) !important;
-}
-.p-datatable .p-datatable-thead > tr > th,
-.p-datatable .p-datatable-tbody > tr > td,
-.p-datatable .p-datatable-tfoot > tr > td {
-  background-color: white !important;
-  color: #333;
-}
-
-.p-datatable .p-datatable-wrapper,
-.p-datatable {
-  background-color: white !important;
-  color: #333;
-}
-.p-toast .p-toast-message .p-toast-summary,
-.p-toast .p-toast-message .p-toast-detail {
-  color: #000000 !important;
-  font-weight: 500;
-}
-.p-datatable-striped .p-datatable-tbody > tr:nth-child(even) {
-  background-color: #f8f9fa !important;
-}
 
 button,
 input,
 select,
 textarea {
   font-family: inherit;
+}
+
+.p-menubar {
+  background-color: black !important;
+  color: #333 !important;
 }
 
 .card {
@@ -94,11 +32,11 @@ textarea {
 }
 
 .label_modal {
-  @apply block text-green-500 mb-2 font-bold;
+  @apply block text-green-500 mb-2 ;
 }
 
 .input {
-  @apply p-2   border-2 my-2 rounded-xl border-green-500;
+  @apply p-2  my-2 rounded-md border border-slate-300;
 }
 
 .login {
@@ -112,4 +50,3 @@ textarea {
 .menu-link a {
   @apply text-white transition-colors duration-300;
 }
-

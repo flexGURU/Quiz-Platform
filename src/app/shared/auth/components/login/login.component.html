@@ -4,7 +4,7 @@
 } @if (!isLoading) {
 <div class="flex min-h-screen bg-white">
   <div
-    class="m-auto border  bg-slate-50 rounded-lg shadow-lg p-8 max-w-md w-full"
+    class="m-auto border bg-slate-50 rounded-lg shadow-lg p-8 max-w-md w-full"
   >
     <div class="text-center mb-8">
       <h1 class="text-3xl font-semibold mb-2 text-black">Welcome</h1>
@@ -45,7 +45,9 @@
       </div>
 
       <div class="p-field">
-        <label for="login-password" class="block mb-2 font-medium text-slate-800"
+        <label
+          for="login-password"
+          class="block mb-2 font-medium text-slate-800"
           >Password</label
         >
         <span class="p-input-icon-left w-full">
@@ -56,8 +58,8 @@
             [feedback]="false"
             [inputStyle]="{
               width: '100%',
-              'background-color': '#1f2937',
-              color: 'white',
+              color: 'black',
+
             }"
             styleClass="w-full dark-password"
             placeholder="Enter your password"
@@ -93,4 +95,5 @@
   </div>
 </div>
 }
+
 <p-toast></p-toast>

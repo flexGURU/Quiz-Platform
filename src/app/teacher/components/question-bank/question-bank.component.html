@@ -1,4 +1,4 @@
-<div class="grid min-h-screen">
+<div *ngIf="!loadSpinner" class="grid">
   <div class="p-2 bg-slate-200">
     <div class="p-4">
       <h5 class="text-2xl font-bold mb-4 tracking-wider text-black">
@@ -19,16 +19,17 @@
 
             <div>
               <label class="block m-2 tracking-wider">Select Quiz</label>
-              <select
-                class="text-black input"
+              <p-select
+                [options]="quizList"
                 [(ngModel)]="selectedQuiz"
-                (change)="onQuizChange($event)"
-              >
-                <option value="" disabled selected>Select Quiz</option>
-                <option *ngFor="let quiz of quizList" [value]="quiz.id">
-                  {{ quiz.title }}
-                </option>
-              </select>
+                optionLabel="title"
+                optionValue="id"
+                placeholder="Select Quiz"
+                (onChange)="onQuizChange($event)"
+                [showClear]="true"
+              ></p-select>
+
+              <select formControlName="" id=""></select>
             </div>
           </div>
         </div>
@@ -87,7 +88,7 @@
               <th>Question</th>
               <th>Type</th>
               <th>Options</th>
-              <th>Points</th>
+              <th>Correct Answer</th>
             </tr>
           </ng-template>
           <ng-template pTemplate="body" let-question>
@@ -126,14 +127,15 @@
         </p-table>
 
         <div class="my-4 flex justify-end">
-          <button
-            class="p-2 bg-amber-500 text-white cursor-pointer"
-            (click)="clearUpload()"
+          <p-button
             *ngIf="dbQuestions().length > 0"
-          >
-            <i class="pi pi-times"></i>
-            Clear Upload
-          </button>
+            label="Clear Upload"
+            class="p-button-lg"
+            icon="pi pi-times"
+            severity="danger"
+            [raised]="true"
+            (click)="clearUpload()"
+          ></p-button>
           <p-button
             label="Create Quiz"
             class="p-button-lg"
@@ -164,7 +166,7 @@
           pInputText
           formControlName="title"
           [required]="true"
-          class="w-full p-2 border rounded"
+          class="input w-full"
         />
       </div>
       <div class="mb-4">
@@ -174,12 +176,12 @@
           pInputText
           formControlName="subject"
           [required]="true"
-          class="w-full p-2 border rounded"
+          class="input w-full"
         />
       </div>
       <div class="mb-4">
         <label for="difficulty" class="label_modal">Add Difficulty Level</label>
-        <!-- <p-select
+        <p-select
           id="difficulty"
           formControlName="difficulty"
           [options]="difficultyLevels"
@@ -189,32 +191,15 @@
           appendTo="body"
           [showClear]="false"
           optionValue="value"
-        ></p-select> -->
-
-        <select
-          name=""
-          id="difficulty"
-          formControlName="difficulty"
-          class="w-full p-2 border rounded"
-          required
-        >
-          <option value="" disabled selected>Select Difficulty</option>
-          <option
-            *ngFor="let difficulty of difficultyLevels"
-            value="difficulty.value"
-          >
-            {{ difficulty.label }}
-          </option>
-        </select>
+        ></p-select>
       </div>
       <div>
         <label class="label_modal">Add Number of Questions</label>
-        <input
-          type="number"
-          pInputText
+
+        <p-inputnumber
+          inputId="integeronly"
           formControlName="numberofquestions"
           [required]="true"
-          class="w-full p-2 border rounded"
         />
       </div>
     </form>
@@ -244,3 +229,12 @@
 
 <p-toast></p-toast>
 <p-confirmDialog [style]="{ width: '450px' }"></p-confirmDialog>
+<div *ngIf="loadSpinner" class="flex flex-col items-center justify-center">
+  <p-progress-spinner
+    strokeWidth="8"
+    fill="transparent"
+    animationDuration=".5s"
+    [style]="{ width: '50px', height: '50px', stroke: 'green' }"
+  />
+  <span>Adding Questions to the Quiz</span>
+</div>

@@ -1,6 +1,6 @@
 <div class="flex justify-center bg-slate-200 min-h-screen p-8">
   <!-- HTML Template -->
-  <div class="p-8 w-11/12 flex flex-col gap-4">
+  <div class="p-8 w-11/12 flex flex-col gap-8">
     <h2 class="mb-4 text-3xl">User Management</h2>
 
     <!-- Add New User Button -->
@@ -57,15 +57,23 @@
           <td>{{ user.email }}</td>
           <td>{{ user.role }}</td>
           <td class="">
-            <i
-              class="pi pi-pencil bg-green-500 p-2 text-white rounded-lg mr-2 cursor-pointer"
+            <p-button
+              icon="pi pi-pencil"
+              pTooltip="Edit User"
+              tooltipPosition="top"
               (click)="editUser(user)"
-            ></i>
-
-            <i
-              class="pi pi-check bg-red-500 p-2 text-white rounded-lg cursor-pointer"
+              styleClass="p-button-lg p-button-outlined p-button-primary mr-2"
+              class="mr-2"
+            >
+            </p-button>
+            <p-button
+              icon="pi pi-trash"
+              pTooltip="Delete User"
+              tooltipPosition="top"
               (click)="confirmDelete(user)"
-            ></i>
+              styleClass="p-button-lg p-button-outlined p-button-danger"
+            >
+            </p-button>
           </td>
         </tr>
       </ng-template>
@@ -90,7 +98,7 @@
     <ng-template pTemplate="content">
       <form [formGroup]="userForm" class="p-3">
         <div class="p-field mb-3">
-          <label for="name" class="block mb-1 ml-5">Name</label>
+          <label for="name" class="block mb-1">Name</label>
           <input
             type="text"
             pInputText
@@ -101,7 +109,7 @@
         </div>
 
         <div class="p-field mb-3">
-          <label for="email" class="block mb-1 ml-5">Email</label>
+          <label for="email" class="block mb-1 ">Email</label>
           <input
             type="email"
             pInputText
@@ -113,16 +121,17 @@
 
         <div class="p-field mb-3">
           <label for="role" class="block mb-1">Role</label>
-          <select
+          <p-select
             id="role"
+            [options]="roleOptions"
             formControlName="role"
-            class="w-full text-black input"
-          >
-            <option value="" disabled selected>Select a Role</option>
-            <option *ngFor="let option of roleOptions" [value]="option.value">
-              {{ option.label }}
-            </option>
-          </select>
+            placeholder="Select a Role"
+            optionLabel="label"
+            optionValue="value"
+            appendTo="body"
+            class="w-full text-black"
+            [style]="{ color: 'black', background: 'white' }"
+          ></p-select>
         </div>
 
         <div class="p-field mb-3" *ngIf="isNewUser">

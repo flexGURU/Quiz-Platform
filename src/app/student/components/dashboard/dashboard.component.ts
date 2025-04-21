@@ -21,7 +21,7 @@ export interface Badge {
   id: string;
   name: string;
   description: string;
-  image_url: string;
+  icon: string;
   points_threshold: number;
 }
 const STATIC_BADGES: Badge[] = [
@@ -29,24 +29,24 @@ const STATIC_BADGES: Badge[] = [
     id: 'explorer',
     name: 'Knowledge Explorer',
     description: 'Mastered 50 points in easy quizzes - Solid fundamentals!',
-    image_url: '/badges/explorer.png',
+    icon: 'fa-brands fa-wpexplorer', 
     points_threshold: 300,
   },
   {
     id: 'challenger',
     name: 'Skilled Challenger',
-    description:
-      'Earned 150 points in medium quizzes - Tackling complex problems!',
-    image_url: '/badges/challenger.png',
+    description: 'Earned 150 points in medium quizzes - Tackling complex problems!',
+    icon: 'fa-solid fa-brain', 
     points_threshold: 500,
   },
   {
     id: 'mastermind',
     name: 'Expert Mastermind',
     description: 'Achieved 200 points in hard quizzes - Top-tier performance!',
-    image_url: '/badges/mastermind.png',
+    icon: 'fa-solid fa-meteor', 
     points_threshold: 1000,
   },
+  
 ];
 
 @Component({

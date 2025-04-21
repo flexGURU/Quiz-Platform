@@ -348,7 +348,7 @@
           </ng-template>
           <ng-template #body let-quizz>
             <tr class="hover:bg-slate-50 dark:hover:bg-slate-700">
-              <td class="text-slate-700 dark:text-slate-300 font-medium">
+              <td class="text-slate-700  font-medium">
                 {{ quizz.name }}
               </td>
               <td>
@@ -395,7 +395,7 @@
         </p-table>
 
         <!-- Skeleton for table -->
-        <div class="p-4" *ngIf="loading"  class="bg-slate-200">
+        <div class="p-4" *ngIf="loading" class="bg-slate-200">
           <p-skeleton height="2rem" styleClass="mb-2"></p-skeleton>
           <p-skeleton height="3.5rem" styleClass="mb-2"></p-skeleton>
           <p-skeleton height="3.5rem" styleClass="mb-2"></p-skeleton>
@@ -460,11 +460,8 @@
                     <div
                       class="absolute -inset-1 rounded-full bg-white dark:bg-slate-700 opacity-20 blur"
                     ></div>
-                    <img
-                      [src]="badge.image_url"
-                      alt="{{ badge.name }}"
-                      class="w-24 h-24 object-contain drop-shadow-lg"
-                    />
+                    <i class=""></i>
+                    <i class="{{ badge.icon }} text-8xl "></i>
                   </div>
                 </div>
               </ng-template>
