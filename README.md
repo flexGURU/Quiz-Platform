@@ -1,32 +1,5 @@
-# CSC3094 Dissertation: Gamified Quiz Application with Role-Based Access Control
+#  Gamified Quiz Application Angular
 
-## 1. Introduction
-
-### Motivation
-- Growing demand for interactive e-learning tools in post-pandemic education
-- Need for adaptive assessment systems that reward progressive learning
-- Gap in existing solutions: lack of integrated point-based motivation systems with granular RBAC
-
-### Aims & Objectives (SMART Framework)
-1. **Specific**: Develop an Angular/Supabase quiz app with 3-tier role management (admin/teacher/student)
-2. **Measurable**: Implement 5 core features (bulk quiz import, timed tests, scoring, leaderboard, RBAC)
-3. **Achievable**: Leverage Supabase BaaS for 90% backend functionality
-4. **Relevant**: Aligns with digital education trends (QAA Digital Literacy Framework)
-5. **Time-bound**: 12-week development cycle
-
-### Dissertation Structure
-1. Background review of EdTech systems
-2. System architecture decisions
-3. Implementation challenges
-4. Evaluation against learning outcomes
-5. Future enhancements
-
-## 2. Background Review
-
-### Key Literature
-- **Pedagogical Foundations**:
-  - Bloom's Taxonomy for question difficulty levels (Anderson & Krathwohl, 2001)
-  - Gamification in education (Deterding et al., 2011)
 
 ### Technical Landscape
 - **Supabase Advantages**:
@@ -48,3 +21,30 @@ graph TD
     B --> C[(PostgreSQL DB)]
     C --> D[Triggers]
     D --> E[Points Calculation]
+```
+
+### Optimisation 
+- Lazy Loading modules i.e students, teacher, admin
+- angular Query for state management
+- observable pattern for consuming API
+- signals for better reactivity
+![image](https://github.com/user-attachments/assets/d3c02b25-0e34-457d-9adc-13b71810cfd5)
+![image](https://github.com/user-attachments/assets/72c1f8f0-1a7a-4196-8f15-69a35936eb38)
+![image](https://github.com/user-attachments/assets/6dcac69f-c26e-4de6-a47c-f24375c0a8c4)
+![image](https://github.com/user-attachments/assets/4328fe1f-ad50-48bc-9f3b-e2bc6fe802c8)
+![image](https://github.com/user-attachments/assets/705cffce-0e0a-4f60-9553-22c6ba6254a9)
+![image](https://github.com/user-attachments/assets/43ecf938-4e8b-453c-9e3f-a280b1f8803a)
+![image](https://github.com/user-attachments/assets/b56ae2d5-877b-4da9-b108-3fa3a1208cef)
+![image](https://github.com/user-attachments/assets/cce13565-76a4-4086-918e-3a655421af0c)
+![image](https://github.com/user-attachments/assets/f2378347-98f6-4740-8878-3f6660765c68)
+![image](https://github.com/user-attachments/assets/7c643ff6-c963-4e1e-94c5-4bd6514b96c0)
+
+
+
+
+
+
+
+
+
+
